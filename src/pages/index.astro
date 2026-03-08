@@ -1,26 +1,22 @@
 ---
-import '@/styles/global.css'
-import { Button } from '@/components/ui/button'
+import LandingLayout from '@/layouts/landing-layout.astro'
+import { CapabilitiesSection } from '@/components/sections/capabilities'
+import { ProcessSection } from '@/components/sections/process'
+import { CaseStudiesSection } from '@/components/sections/case-studies'
+import { TestimonialsSection } from '@/components/sections/testimonials'
+import { ToolstackSection } from '@/components/sections/toolstack'
+import { PricingSection } from '@/components/sections/pricing'
+import { FaqSection } from '@/components/sections/faq'
+import { CtaSection } from '@/components/sections/cta'
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body class="flex min-h-screen items-center justify-center">
-		<div class="flex flex-col items-center gap-4">
-			<h1 class="text-4xl font-bold">Astro</h1>
-			<div class="flex gap-2">
-				<Button client:load>Default</Button>
-				<Button client:load variant="secondary">Secondary</Button>
-				<Button client:load variant="outline">Outline</Button>
-				<Button client:load variant="destructive">Destructive</Button>
-			</div>
-		</div>
-	</body>
-</html>
+<LandingLayout title="ilzam.dev">
+	<CapabilitiesSection client:load />
+	<ProcessSection client:load />
+	<CaseStudiesSection client:load />
+	<TestimonialsSection client:load />
+	<ToolstackSection client:load />
+	<PricingSection client:load />
+	<FaqSection client:load />
+	<CtaSection client:load />
+</LandingLayout>
