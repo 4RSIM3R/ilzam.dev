@@ -1,0 +1,55 @@
+# Ilzam — Fractional CTO & Full-Stack Developer
+
+> I help early-stage founders build and ship their product — acting as fractional CTO with AI-assisted development. Based in Indonesia, working globally.
+
+## About
+
+Ilzam is a full-stack developer turned fractional CTO. He has shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently works embedded in a San Francisco AI company — remotely from East Java, Indonesia. He builds with Go, React, TypeScript, .NET MAUI, and PostgreSQL. He thinks in systems, not tickets.
+
+## Services
+
+### Fractional CTO
+Senior technical judgment, without the full-time salary. For founders who need someone to own the technical side — architecture decisions, stack choices, vendor evaluation, team hiring, sprint planning — without committing to a $150k/year hire.
+
+### MVP Development
+From whiteboard to deployed. In weeks, not months. AI-assisted development that moves at 2-3x the speed of a traditional agency while writing production-quality code. Most MVPs ship in 6-10 weeks.
+
+### Technical Advisory
+A one-time or recurring session for founders who need a second opinion — on a vendor proposal, an agency quote, a build vs buy decision, or a technology choice.
+
+## Tech Stack
+
+- Languages: Go, TypeScript, JavaScript, PHP, C#, Dart
+- Frontend: React, .NET MAUI, Flutter, Tailwind CSS, Astro
+- Backend: Go Fiber, Node.js, Express, Laravel, .NET
+- Data & Infra: PostgreSQL, MySQL, Redis, Docker, Kubernetes, AWS
+- Architecture: Event-driven, microservices, REST APIs, RAG pipelines, hybrid search
+
+## Proof Points
+
+- 15+ MVPs shipped
+- Reduced infrastructure costs by 80% for a healthcare network
+- Rebuilt a KOL platform from 85% to 99% uptime, serving 5,000+ users
+- Introduced methodology that cut requirement analysis time by 75%
+- Guided 60+ vocational teachers through technical upskilling
+- Currently embedded in a San Francisco AI company as full-stack developer
+
+## Things I've Shipped
+
+- Chef Booking Marketplace (Scandinavia) — Two-sided marketplace, 10 weeks, one engineer. Go, React, PostgreSQL, Stripe Connect, Redis.
+- AI Knowledge Pipeline (San Francisco, US) — RAG that actually retrieves the right thing. Go, PostgreSQL, pgvector, BM25, Markdown AST.
+- KOL Management Platform Rebuild (Jakarta, Indonesia) — 85% to 99% uptime. 5,000+ users. Full-stack rebuild, team lead.
+- Government Vocational Dashboard (Indonesia) — Centralizing education data for a national directorate. REST API, recommender system, data dashboard.
+
+## Contact
+
+- Website: https://ilzam.dev
+- Email: ilzammulkhaq85@gmail.com
+- Book a call: https://cal.com/ilzam/intro
+- Advisory session: https://cal.com/ilzam/advisory
+- GitHub: https://github.com/ilzam
+- LinkedIn: https://linkedin.com/in/ilzam
+
+## Location
+
+Pasuruan, East Java, Indonesia — working remotely with clients in the US, Europe, and Southeast Asia.
