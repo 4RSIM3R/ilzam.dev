@@ -142,7 +142,7 @@ export function CapabilitiesSection() {
         </div>
 
         {/* Right — dynamic card */}
-        <div className="flex items-start justify-center">
+        <div className="flex items-start justify-center md:sticky md:top-20">
           <AnimatePresence mode="wait">
             <motion.div
               key={active}

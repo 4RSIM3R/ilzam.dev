@@ -1,33 +1,22 @@
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import {
-  MessageCircleQuestionIcon,
-  GitForkIcon,
-  CodeIcon,
-  BarChart3Icon,
-} from "lucide-react"
-
 const steps = [
   {
-    icon: MessageCircleQuestionIcon,
     title: "Understand the Problem",
     description:
       "Before touching any code, I ask the question most developers skip: 'Why are we building this?' I dig into your business goals, user needs, and constraints. This is where 80% of bad technical decisions get prevented.",
   },
   {
-    icon: GitForkIcon,
     title: "Make the Hard Calls",
     description:
       "Stack selection. Build vs buy. Monolith vs microservices. I make these decisions with you based on your stage, budget, and timeline — not based on what's trendy. I've seen what works at startup scale and what becomes technical debt by month six.",
   },
   {
-    icon: CodeIcon,
     title: "Ship It",
     description:
       "I build with AI-assisted development — moving at 2-3x the speed of a traditional agency while writing production-quality code. Go, React, TypeScript, PostgreSQL. You get weekly updates, working demos, and zero surprises.",
   },
   {
-    icon: BarChart3Icon,
     title: "Measure and Improve",
     description:
       "Launch isn't the finish line. I set up monitoring, review real user data, and help you prioritize what to build next. The goal is a product that works in production — not just in a demo.",
@@ -66,7 +55,6 @@ export function ProcessSection() {
               <span className="flex size-8 items-center justify-center rounded-full bg-muted text-sm font-semibold">
                 {i + 1}
               </span>
-              <step.icon className="size-4 text-muted-foreground" />
               <h3 className="text-base font-semibold">{step.title}</h3>
             </div>
             <p className="text-sm leading-relaxed text-muted-foreground">

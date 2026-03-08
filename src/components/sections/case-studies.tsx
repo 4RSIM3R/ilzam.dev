@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
+import { ArrowUpRightIcon } from "lucide-react"
 
 const caseStudies = [
   {
@@ -8,6 +9,7 @@ const caseStudies = [
     label: "Marketplace",
     region: "Scandinavia",
     year: "2024",
+    slug: "chef-booking-marketplace",
     stack: ["Go", "React", "PostgreSQL", "Stripe Connect", "Redis"],
     brief:
       "Built a complete chef booking platform from zero — matching customers with private chefs, handling payments through Stripe Connect, and managing real-time availability.",
@@ -18,6 +20,7 @@ const caseStudies = [
     label: "AI / RAG",
     region: "San Francisco, US",
     year: "2025",
+    slug: "ai-knowledge-pipeline",
     stack: ["Go", "PostgreSQL", "pgvector", "BM25", "Markdown AST"],
     brief:
       "Designed and built a retrieval-augmented generation pipeline with hybrid search — combining vector similarity and BM25 keyword matching for accurate document retrieval.",
@@ -28,6 +31,7 @@ const caseStudies = [
     label: "Platform Rebuild",
     region: "Jakarta, Indonesia",
     year: "2024",
+    slug: "kol-platform-rebuild",
     stack: ["Full-stack rebuild", "Team lead"],
     brief:
       "Led the technical rebuild of a KOL management platform. Took uptime from 85% to 99%, introduced proper architecture, and scaled to serve 5,000+ daily active users.",
@@ -38,6 +42,7 @@ const caseStudies = [
     label: "Government Tech",
     region: "Indonesia",
     year: "2023",
+    slug: "vocational-dashboard",
     stack: ["REST API", "Recommender system", "Data dashboard"],
     brief:
       "Built a centralized dashboard for Indonesia's vocational education directorate — pulling data from multiple sources into a single view with a recommendation engine.",
@@ -74,39 +79,45 @@ export function CaseStudiesSection() {
       {/* Cards */}
       <div className="mt-12 grid gap-6 md:grid-cols-2">
         {caseStudies.map((study) => (
-          <Card
+          <a
             key={study.title}
-            className="group gap-0 overflow-hidden border p-0"
+            href={`/work/${study.slug}`}
+            className="group"
           >
-            <CardContent className="p-5">
-              <div className="mb-3 flex items-center justify-between">
-                <Badge variant="secondary" className="text-xs uppercase">
-                  {study.label}
-                </Badge>
-                <span className="text-xs text-muted-foreground">
-                  {study.region} / {study.year}
-                </span>
-              </div>
-              <h3 className="text-lg font-semibold">{study.title}</h3>
-              <p className="mt-1 text-sm font-medium text-muted-foreground">
-                {study.subtitle}
-              </p>
-              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                {study.brief}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-1.5">
-                {study.stack.map((tech) => (
-                  <Badge
-                    key={tech}
-                    variant="outline"
-                    className="rounded-full text-xs font-normal"
-                  >
-                    {tech}
+            <Card className="gap-0 overflow-hidden border p-0 transition-shadow group-hover:shadow-md">
+              <CardContent className="p-5">
+                <div className="mb-3 flex items-center justify-between">
+                  <Badge variant="secondary" className="text-xs uppercase">
+                    {study.label}
                   </Badge>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  <span className="text-xs text-muted-foreground">
+                    {study.region} / {study.year}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-semibold">{study.title}</h3>
+                  <ArrowUpRightIcon className="size-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                </div>
+                <p className="mt-1 text-sm font-medium text-muted-foreground">
+                  {study.subtitle}
+                </p>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {study.brief}
+                </p>
+                <div className="mt-4 flex flex-wrap gap-1.5">
+                  {study.stack.map((tech) => (
+                    <Badge
+                      key={tech}
+                      variant="outline"
+                      className="rounded-full text-xs font-normal"
+                    >
+                      {tech}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </a>
         ))}
       </div>
 
