@@ -1,0 +1,87 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+
+const caseStudies = [
+	{
+		title: "Chef Booking Marketplace",
+		subtitle: "Two-sided marketplace, 10 weeks, one engineer.",
+		label: "Marketplace",
+		region: "Scandinavia",
+		year: "2024",
+		slug: "chef-booking-marketplace",
+		stack: ["Go", "React", "PostgreSQL", "Stripe Connect", "Redis"],
+	},
+	{
+		title: "AI Knowledge Pipeline",
+		subtitle: "RAG that actually retrieves the right thing.",
+		label: "AI / RAG",
+		region: "San Francisco, US",
+		year: "2025",
+		slug: "ai-knowledge-pipeline",
+		stack: ["Go", "PostgreSQL", "pgvector", "BM25", "Markdown AST"],
+	},
+	{
+		title: "KOL Platform Rebuild",
+		subtitle: "85% to 99% uptime. 5,000+ users. One team.",
+		label: "Platform Rebuild",
+		region: "Jakarta, Indonesia",
+		year: "2024",
+		slug: "kol-platform-rebuild",
+		stack: ["Full-stack rebuild", "Team lead"],
+	},
+	{
+		title: "Vocational Dashboard",
+		subtitle: "Centralizing education data for a national directorate.",
+		label: "Government Tech",
+		region: "Indonesia",
+		year: "2023",
+		slug: "vocational-dashboard",
+		stack: ["REST API", "Recommender system", "Data dashboard"],
+	},
+]
+---
+
+<ContentLayout
+	title="Things I've Shipped — Ilzam"
+	description="Case studies from 15+ MVPs shipped across marketplaces, SaaS, AI pipelines, and government systems. Most details are under NDA — here's what I can share."
+>
+	<h1 class="text-4xl font-light leading-tight tracking-tight md:text-5xl">
+		Things I've Shipped
+	</h1>
+	<p class="mt-4 text-muted-foreground">
+		Most details are under NDA. Here's what I can share.
+	</p>
+
+	<div class="mt-12 grid gap-6">
+		{caseStudies.map((study) => (
+			<a href={`/work/${study.slug}`} class="group block rounded-lg border p-5 transition-shadow hover:shadow-md">
+				<div class="flex items-center justify-between">
+					<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">{study.label}</span>
+					<span class="text-xs text-muted-foreground">{study.region} / {study.year}</span>
+				</div>
+				<h2 class="mt-3 text-lg font-semibold group-hover:underline">{study.title}</h2>
+				<p class="mt-1 text-sm text-muted-foreground">{study.subtitle}</p>
+				<div class="mt-3 flex flex-wrap gap-1.5">
+					{study.stack.map((tech) => (
+						<span class="rounded-full border px-2 py-0.5 text-xs">{tech}</span>
+					))}
+				</div>
+			</a>
+		))}
+	</div>
+
+	<div class="mt-12 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Working on something that could be next?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			Book a free 30-minute intro call. No pitch, no pressure.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book a Call
+		</a>
+	</div>
+</ContentLayout>

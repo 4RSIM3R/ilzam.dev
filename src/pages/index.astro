@@ -16,8 +16,8 @@ const personSchema = {
 	"jobTitle": "Fractional CTO & Full-Stack Developer",
 	"url": "https://ilzam.dev",
 	"sameAs": [
-		"https://github.com/ilzam",
-		"https://linkedin.com/in/ilzam"
+		"https://github.com/4RSIM3R/",
+		"https://www.linkedin.com/in/ilzam-mulkhaq/"
 	],
 	"knowsAbout": ["Go", "React", "TypeScript", ".NET MAUI", "PostgreSQL", "AWS", "UI/UX Design"],
 	"address": {
@@ -94,6 +94,17 @@ const faqSchema = {
 	<PricingSection client:load />
 	<FaqSection client:load />
 	<CtaSection client:load />
+	<footer class="border-t px-6 py-8 md:px-10">
+		<div class="flex flex-col gap-4 text-sm md:flex-row md:items-center md:justify-between">
+			<p class="text-muted-foreground">Building from East Java. Shipping to the world.</p>
+			<nav class="flex gap-6">
+				<a href="/work" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Work</a>
+				<a href="/notes" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Notes</a>
+				<a href="https://github.com/4RSIM3R/" target="_blank" rel="noopener noreferrer" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">GitHub</a>
+				<a href="https://www.linkedin.com/in/ilzam-mulkhaq/" target="_blank" rel="noopener noreferrer" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">LinkedIn</a>
+			</nav>
+		</div>
+	</footer>
 	<script type="application/ld+json" set:html={JSON.stringify(personSchema)} />
 	<script type="application/ld+json" set:html={JSON.stringify(faqSchema)} />
 </LandingLayout>

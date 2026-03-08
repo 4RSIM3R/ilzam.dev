@@ -1,0 +1,87 @@
+---
+import '@/styles/global.css'
+
+interface Props {
+	title: string
+	description: string
+	canonicalUrl?: string
+	ogImage?: string
+}
+
+const {
+	title,
+	description,
+	canonicalUrl = Astro.url.href,
+	ogImage = '/profile.jpeg',
+} = Astro.props
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://ilzam.dev'
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="author" content="Ilzam" />
+		<link rel="canonical" href={canonicalUrl} />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="article" />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:site_name" content="ilzam.dev" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageUrl} />
+	</head>
+	<body class="bg-background text-foreground antialiased">
+		<header class="sticky top-0 z-20 flex h-14 items-center justify-between border-b bg-background/80 px-6 backdrop-blur-sm">
+			<a href="/" class="flex items-center gap-3">
+				<img
+					src="/profile.jpeg"
+					alt="Ilzam - Fractional CTO"
+					width={32}
+					height={32}
+					class="size-8 rounded-full object-cover"
+				/>
+				<div>
+					<p class="text-sm font-semibold leading-tight">Ilzam</p>
+					<p class="text-xs text-muted-foreground">Fractional CTO</p>
+				</div>
+			</a>
+			<nav class="flex items-center gap-4 text-sm">
+				<a href="/work" class="text-muted-foreground transition-colors hover:text-foreground">Work</a>
+				<a href="/notes" class="text-muted-foreground transition-colors hover:text-foreground">Notes</a>
+				<a
+					href="https://cal.com/ilzam/intro"
+					target="_blank"
+					rel="noopener noreferrer"
+					class="rounded-full bg-foreground px-4 py-1.5 text-xs font-medium text-background transition-opacity hover:opacity-90"
+				>
+					Book a Call
+				</a>
+			</nav>
+		</header>
+		<main class="mx-auto max-w-3xl px-6 py-12 md:py-16">
+			<slot />
+		</main>
+		<footer class="border-t px-6 py-8 text-center text-sm text-muted-foreground">
+			<p>Building from East Java. Shipping to the world.</p>
+			<p class="mt-1">
+				<a href="/" class="underline underline-offset-4 hover:text-foreground">ilzam.dev</a>
+			</p>
+		</footer>
+	</body>
+</html>

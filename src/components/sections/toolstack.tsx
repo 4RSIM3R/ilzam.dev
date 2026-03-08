@@ -2,15 +2,15 @@ import { Badge } from "@/components/ui/badge"
 
 const cells: [number, number, string, string][] = [
   // Row 1
-  [1, 1, "", ""], [2, 1, "Go", "https://cdn.simpleicons.org/go"], [3, 1, "", ""], [4, 1, "TypeScript", "https://cdn.simpleicons.org/typescript"], [5, 1, "", ""],
+  [1, 1, "PHP", "https://cdn.simpleicons.org/php"], [2, 1, "Go", "https://cdn.simpleicons.org/go"], [3, 1, "Laravel", "https://cdn.simpleicons.org/laravel"], [4, 1, "TypeScript", "https://cdn.simpleicons.org/typescript"], [5, 1, ".NET", "https://cdn.simpleicons.org/dotnet"],
   // Row 2
-  [1, 2, "React", "https://cdn.simpleicons.org/react"], [2, 2, "", ""], [3, 2, "PostgreSQL", "https://cdn.simpleicons.org/postgresql"], [4, 2, "", ""], [5, 2, "Docker", "https://cdn.simpleicons.org/docker"],
+  [1, 2, "React", "https://cdn.simpleicons.org/react"], [2, 2, "Vue", "https://cdn.simpleicons.org/vuedotjs"], [3, 2, "PostgreSQL", "https://cdn.simpleicons.org/postgresql"], [4, 2, "MySQL", "https://cdn.simpleicons.org/mysql"], [5, 2, "Docker", "https://cdn.simpleicons.org/docker"],
   // Row 3
-  [1, 3, "Redis", "https://cdn.simpleicons.org/redis"], [2, 3, "AWS", "https://cdn.simpleicons.org/amazonaws"], [3, 3, "", ""], [4, 3, "Kubernetes", "https://cdn.simpleicons.org/kubernetes"], [5, 3, "GitHub", "https://cdn.simpleicons.org/github"],
+  [1, 3, "Redis", "https://cdn.simpleicons.org/redis"], [2, 3, "AWS", "https://cdn.simpleicons.org/amazonaws"], [3, 3, "Google Cloud", "https://cdn.simpleicons.org/googlecloud"], [4, 3, "Kubernetes", "https://cdn.simpleicons.org/kubernetes"], [5, 3, "GitHub", "https://cdn.simpleicons.org/github"],
   // Row 4
-  [1, 4, "Tailwind", "https://cdn.simpleicons.org/tailwindcss"], [2, 4, "", ""], [3, 4, "Node.js", "https://cdn.simpleicons.org/nodedotjs"], [4, 4, "", ""], [5, 4, "Flutter", "https://cdn.simpleicons.org/flutter"],
+  [1, 4, "Tailwind", "https://cdn.simpleicons.org/tailwindcss"], [2, 4, "Github", ""], [3, 4, "Node.js", "https://cdn.simpleicons.org/nodedotjs"], [4, 4, "Python", "https://cdn.simpleicons.org/python"], [5, 4, "Flutter", "https://cdn.simpleicons.org/flutter"],
   // Row 5
-  [1, 5, "", ""], [2, 5, "Claude", "https://cdn.simpleicons.org/claude"], [3, 5, "", ""], [4, 5, "Astro", "https://cdn.simpleicons.org/astro"], [5, 5, "", ""],
+  [1, 5, "Open AI", ""], [2, 5, "Claude", "https://cdn.simpleicons.org/claude"], [3, 5, "", ""], [4, 5, "Astro", "https://cdn.simpleicons.org/astro"], [5, 5, "", ""],
 ]
 
 export function ToolstackSection() {

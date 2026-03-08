@@ -1,0 +1,743 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+---
+
+<ContentLayout
+	title="How to Build Your Startup's Website in 2025 (Without Overpaying) — Ilzam"
+	description="WordPress, Webflow, Next.js, or Astro? A fractional CTO breaks down the real costs, tradeoffs, and mistakes founders make when building their startup website. Includes a full comparison table."
+>
+	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<div class="mt-6 flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Founder Decisions</span>
+		<span class="text-xs text-muted-foreground">March 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		How to Build Your Startup's Website in 2025 (Without Overpaying)
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			Most startups overpay for their website or pick the wrong tool. WordPress works
+			if you don't code. Webflow works if you want design control without a developer.
+			But if you know code — or you're willing to use AI tools — Astro on Cloudflare
+			gets you a faster site for nearly $0/month. I built this entire site that way.
+			This article breaks down exactly why, with real numbers.
+		</p>
+	</blockquote>
+
+	<!-- Hook -->
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			Let me tell you something that will sound insane.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The website you're reading right now — with case studies, a pricing section, an
+			FAQ, structured data for Google, an SEO-optimized notes section, and a full
+			programmatic SEO setup — costs me <span class="font-medium text-foreground">$0
+			per month</span> to host.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Zero. Not "basically free." Literally zero dollars.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Meanwhile, I've watched founders pay agencies $8,000–$15,000 for WordPress sites
+			that load slower, need constant plugin updates, and cost $30–50/month just to
+			keep the lights on. Some of those sites break every time WordPress pushes an
+			update. Some get hacked because someone forgot to update a plugin.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is not an "Astro is better than WordPress" rant. Different tools solve
+			different problems. But most founders pick their website tool the way people
+			pick restaurants — based on what's popular, not based on what they actually need.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Let's fix that.
+		</p>
+	</section>
+
+	<!-- The real question -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Before you pick a tool, answer this one question</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			When a founder asks me "should I use WordPress or Webflow?" I always respond
+			with the same question:
+		</p>
+		<p class="mt-4 text-lg font-medium">
+			"What does your website need to do?"
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Not "what do you want it to look like." Not "what's the latest trend." What
+			does it need to <span class="italic">do</span>?
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Most startup websites fall into one of four categories. And each category has
+			a very different answer.
+		</p>
+
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">Category 1: "I just need a landing page"</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					A headline, a few sentences about what you do, maybe some proof points, and
+					a button that says "Book a Call." That's it. Think of it like a business card
+					that lives on the internet.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					If this is you, you're probably pre-product or early-stage. You don't need a
+					fancy website. You need something that exists, loads fast, and doesn't
+					embarrass you when an investor Googles your name. A Carrd page ($19/year),
+					a simple WordPress theme, or even a well-formatted Notion page will do.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Seriously — don't spend three weeks on your website when you should be talking
+					to customers.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">Category 2: "I need a content site that ranks on Google"</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Blog posts, comparison pages, guides, field notes — content that brings people
+					to you through search. This is what I'm doing with ilzam.dev. You're reading
+					one of those pages right now.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					This is where the tool choice actually matters. Page speed affects rankings.
+					URL structure affects rankings. Meta tags, structured data, sitemap generation
+					— these things compound over time. You want a tool that makes all of this easy,
+					not one that fights you.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">Category 3: "I'm building a web application"</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					User login, dashboards, real-time data, payments. This is a real software
+					engineering problem, not a "which website builder" problem. You need Next.js,
+					Remix, SvelteKit, or something similar. And you probably need a developer.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					If this is you, stop reading website builder comparisons and go read my
+					note on <a href="/notes/mvp-stack-choice-2025" class="underline underline-offset-4 hover:text-foreground">choosing
+					a startup tech stack</a> instead.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">Category 4: "I'm selling products online"</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					E-commerce is its own world. Shopify exists. It's good at what it does. Use
+					it. Unless you have very specific reasons not to, Shopify will save you
+					hundreds of hours compared to building a custom checkout flow.
+				</p>
+			</div>
+		</div>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Notice how I didn't start with "WordPress vs Webflow"? That's because the tool
+			should follow the need. Most founders do it backwards — they pick a tool first,
+			then try to make their needs fit into it. That's how you end up with a $10K
+			WordPress site for a problem that Carrd solves for $19.
+		</p>
+	</section>
+
+	<!-- Deep dive: the four tools -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The four tools worth considering (and when each one wins)</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			If you're in Category 1 or 2 — landing pages or content sites — these are your
+			real options. I'm going to go deep on each one, because surface-level comparisons
+			are everywhere and they're all useless.
+		</p>
+
+		<!-- WordPress -->
+		<div class="mt-8">
+			<h3 class="text-lg font-semibold">WordPress: The reliable old truck</h3>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				WordPress powers 43% of the internet. It's been around since 2003. Your mom's
+				blog probably runs on WordPress. So does the New York Times.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				The good part: you don't need to know how to code. There are thousands of themes,
+				thousands of plugins. Want a contact form? Plugin. Want SEO tools? Plugin
+				(Yoast or Rank Math). Want to sell something? Plugin (WooCommerce). The ecosystem
+				is massive.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				The bad part: all those plugins are also WordPress's biggest weakness.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Every plugin is a piece of code written by someone you don't know, maintained
+				on a schedule you can't control, with security practices you can't verify.
+				Every WordPress update risks breaking a plugin. Every plugin update risks
+				breaking another plugin. I've seen client sites go down because a $29 slider
+				plugin hadn't been updated in 8 months and conflicted with a WordPress core
+				update.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				WordPress is also <span class="font-medium text-foreground">slow by default</span>.
+				It generates pages dynamically — every time someone visits your site, WordPress
+				talks to a database, builds the page, and sends it back. You can fix this with
+				caching plugins, CDNs, and optimization, but now you're managing infrastructure
+				instead of building your business.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Hosting costs $20–50/month for something decent (SiteGround, Kinsta, WP Engine).
+				Cheap shared hosting exists, but your site will feel like it's loading through
+				molasses.
+			</p>
+			<p class="mt-3 font-medium">
+				Use WordPress if: you don't code, need a blog, and want the largest ecosystem
+				of tutorials and freelancers available.
+			</p>
+		</div>
+
+		<!-- Webflow -->
+		<div class="mt-8">
+			<h3 class="text-lg font-semibold">Webflow: The designer's playground</h3>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Webflow is what happens when you give a visual designer the power to build real
+				websites without writing code. The visual editor is genuinely impressive. You
+				can create animations, responsive layouts, and interactions that would take a
+				developer days to code — all by dragging and clicking.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				The sites look great. The hosting is fast (Webflow manages it for you). And you
+				don't need a developer to make changes — if you're comfortable with the
+				editor, you can update your site yourself.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				But here's the thing nobody tells you upfront: <span class="font-medium text-foreground">Webflow
+				has a ceiling</span>.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Need custom logic? Can't do it. Need to integrate with a third-party API in a
+				way Webflow doesn't support? Can't do it. Need to generate 50 pages
+				programmatically for SEO? Painful. Need to add a feature that doesn't exist in
+				Webflow's ecosystem? You're stuck.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				And the lock-in is real. Your site lives in Webflow's proprietary system. If you
+				ever want to leave, you can export the HTML, but it's messy — you're essentially
+				starting over. Every month you pay Webflow is another month you can't easily
+				leave.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				The pricing is also sneaky. The "free" plan puts a Webflow badge on your site
+				and limits functionality. The real plans start at $14/month for basic hosting,
+				but most startups end up on the $39/month plan. Add a CMS ($23–39/month more)
+				and you're suddenly paying $60–80/month for a marketing site.
+			</p>
+			<p class="mt-3 font-medium">
+				Use Webflow if: you're design-focused, don't want to hire a developer, and
+				your site will stay a marketing site (no custom logic, no complex SEO plays).
+			</p>
+		</div>
+
+		<!-- Next.js -->
+		<div class="mt-8">
+			<h3 class="text-lg font-semibold">Next.js: The Swiss Army knife that's sometimes too much knife</h3>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Next.js is the most popular React framework. It can do everything — static
+				pages, server-rendered pages, API routes, authentication, the works. If
+				WordPress is the reliable old truck, Next.js is a Tesla with every feature
+				enabled.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				The problem? Most startup marketing sites use about 5% of what Next.js offers.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Next.js ships JavaScript to the browser by default. For a web application with
+				interactive dashboards, that makes sense — you need JavaScript for buttons,
+				forms, real-time updates. But for a marketing page? Your "About Us" page doesn't
+				need a JavaScript runtime. Your pricing page doesn't need client-side hydration.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				That extra JavaScript costs you something real: <span class="font-medium text-foreground">page
+				speed</span>. Google measures Core Web Vitals. Page speed affects your search
+				rankings. Every kilobyte of unused JavaScript is a tax you're paying for
+				features you're not using.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				I've built production applications with Next.js. It's excellent for that. But
+				if you're building a marketing site or content site, it's like driving a
+				semi-truck to pick up groceries. It'll work. But there's a better option.
+			</p>
+			<p class="mt-3 font-medium">
+				Use Next.js if: you're building a web application that also needs marketing
+				pages. Not the other way around.
+			</p>
+		</div>
+
+		<!-- Astro -->
+		<div class="mt-8">
+			<h3 class="text-lg font-semibold">Astro: The one I actually used (and why)</h3>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Astro was designed specifically for content-heavy websites. Its core idea is
+				simple and brilliant: <span class="font-medium text-foreground">ship zero
+				JavaScript by default, and only add it where you actually need interaction</span>.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				Think about that for a second. Your headline doesn't need JavaScript. Your
+				pricing table doesn't need JavaScript. Your FAQ section? A little bit of
+				JavaScript for the accordion. Astro lets you be surgical about it — the rest
+				of the page is pure, fast HTML.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				The result? Pages that load almost instantly. Google loves it. Your visitors
+				love it (even on slow connections — and if you're targeting founders globally
+				like I am, not everyone has fiber internet).
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				But the real reason I chose Astro is more practical than philosophical:
+				<span class="font-medium text-foreground">every page is just a file</span>.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				There's no database. No CMS. No admin panel. The page you're reading right now
+				is a single <code>.astro</code> file on my computer. If I want to make this
+				page completely different from every other page on the site — different layout,
+				different sections, different components — I just... do it. No template
+				constraints. No "custom post types." No fighting a system that wants every page
+				to look the same.
+			</p>
+			<p class="mt-3 leading-relaxed text-muted-foreground">
+				You might be thinking: "But I'd need a developer for that." And you're right —
+				sort of. This is where 2025 is genuinely different from 2023.
+			</p>
+		</div>
+	</section>
+
+	<!-- AI-assisted development -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The AI development angle (this changes everything)</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I'm a full-stack developer. I've been writing code professionally for years. But
+			here's the truth about how this site was built: <span class="font-medium text-foreground">a
+			significant portion of the code was generated by AI</span>.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I used Claude (Anthropic's AI, via the Claude Code CLI tool) throughout the entire
+			process. Here's what that looked like in practice:
+		</p>
+		<ul class="mt-4 space-y-3 text-muted-foreground">
+			<li class="leading-relaxed">
+				I described the section I wanted — "build a pricing section with three tiers
+				for fractional CTO, MVP build, and advisory" — and Claude generated the React
+				component with Tailwind styling.
+			</li>
+			<li class="leading-relaxed">
+				I gave it my content blueprint and said "rewrite all the landing page copy to
+				match this positioning" — and Claude produced copy for every section, with SEO
+				keywords woven in naturally.
+			</li>
+			<li class="leading-relaxed">
+				I said "set up the programmatic SEO structure with hub pages and internal
+				linking" — and Claude scaffolded the entire page architecture.
+			</li>
+			<li class="leading-relaxed">
+				When something looked wrong, I'd screenshot it and say "fix this" — and Claude
+				would read the screenshot and adjust the code.
+			</li>
+		</ul>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I'm not saying the AI did everything. I made every strategic decision — what to
+			build, what to cut, how to structure the information, which keywords to target.
+			The AI handled the implementation. I handled the thinking.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is relevant because it changes the equation. The old argument for WordPress
+			was "you don't need a developer." The new argument is: <span class="font-medium text-foreground">if
+			you're technical enough to use a command line and describe what you want in
+			English, you can build a custom Astro site with AI assistance</span>. The skill
+			floor has dropped dramatically.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			That doesn't mean everyone should do this. If you've never opened a terminal in
+			your life, WordPress or Webflow is still your best bet. But if you're a technical
+			founder, a developer, or someone who's comfortable with tools like GitHub — the
+			cost-benefit math has shifted hard toward code-based solutions.
+		</p>
+	</section>
+
+	<!-- How this site was built -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Exactly how this site was built (the receipts)</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I'm going to be annoyingly specific here, because generic advice is everywhere
+			and it's all useless. Here's the real breakdown:
+		</p>
+
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">The stack</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Astro 5 for the framework. React 19 for interactive components (the accordion,
+					the testimonial carousel, the capability selector). Tailwind CSS v4 for styling.
+					Deployed on Cloudflare Pages.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Why Astro + React instead of just React (Next.js)? Because 90% of this site
+					is static content. Only the interactive bits need React. Astro lets me use
+					React only where I need it and ships zero JavaScript everywhere else. The
+					landing page loads in under a second.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">The hosting</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Cloudflare Pages, free tier. Not "free trial." Not "free for the first year."
+					Free. Period. Cloudflare serves the site from edge servers around the world,
+					so it loads fast whether you're in San Francisco or Jakarta. I don't manage
+					any servers. I don't patch anything. I push code to GitHub, Cloudflare builds
+					and deploys it automatically.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Compare this to WordPress hosting: $20/month for SiteGround. $35/month for
+					Kinsta. $25/month for WP Engine. That's $240–420/year — for a marketing
+					website. Every year. Forever.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">The development process</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					I started with a content blueprint — a document that defined everything:
+					positioning, services, proof points, tone of voice, SEO defaults. Then I
+					used Claude Code to generate components section by section. I'd describe what
+					I wanted, review what it produced, adjust, and move on.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					The entire landing page — hero, services, process, case studies, testimonials,
+					toolstack, pricing, FAQ, CTA — was built in a single working session. Not
+					because I'm fast. Because AI-assisted development compresses weeks of
+					agency work into hours.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">The SEO setup</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Structured data (JSON-LD) for Person and FAQ schemas — this is what makes
+					Google show rich snippets. Proper meta tags on every page. Automatic sitemap
+					generation via Astro's sitemap integration. An <code>llms.txt</code> file for
+					AI crawlers (Perplexity, ChatGPT search, etc.). A <code>robots.txt</code> file.
+					All built into the framework — no plugins required.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">The maintenance burden</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					There is none. No WordPress core updates. No plugin updates. No PHP version
+					upgrades. No database to back up. No security vulnerabilities to monitor. The
+					site is static HTML served from a CDN. There is nothing to break.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					When I want to add a new page, I create a file. When I want to change
+					something, I edit a file. When I want to deploy, I push to GitHub. That's
+					the entire workflow.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Comparison table -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The full comparison table</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Here's everything in one view. No affiliate links, no sponsorships — just what
+			I've seen work (and break) across 15+ client projects.
+		</p>
+
+		<div class="mt-6 overflow-x-auto">
+			<table class="w-full text-sm">
+				<thead>
+					<tr class="border-b text-left">
+						<th class="py-3 pr-4 font-medium"></th>
+						<th class="py-3 pr-4 font-medium">WordPress</th>
+						<th class="py-3 pr-4 font-medium">Webflow</th>
+						<th class="py-3 pr-4 font-medium">Next.js</th>
+						<th class="py-3 pr-4 font-medium">Astro</th>
+					</tr>
+				</thead>
+				<tbody class="text-muted-foreground">
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Best for</td>
+						<td class="py-3 pr-4">Blog-heavy sites, non-technical teams</td>
+						<td class="py-3 pr-4">Design-led marketing sites</td>
+						<td class="py-3 pr-4">Web apps that also need marketing pages</td>
+						<td class="py-3 pr-4">Fast content sites, SEO plays, personal sites</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Who builds it</td>
+						<td class="py-3 pr-4">You or a cheap freelancer</td>
+						<td class="py-3 pr-4">You (no-code) or a designer</td>
+						<td class="py-3 pr-4">Developer required</td>
+						<td class="py-3 pr-4">Developer or AI-assisted</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Upfront cost</td>
+						<td class="py-3 pr-4">$0–2K</td>
+						<td class="py-3 pr-4">$0–5K</td>
+						<td class="py-3 pr-4">$5–15K</td>
+						<td class="py-3 pr-4">$3–10K (less with AI)</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Monthly hosting</td>
+						<td class="py-3 pr-4">$20–50/mo</td>
+						<td class="py-3 pr-4">$15–80/mo</td>
+						<td class="py-3 pr-4">$0–20/mo</td>
+						<td class="py-3 pr-4">$0–5/mo</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Annual cost (year 1)</td>
+						<td class="py-3 pr-4">$240–2,600</td>
+						<td class="py-3 pr-4">$180–5,960</td>
+						<td class="py-3 pr-4">$5,000–15,240</td>
+						<td class="py-3 pr-4">$3,000–10,060</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Annual cost (year 2+)</td>
+						<td class="py-3 pr-4">$240–600</td>
+						<td class="py-3 pr-4">$180–960</td>
+						<td class="py-3 pr-4">$0–240</td>
+						<td class="py-3 pr-4">$0–60</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Page speed</td>
+						<td class="py-3 pr-4">Slow without heavy optimization</td>
+						<td class="py-3 pr-4">Fast</td>
+						<td class="py-3 pr-4">Fast, but can bloat with JS</td>
+						<td class="py-3 pr-4">Extremely fast by default</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">SEO control</td>
+						<td class="py-3 pr-4">Good (via plugins)</td>
+						<td class="py-3 pr-4">Limited</td>
+						<td class="py-3 pr-4">Full control</td>
+						<td class="py-3 pr-4">Full control, content-first design</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">AI-assisted dev</td>
+						<td class="py-3 pr-4">Minimal</td>
+						<td class="py-3 pr-4">Minimal</td>
+						<td class="py-3 pr-4">Yes — Cursor, Claude, Copilot</td>
+						<td class="py-3 pr-4">Yes — Cursor, Claude, Copilot</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Maintenance</td>
+						<td class="py-3 pr-4">High — updates, plugins, security patches</td>
+						<td class="py-3 pr-4">Low — Webflow handles it</td>
+						<td class="py-3 pr-4">Medium — dependency updates</td>
+						<td class="py-3 pr-4">Very low — static files, nothing to patch</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Customization</td>
+						<td class="py-3 pr-4">Plugin-dependent (hit or miss)</td>
+						<td class="py-3 pr-4">Visual editor (ceiling exists)</td>
+						<td class="py-3 pr-4">Unlimited</td>
+						<td class="py-3 pr-4">Unlimited</td>
+					</tr>
+					<tr>
+						<td class="py-3 pr-4 font-medium text-foreground">Lock-in risk</td>
+						<td class="py-3 pr-4">Medium — plugin ecosystem ties you down</td>
+						<td class="py-3 pr-4">High — proprietary, hard to export</td>
+						<td class="py-3 pr-4">Low — standard React</td>
+						<td class="py-3 pr-4">Very low — standard HTML output</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<!-- Decision framework -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Just tell me what to use</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Fine. Here's the cheat sheet. Find the statement that sounds like you:
+		</p>
+
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">"I don't code and I need something up this week"</p>
+				<p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+					Use Carrd ($19/year) for a single landing page. Or grab a WordPress theme
+					and put it on SiteGround ($3/month to start). Don't overthink it. The goal
+					is to exist on the internet, not to win a design award. You can always
+					rebuild later when you have revenue.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">"I want a beautiful marketing site and I don't want to touch code"</p>
+				<p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+					Use Webflow. Accept that you're trading flexibility for convenience. Budget
+					$40–80/month for hosting. Know that if you ever outgrow it, migrating away
+					will be painful. For most marketing-only sites, you won't outgrow it.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">"I need content that ranks on Google"</p>
+				<p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+					If you don't code: WordPress with a good theme (GeneratePress or Astra),
+					Yoast for SEO, hosted on SiteGround or Cloudways. If you code: Astro on
+					Cloudflare. The speed difference is significant, and Google notices.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">"I'm building a SaaS or web app"</p>
+				<p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+					Next.js for the application. You could use Astro for the marketing site and
+					Next.js for the app — that's actually a great pattern. Separate concerns,
+					separate deployments, the marketing site stays fast while the app does its
+					thing.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">"I code (or I'm comfortable with AI tools) and I want full control"</p>
+				<p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+					Astro + Tailwind + Cloudflare. This is what I use. It's fast, free to host,
+					fully customizable, and AI tools like Claude can generate entire pages for
+					you. You own everything. No monthly fees. No vendor dependencies. No
+					maintenance burden.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Common mistakes -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Five expensive mistakes I keep seeing</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I've worked with 15+ startups as a fractional CTO. Here are the website
+			decisions that cost founders the most time and money:
+		</p>
+
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">1. Paying an agency $10K+ for a WordPress marketing site</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					I've reviewed agency proposals that charge $12,000 for a 5-page WordPress
+					site. The same site could be built with Astro in a week and hosted for free.
+					The agency knows this. They're charging for their time, their process, their
+					project management — not for the complexity of the build. If you have a
+					developer (or AI tools), you don't need any of that.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">2. Using Next.js for a site that has no interactivity</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					I see this constantly. A developer chooses Next.js because it's what they
+					know, then builds a marketing site that ships 200KB of JavaScript to render
+					static text. It's like hiring a moving truck to deliver a letter. It works,
+					but you're paying for capacity you don't need — in slower page loads, worse
+					SEO scores, and unnecessary complexity.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">3. Starting with Webflow when you'll eventually need custom logic</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Webflow is fantastic right up until the moment it isn't. If your roadmap
+					includes anything beyond a marketing site — custom integrations, user
+					accounts, programmatic pages — you'll hit the wall. And when you do, the
+					migration cost is brutal because Webflow doesn't export cleanly. Start with
+					code if you can see custom requirements on the horizon.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">4. Spending three weeks on a website when you're pre-product</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Your website is not your product. If you don't have paying customers yet,
+					your website's job is simple: explain what you do and give people a way to
+					contact you. That's a one-page job. Everything else is procrastination
+					disguised as productivity. Ship the landing page in a day. Talk to customers.
+					Build the real website after you have revenue.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">5. Ignoring the AI shift in web development</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					This one is 2025-specific and it's massive. Two years ago, building a custom
+					website required either deep coding skills or an expensive developer. Today,
+					AI coding tools (Claude Code, Cursor, GitHub Copilot) can generate
+					production-quality components from a description. The cost of "custom" has
+					dropped by 50–70%. If you're still comparing WordPress vs Webflow without
+					considering AI-assisted development, you're making a decision with 2022
+					information.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- My take -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">My take</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I've built websites and web applications for startups across healthcare,
+			fintech, marketplaces, government, and AI. I've seen the full spectrum — from
+			founders who shipped a Notion page and closed their first deal, to companies
+			that spent $40K on a website rebuild that didn't move any business metric.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Here's what I believe:
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			<span class="font-medium text-foreground">Your website should cost as close to
+			zero as possible until it's proven to generate revenue.</span> Don't invest
+			heavily in a website until you know it's working — until it's driving calls,
+			generating leads, or ranking for keywords that bring you customers.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			For most technical founders in 2025, the best path is: start with Astro, use AI
+			tools to accelerate the build, host for free on Cloudflare, and invest your money
+			in the product — not the marketing site.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			For non-technical founders: WordPress or Webflow. Pick whichever one your network
+			can support. Don't agonize over the choice. Both work. Neither is perfect. The
+			worst option is spending two weeks deciding instead of shipping.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			WordPress made sense when the alternative was hand-coding HTML. That's not the
+			world we live in anymore. The alternative is telling an AI what you want, reviewing
+			what it builds, and deploying it for free.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The game has changed. Build accordingly.
+		</p>
+	</section>
+
+	<!-- Related -->
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/nextjs-vs-astro-content-site" class="text-sm underline underline-offset-4 hover:text-foreground">Next.js vs Astro for Content Sites</a></li>
+			<li><a href="/notes/how-much-does-mvp-cost" class="text-sm underline underline-offset-4 hover:text-foreground">How Much Does an MVP Cost?</a></li>
+			<li><a href="/notes/mvp-stack-choice-2025" class="text-sm underline underline-offset-4 hover:text-foreground">MVP Stack Choice in 2025</a></li>
+		</ul>
+	</section>
+
+	<!-- CTA -->
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Not sure what to build or how to build it?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			That's exactly what the advisory session is for. One call can save you months
+			of building on the wrong foundation.
+		</p>
+		<a
+			href="https://cal.com/ilzam/advisory"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Advisory Session
+		</a>
+	</section>
+</ContentLayout>

@@ -1,0 +1,94 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+---
+
+<ContentLayout
+	title="AI Knowledge Pipeline — Ilzam"
+	description="RAG pipeline with hybrid search — pgvector + BM25 for accurate document retrieval. Built with Go and PostgreSQL for a San Francisco AI company."
+>
+	<a href="/work" class="text-sm text-muted-foreground hover:text-foreground">&larr; All work</a>
+
+	<div class="mt-6 flex items-center justify-between">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">AI / RAG</span>
+		<span class="text-sm text-muted-foreground">San Francisco, US / 2025</span>
+	</div>
+
+	<h1 class="mt-4 text-4xl font-light leading-tight tracking-tight md:text-5xl">
+		AI Knowledge Pipeline
+	</h1>
+	<p class="mt-2 text-lg text-muted-foreground">
+		RAG that actually retrieves the right thing.
+	</p>
+
+	<div class="mt-4 flex flex-wrap gap-1.5">
+		{["Go", "PostgreSQL", "pgvector", "BM25", "Markdown AST"].map((tech) => (
+			<span class="rounded-full border px-2.5 py-0.5 text-xs">{tech}</span>
+		))}
+	</div>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The Challenge</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			A San Francisco AI company needed a retrieval-augmented generation pipeline that could accurately retrieve relevant documents from a large knowledge base. Pure vector search wasn't cutting it — semantic similarity alone missed keyword-specific matches, and the retrieval quality was inconsistent.
+		</p>
+	</section>
+
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">The Approach</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			I designed a hybrid search system combining pgvector (vector similarity) with BM25 (keyword matching), using Reciprocal Rank Fusion to merge results. Documents were chunked using Markdown AST parsing — preserving heading hierarchy and semantic structure instead of naive character splitting.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Everything runs on PostgreSQL. No external vector database. No separate search engine. One database, two search strategies, fused results.
+		</p>
+	</section>
+
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">Key Decisions</h2>
+		<ul class="mt-3 space-y-3 text-muted-foreground">
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">pgvector over Pinecone.</span>
+				Keeping everything in PostgreSQL meant no extra infrastructure, no API latency, and simpler deployments. For this scale, pgvector performed well enough — and the operational simplicity was worth more than marginal speed gains.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">Markdown AST chunking over naive splitting.</span>
+				Splitting by character count destroys context. Parsing the Markdown AST lets you chunk by semantic sections — a heading and its content stay together, producing more meaningful embeddings.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">Hybrid search over pure vector.</span>
+				Vector search is great for semantic similarity but misses exact matches. BM25 catches those. Fusing both with RRF gives consistently better retrieval quality than either alone.
+			</li>
+		</ul>
+	</section>
+
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">The Result</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Measurably better retrieval quality compared to the previous vector-only approach. The pipeline runs in production, serving real users daily. The architecture is simple enough that the internal team can maintain and extend it without specialized infrastructure knowledge.
+		</p>
+	</section>
+
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/pgvector-vs-pinecone-rag" class="text-sm underline underline-offset-4 hover:text-foreground">pgvector vs Pinecone for RAG</a></li>
+			<li><a href="/notes/rag-chunking-markdown-ast" class="text-sm underline underline-offset-4 hover:text-foreground">RAG Chunking with Markdown AST</a></li>
+			<li><a href="/notes/bm25-vector-rrf-retrieval-quality" class="text-sm underline underline-offset-4 hover:text-foreground">BM25 + Vector + RRF Retrieval Quality</a></li>
+		</ul>
+	</section>
+
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Building a RAG pipeline?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			I've shipped this in production. If you want a second opinion on your approach, book a technical call.
+		</p>
+		<a
+			href="https://cal.com/ilzam/technical"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book a Technical Call
+		</a>
+	</section>
+</ContentLayout>
