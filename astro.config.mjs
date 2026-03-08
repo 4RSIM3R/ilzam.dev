@@ -12,6 +12,9 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://ilzam.dev',
   integrations: [react(), sitemap()],
+  redirects: {
+    '/sitemap.xml': '/sitemap-index.xml',
+  },
 
   vite: {
     plugins: [tailwindcss()]
