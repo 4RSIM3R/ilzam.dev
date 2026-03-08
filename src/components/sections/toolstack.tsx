@@ -6,11 +6,11 @@ const cells: [number, number, string, string][] = [
   // Row 2
   [1, 2, "React", "https://cdn.simpleicons.org/react"], [2, 2, "Vue", "https://cdn.simpleicons.org/vuedotjs"], [3, 2, "PostgreSQL", "https://cdn.simpleicons.org/postgresql"], [4, 2, "MySQL", "https://cdn.simpleicons.org/mysql"], [5, 2, "Docker", "https://cdn.simpleicons.org/docker"],
   // Row 3
-  [1, 3, "Redis", "https://cdn.simpleicons.org/redis"], [2, 3, "AWS", "https://cdn.simpleicons.org/amazonaws"], [3, 3, "Google Cloud", "https://cdn.simpleicons.org/googlecloud"], [4, 3, "Kubernetes", "https://cdn.simpleicons.org/kubernetes"], [5, 3, "GitHub", "https://cdn.simpleicons.org/github"],
+  [1, 3, "Redis", "https://cdn.simpleicons.org/redis"], [2, 3, "Kafka", "https://cdn.simpleicons.org/apachekafka"], [3, 3, "Google Cloud", "https://cdn.simpleicons.org/googlecloud"], [4, 3, "Kubernetes", "https://cdn.simpleicons.org/kubernetes"], [5, 3, "GitHub", "https://cdn.simpleicons.org/github"],
   // Row 4
-  [1, 4, "Tailwind", "https://cdn.simpleicons.org/tailwindcss"], [2, 4, "Github", ""], [3, 4, "Node.js", "https://cdn.simpleicons.org/nodedotjs"], [4, 4, "Python", "https://cdn.simpleicons.org/python"], [5, 4, "Flutter", "https://cdn.simpleicons.org/flutter"],
+  [1, 4, "Tailwind", "https://cdn.simpleicons.org/tailwindcss"], [2, 4, "Github", "https://cdn.simpleicons.org/github"], [3, 4, "Node.js", "https://cdn.simpleicons.org/nodedotjs"], [4, 4, "Python", "https://cdn.simpleicons.org/python"], [5, 4, "Flutter", "https://cdn.simpleicons.org/flutter"],
   // Row 5
-  [1, 5, "Open AI", ""], [2, 5, "Claude", "https://cdn.simpleicons.org/claude"], [3, 5, "", ""], [4, 5, "Astro", "https://cdn.simpleicons.org/astro"], [5, 5, "", ""],
+  [1, 5, "Py Torch", "https://cdn.simpleicons.org/pytorch"], [2, 5, "Claude", "https://cdn.simpleicons.org/claude"], [3, 5, "Datadog", "https://cdn.simpleicons.org/datadog"], [4, 5, "Astro", "https://cdn.simpleicons.org/astro"], [5, 5, "Dart", "https://cdn.simpleicons.org/dart"],
 ]
 
 export function ToolstackSection() {
