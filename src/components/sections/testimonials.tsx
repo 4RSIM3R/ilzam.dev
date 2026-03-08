@@ -2,53 +2,53 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "motion/react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { ArrowLeftIcon, ArrowRightIcon } from "lucide-react"
 
 const testimonials = [
   {
     name: "Mara Davana",
-    role: "Founding Design at Protoze",
+    role: "Founder at Protoze",
     image: "https://picsum.photos/seed/mara/400/600",
-    tags: ["UX Audit", "UI Design"],
+    tags: ["Fractional CTO", "MVP Build"],
     quote:
-      "Working with Ilzam was a game-changer. He took our rough wireframes and turned them into a polished, user-friendly product that our customers love.",
+      "We needed someone who could make real technical decisions, not just write code. Ilzam became our remote CTO — he chose our stack, built the first version, and shipped it in under 8 weeks. We went from idea to paying customers.",
   },
   {
     name: "Alex Hartanto",
-    role: "Founding Design at Pentagi",
+    role: "CEO at Pentagi",
     image: "https://picsum.photos/seed/alex/400/600",
-    tags: ["Prototyping", "User Research"],
+    tags: ["Technical Advisory", "Architecture"],
     quote:
-      "Ilzam has a rare ability to understand both the business and the user. His design process is thorough, and the results speak for themselves.",
+      "We were about to sign a $60k contract with an agency. Ilzam reviewed the proposal in one session and saved us from a stack choice that would have cost us 6 months. Best advisory call I've ever had.",
   },
   {
     name: "Michael Hartono",
-    role: "Head Of Officer at Montagem",
+    role: "Co-founder at Montagem",
     image: "https://picsum.photos/seed/michael/400/600",
-    tags: ["UX Audit", "UIX Design", "Prototyping"],
+    tags: ["MVP Development", "Startup CTO"],
     quote:
-      "What impressed me most was how Ilzam simplified complexity. He turned our messy product idea into a clear, intuitive flow that investors instantly understood during our demo.",
+      "What sets Ilzam apart is he asks 'why are we building this?' before 'how.' That saved us from building three features we didn't need. Our MVP launched lean, and users actually loved it.",
   },
 ]
 
 const stats = [
   {
-    value: "40+",
-    label: "Products",
+    value: "15+",
+    label: "MVPs Shipped",
     description:
-      "Products, dashboards, etc designed across startups and SaaS companies.",
+      "Products built and deployed across marketplaces, SaaS, AI, and government systems.",
   },
   {
-    value: "3x",
-    label: "Faster",
-    description: "Avg. design-to-launch time compared to traditional agency.",
+    value: "80%",
+    label: "Cost Reduction",
+    description:
+      "Infrastructure cost savings delivered for a healthcare network.",
   },
   {
-    value: "+30%",
-    label: "Conversion",
+    value: "99%",
+    label: "Uptime",
     description:
-      "Average uplift in product conversions and sign-ups.",
+      "Platform reliability achieved after rebuilding a system serving 5,000+ users.",
   },
 ]
 
@@ -64,24 +64,24 @@ export function TestimonialsSection() {
 
   return (
     <section
-      id="testimonials"
+      id="proof"
       className="snap-start min-h-[calc(100vh-3.5rem)] px-6 py-12 md:px-10 md:py-16"
     >
       {/* Header */}
       <div className="flex items-start justify-between">
         <h2 className="max-w-md text-4xl font-light leading-tight tracking-tight md:text-5xl">
-          Results That Speak
+          Don't take my
           <br />
-          for{" "}
           <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            Themselves
-          </span>
+            word
+          </span>{" "}
+          for it
         </h2>
         <Badge
           variant="outline"
           className="hidden shrink-0 rounded-none border-0 font-mono text-xs uppercase tracking-widest md:inline-flex"
         >
-          [ What They Said ]
+          [ Proof ]
         </Badge>
       </div>
 
@@ -98,11 +98,11 @@ export function TestimonialsSection() {
                 className="relative flex flex-col items-start overflow-hidden"
                 animate={{
                   zIndex: isActive ? 10 : 0,
-                  width: isActive ? 220 : 140,
+                  width: isActive ? "clamp(140px, 40vw, 220px)" : "clamp(80px, 25vw, 140px)",
                 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                <div className="relative h-[320px] w-full overflow-hidden bg-muted">
+                <div className="relative h-60 w-full overflow-hidden bg-muted md:h-80">
                   <img
                     src={t.image}
                     alt={`${t.name} - ${t.role}`}

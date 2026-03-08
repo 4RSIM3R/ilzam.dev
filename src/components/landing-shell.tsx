@@ -9,9 +9,9 @@ export function LandingShell({ children }: PropsWithChildren) {
       <LandingSidebar />
       <SidebarInset className="flex h-screen flex-col overflow-hidden">
         <LandingTopbar />
-        <div className="flex-1 overflow-y-auto snap-y snap-mandatory">
+        <main className="flex-1 overflow-y-auto snap-y snap-mandatory">
           {children}
-        </div>
+        </main>
       </SidebarInset>
     </SidebarProvider>
   )

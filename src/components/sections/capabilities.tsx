@@ -9,88 +9,71 @@ import {
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import {
-  SearchIcon,
-  UsersIcon,
-  PenToolIcon,
+  BrainCircuitIcon,
   RocketIcon,
+  ShieldCheckIcon,
   CheckCircleIcon,
 } from "lucide-react"
 
 const capabilities = [
   {
-    icon: SearchIcon,
-    title: "UX Audit",
+    icon: BrainCircuitIcon,
+    title: "Fractional CTO",
     description:
-      "Identify what's holding your product back. I analyze usability, flow, and interaction patterns to uncover friction points and turn them into opportunities for better user experience.",
+      "You need someone to own the technical side — architecture, stack choices, vendor evaluation, hiring — without committing to a $150k/year executive. I act as your startup CTO on a fractional basis, embedded in your team weekly.",
     card: {
-      badge: "UX Audit",
-      heading: "What You'll Get",
+      badge: "Technical Leadership",
+      heading: "What You Get",
       message:
-        "A detailed report that pinpoints exactly where users drop off and what to fix first.",
+        "Senior technical judgment and strategic oversight, without the full-time salary.",
       items: [
-        "Usability & clarity findings report",
-        "Accessibility & WCAG compliance check",
-        "Design consistency & pattern review",
-        "Prioritized action plan with quick wins",
+        "Architecture and technology decision-making",
+        "Code review and technical quality oversight",
+        "Sprint planning and async check-ins",
+        "Team building from my network of trusted engineers",
+        "Honest answers, not consultant fluff",
       ],
-      tip: "A thorough audit typically uncovers 15–30 actionable improvements that directly impact user retention and conversion.",
-    },
-  },
-  {
-    icon: UsersIcon,
-    title: "User Segmentation & Insights",
-    description:
-      "Define who your users truly are. I help you develop clear user segments and behavioral insights to make every design decision data-driven and human-centered.",
-    card: {
-      badge: "User Research",
-      heading: "What You'll Get",
-      message:
-        "Clear user profiles and behavioral maps so every design decision is backed by real data.",
-      items: [
-        "User persona documents with goals & pain points",
-        "Behavioral segment mapping & journey flows",
-        "Data-driven design recommendations",
-        "Prioritized opportunities by business impact",
-      ],
-      tip: "Mapping segments to specific user journeys increases feature adoption by up to 40%.",
-    },
-  },
-  {
-    icon: PenToolIcon,
-    title: "UI/UX Design & Prototyping",
-    description:
-      "From concept to clickable prototype — I design interfaces that don't just look good but feel intuitive, efficient, and on-brand.",
-    card: {
-      badge: "Design",
-      heading: "What You'll Get",
-      message:
-        "Pixel-perfect screens and a clickable prototype you can test with real users before writing code.",
-      items: [
-        "Wireframes & information architecture",
-        "High-fidelity UI mockups in Figma",
-        "Interactive prototype with real user flows",
-        "Design system with reusable components",
-      ],
-      tip: "Clickable prototypes reduce development rework by 60% by catching issues before a single line of code is written.",
+      tip: "Rebuilt a KOL platform from 85% to 99% uptime serving 5,000+ users.",
     },
   },
   {
     icon: RocketIcon,
-    title: "MVP Product Development",
+    title: "MVP Development",
     description:
-      "Turn your idea into a working product fast. I help you design, build, and launch your MVP with just the right features to validate your vision and attract early users.",
+      "I design, build, and ship your product using AI-assisted development. What used to take a 3-person team 3 months, I move through in weeks — without the technical debt that kills products at scale.",
     card: {
-      badge: "Development",
-      heading: "What You'll Get",
+      badge: "Build",
+      heading: "What You Get",
       message:
-        "A working product shipped to production, ready for real users and feedback from day one.",
+        "A working product shipped to production — built fast, built right.",
       items: [
-        "Core feature scoping & tech stack selection",
-        "Rapid development with modern frameworks",
-        "Deployment to production infrastructure",
-        "Analytics setup for launch-day insights",
+        "Core feature scoping and startup tech stack selection",
+        "Full-stack development with Go, React, TypeScript, PostgreSQL",
+        "Database design and API architecture",
+        "Deployment to production infrastructure (AWS/Cloudflare)",
+        "Analytics and monitoring from day one",
       ],
-      tip: "The best MVPs ship in 4–6 weeks. Anything longer usually means the scope needs trimming, not the timeline extending.",
+      tip: "15+ MVPs shipped. Chef booking marketplace — two-sided platform, 10 weeks, one engineer.",
+    },
+  },
+  {
+    icon: ShieldCheckIcon,
+    title: "Technical Advisory",
+    description:
+      "A one-time or recurring session for founders who need a second opinion — on a vendor proposal, an agency quote, a build vs buy decision, or a technology choice. I'll tell you what I actually think.",
+    card: {
+      badge: "Advisory",
+      heading: "What You Get",
+      message:
+        "Clarity on the technical decision in front of you — before you commit.",
+      items: [
+        "Vendor and agency proposal review",
+        "Build vs buy analysis for your specific case",
+        "Stack recommendation based on your constraints",
+        "Architecture review for existing systems",
+        "Honest assessment — even if it means 'don't build this yet'",
+      ],
+      tip: "Reduced infrastructure costs by 80% for a healthcare network.",
     },
   },
 ]
@@ -101,27 +84,32 @@ export function CapabilitiesSection() {
 
   return (
     <section
-      id="capability"
+      id="services"
       className="snap-start min-h-[calc(100vh-3.5rem)] px-6 py-12 md:px-10 md:py-16"
     >
       {/* Header */}
       <div className="flex items-start justify-between">
         <h2 className="max-w-xl text-4xl font-light leading-tight tracking-tight md:text-5xl">
-          I don't bring dreams,
+          Your startup needs a CTO.
           <br />
-          I bring{" "}
+          You don't need a{" "}
           <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            solutions
-          </span>{" "}
-          for your Business
+            $200k salary
+          </span>
         </h2>
         <Badge
           variant="outline"
           className="hidden shrink-0 rounded-none border-0 font-mono text-xs uppercase tracking-widest md:inline-flex"
         >
-          [ Capabilities ]
+          [ What I Do ]
         </Badge>
       </div>
+
+      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+        I work as a fractional CTO and full-stack developer for early-stage
+        founders. I make the technical decisions, build the product, and help you
+        ship — so you can focus on customers, not code.
+      </p>
 
       {/* Content grid */}
       <div className="mt-12 grid gap-10 md:grid-cols-[2fr_3fr]">
@@ -154,7 +142,7 @@ export function CapabilitiesSection() {
         </div>
 
         {/* Right — dynamic card */}
-        <div className="hidden items-start justify-center md:flex">
+        <div className="flex items-start justify-center">
           <AnimatePresence mode="wait">
             <motion.div
               key={active}

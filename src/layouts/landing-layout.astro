@@ -4,9 +4,20 @@ import { LandingShell } from '@/components/landing-shell'
 
 interface Props {
 	title?: string
+	description?: string
+	canonicalUrl?: string
+	ogImage?: string
 }
 
-const { title = 'ilzam.dev' } = Astro.props
+const {
+	title = 'Ilzam — Fractional CTO & Full-Stack Developer',
+	description = 'I help early-stage founders build and ship their product — acting as fractional CTO with AI-assisted development. Go, React, TypeScript, .NET MAUI. Based in Indonesia, working globally.',
+	canonicalUrl = Astro.url.href,
+	ogImage = '/profile.jpeg',
+} = Astro.props
+
+const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://ilzam.dev'
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`
 ---
 
 <html lang="en">
@@ -17,6 +28,24 @@ const { title = 'ilzam.dev' } = Astro.props
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta name="author" content="Ilzam" />
+		<link rel="canonical" href={canonicalUrl} />
+
+		<!-- Open Graph -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content={canonicalUrl} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:image" content={ogImageUrl} />
+		<meta property="og:site_name" content="ilzam.dev" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter Card -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content={title} />
+		<meta name="twitter:description" content={description} />
+		<meta name="twitter:image" content={ogImageUrl} />
 	</head>
 	<body>
 		<LandingShell client:load>

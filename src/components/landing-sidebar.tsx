@@ -12,11 +12,11 @@ import {
 } from "@/components/ui/sidebar"
 
 const navItems = [
-  { label: "Capability", href: "#capability" },
-  { label: "Process", href: "#process" },
-  { label: "The Result", href: "#result" },
-  { label: "What They Said", href: "#testimonials" },
-  { label: "Toolstack", href: "#toolstack" },
+  { label: "What I Do", href: "#services" },
+  { label: "How I Work", href: "#process" },
+  { label: "Things I've Shipped", href: "#work" },
+  { label: "Proof", href: "#proof" },
+  { label: "Stack", href: "#stack" },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
 ]
@@ -30,7 +30,7 @@ export function LandingSidebar() {
             <span className="absolute inline-flex size-full animate-ping rounded-full bg-green-400 opacity-75" />
             <span className="relative inline-flex size-2 rounded-full bg-green-500" />
           </span>
-          <span className="font-medium">2 Project Slots Available</span>
+          <span className="font-medium">Available for Q2 2026</span>
         </div>
       </SidebarHeader>
       <SidebarContent />
@@ -40,15 +40,17 @@ export function LandingSidebar() {
             Navigate
           </SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton render={<a href={item.href} />}>
-                    <span>{item.label}</span>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
+            <nav aria-label="Site navigation">
+              <SidebarMenu>
+                {navItems.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton render={<a href={item.href} />}>
+                      <span>{item.label}</span>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </nav>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarFooter>

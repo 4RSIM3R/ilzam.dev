@@ -1,84 +1,125 @@
-import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 
 const caseStudies = [
   {
-    title: "Arctic Cream",
-    subtitle: "E-commerce Redesign",
-    year: "2025",
-    image: "https://picsum.photos/seed/case1/800/600",
-    href: "#",
+    title: "Chef Booking Marketplace",
+    subtitle: "Two-sided marketplace, 10 weeks, one engineer.",
+    label: "Marketplace",
+    region: "Scandinavia",
+    year: "2024",
+    stack: ["Go", "React", "PostgreSQL", "Stripe Connect", "Redis"],
+    brief:
+      "Built a complete chef booking platform from zero — matching customers with private chefs, handling payments through Stripe Connect, and managing real-time availability.",
   },
   {
-    title: "Cargo Express",
-    subtitle: "Logistics Dashboard",
+    title: "AI Knowledge Pipeline",
+    subtitle: "RAG that actually retrieves the right thing.",
+    label: "AI / RAG",
+    region: "San Francisco, US",
+    year: "2025",
+    stack: ["Go", "PostgreSQL", "pgvector", "BM25", "Markdown AST"],
+    brief:
+      "Designed and built a retrieval-augmented generation pipeline with hybrid search — combining vector similarity and BM25 keyword matching for accurate document retrieval.",
+  },
+  {
+    title: "KOL Platform Rebuild",
+    subtitle: "85% to 99% uptime. 5,000+ users. One team.",
+    label: "Platform Rebuild",
+    region: "Jakarta, Indonesia",
     year: "2024",
-    image: "https://picsum.photos/seed/case2/800/600",
-    href: "#",
+    stack: ["Full-stack rebuild", "Team lead"],
+    brief:
+      "Led the technical rebuild of a KOL management platform. Took uptime from 85% to 99%, introduced proper architecture, and scaled to serve 5,000+ daily active users.",
+  },
+  {
+    title: "Vocational Dashboard",
+    subtitle: "Centralizing education data for a national directorate.",
+    label: "Government Tech",
+    region: "Indonesia",
+    year: "2023",
+    stack: ["REST API", "Recommender system", "Data dashboard"],
+    brief:
+      "Built a centralized dashboard for Indonesia's vocational education directorate — pulling data from multiple sources into a single view with a recommendation engine.",
   },
 ]
 
 export function CaseStudiesSection() {
   return (
     <section
-      id="result"
+      id="work"
       className="snap-start min-h-[calc(100vh-3.5rem)] px-6 py-12 md:px-10 md:py-16"
     >
       {/* Header */}
-      <h2 className="max-w-3xl text-4xl font-light leading-tight tracking-tight md:text-5xl">
-        Every product starts as an idea, but not every idea becomes a{" "}
-        <span className="rounded-sm bg-amber-100 px-1 font-normal">
-          product
-        </span>
-        . Through research, testing, and iteration, I help that idea find its
-        form
-      </h2>
+      <div className="flex items-start justify-between">
+        <h2 className="max-w-3xl text-4xl font-light leading-tight tracking-tight md:text-5xl">
+          Every product starts as an idea. Not every idea{" "}
+          <span className="rounded-sm bg-amber-100 px-1 font-normal">
+            ships
+          </span>
+          . These did.
+        </h2>
+        <Badge
+          variant="outline"
+          className="hidden shrink-0 rounded-none border-0 font-mono text-xs uppercase tracking-widest md:inline-flex"
+        >
+          [ Things I've Shipped ]
+        </Badge>
+      </div>
+
+      <p className="mt-4 text-sm text-muted-foreground">
+        Most details are under NDA. Here's what I can share.
+      </p>
 
       {/* Cards */}
       <div className="mt-12 grid gap-6 md:grid-cols-2">
         {caseStudies.map((study) => (
           <Card
             key={study.title}
-            className="group gap-0 overflow-hidden border-0 bg-muted/30 p-0"
+            className="group gap-0 overflow-hidden border p-0"
           >
-            <CardContent className="p-0">
-              <div className="relative aspect-[4/3] overflow-hidden">
-                <img
-                  src={study.image}
-                  alt={`${study.title} — ${study.subtitle}`}
-                  className="size-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 flex items-end justify-between p-5">
-                  <div>
-                    <p className="text-xs text-white/60">{study.year}</p>
-                    <h3 className="text-lg font-semibold text-white">
-                      {study.title}
-                    </h3>
-                    <p className="text-sm text-white/70">{study.subtitle}</p>
-                  </div>
-                  <Button
+            <CardContent className="p-5">
+              <div className="mb-3 flex items-center justify-between">
+                <Badge variant="secondary" className="text-xs uppercase">
+                  {study.label}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  {study.region} / {study.year}
+                </span>
+              </div>
+              <h3 className="text-lg font-semibold">{study.title}</h3>
+              <p className="mt-1 text-sm font-medium text-muted-foreground">
+                {study.subtitle}
+              </p>
+              <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                {study.brief}
+              </p>
+              <div className="mt-4 flex flex-wrap gap-1.5">
+                {study.stack.map((tech) => (
+                  <Badge
+                    key={tech}
                     variant="outline"
-                    className="shrink-0 rounded-full border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
-                    render={<a href={study.href} />}
+                    className="rounded-full text-xs font-normal"
                   >
-                    See Study Case
-                  </Button>
-                </div>
+                    {tech}
+                  </Badge>
+                ))}
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Footer link */}
-      <p className="mt-8 text-center text-sm">
+      {/* Footer */}
+      <p className="mt-8 text-center text-sm text-muted-foreground">
+        Working on something that could be case study #5?{" "}
         <a
-          href="/case-studies"
-          className="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
+          href="https://cal.com/ilzam/intro"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-4 transition-colors hover:text-foreground"
         >
-          Want to see more magic?
+          Book a call
         </a>
       </p>
     </section>

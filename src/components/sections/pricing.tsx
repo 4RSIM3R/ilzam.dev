@@ -11,52 +11,78 @@ import { PhoneCallIcon, MailIcon } from "lucide-react"
 
 const plans = [
   {
-    label: "Pro Plan",
-    price: "$4,500",
+    label: "Fractional CTO",
+    price: "Starting at $3,000",
     period: "/ Month",
     description:
-      "Perfect for startups and teams who want ongoing design and product support without the hassle of hiring full-time.",
+      "Ongoing technical leadership for your startup. I embed in your team, make architecture decisions, review code, and keep your product on track.",
     features: [
-      "Up to 2 active requests at a time",
-      "UX Audit & Design Improvements",
-      "UI/UX Design for Web or App",
-      "Clickable Prototype (Figma)",
-      "Weekly Progress Updates",
-      "Priority Revisions & Support",
+      "Weekly async or live check-ins",
+      "Architecture and stack decisions",
+      "Code review and quality oversight",
+      "Team hiring from my trusted network",
+      "Sprint planning and prioritization",
+      "Slack/async access between sessions",
     ],
+    bestFor: "Pre-seed to seed startups. Non-technical founders. Companies between CTOs.",
     actions: [
       {
-        label: "Go to with my projects",
+        label: "Book Intro Call",
         href: "https://cal.com/ilzam/intro",
         variant: "default" as const,
         full: true,
+        icon: PhoneCallIcon,
       },
     ],
   },
   {
-    label: "Custom Pricing",
-    price: "Contact Me",
+    label: "MVP Build",
+    price: "From $8,000",
     period: "",
     description:
-      "Perfect for startups and teams who want ongoing design and product support without the hassle of hiring full-time.",
+      "I scope, build, and ship your MVP to production. AI-assisted development means startup speed without agency prices. Most MVPs ship in 6-10 weeks.",
     features: [
-      "Unlimited active requests",
-      "Dedicated Slack / Notion workspace",
-      "Product Strategy & UX Research",
-      "Full MVP or Feature Design",
-      "Developer Handoff & QA Support",
-      "Monthly Strategy Session with Ilzam",
+      "Feature scoping and tech stack selection",
+      "Full-stack development (Go, React, TypeScript)",
+      "Database design and API architecture",
+      "Production deployment (AWS/Cloudflare)",
+      "30 days of post-launch support",
     ],
+    bestFor: "Founders ready to build. Validated ideas that need to become real products.",
     actions: [
       {
-        label: "Book 15 Mins Call",
+        label: "Discuss Your Build",
         href: "https://cal.com/ilzam/intro",
+        variant: "default" as const,
+        full: true,
+        icon: PhoneCallIcon,
+      },
+    ],
+  },
+  {
+    label: "Technical Advisory",
+    price: "$500",
+    period: "/ Session",
+    description:
+      "A focused session where I review your vendor proposal, evaluate your tech stack, or give you a second opinion on a big technical decision.",
+    features: [
+      "60-minute deep-dive session",
+      "Written summary with recommendations",
+      "Follow-up async Q&A (48 hours)",
+      "Vendor/agency proposal review",
+      "Build vs buy analysis",
+    ],
+    bestFor: "Founders evaluating options. CTOs wanting peer review. Big decisions ahead.",
+    actions: [
+      {
+        label: "Book Advisory Session",
+        href: "https://cal.com/ilzam/advisory",
         variant: "outline" as const,
         full: false,
         icon: PhoneCallIcon,
       },
       {
-        label: "Contact Me",
+        label: "Email Me",
         href: "mailto:ilzammulkhaq85@gmail.com",
         variant: "default" as const,
         full: false,
@@ -75,23 +101,26 @@ export function PricingSection() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <h2 className="max-w-md text-4xl font-light leading-tight tracking-tight md:text-5xl">
-          From Idea to Launch
-          <br />
+          Three ways to{" "}
           <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            Pick Your Track
+            work together
           </span>
-          .
         </h2>
         <Badge
           variant="outline"
           className="hidden shrink-0 rounded-none border-0 font-mono text-xs uppercase tracking-widest md:inline-flex"
         >
-          [ Pricing Package ]
+          [ Pricing ]
         </Badge>
       </div>
 
+      <p className="mt-4 max-w-xl text-sm text-muted-foreground">
+        Whether you need ongoing CTO-level support, a product built from
+        scratch, or a one-time technical gut check — there's a clear path.
+      </p>
+
       {/* Cards */}
-      <div className="mt-12 grid gap-6 md:grid-cols-2">
+      <div className="mt-12 grid gap-6 md:grid-cols-3">
         {plans.map((plan) => (
           <Card key={plan.label} className="flex flex-col">
             <CardHeader className="space-y-4">
@@ -102,10 +131,10 @@ export function PricingSection() {
                 {plan.label}
               </Badge>
               <div>
-                <p className="text-4xl font-light tracking-tight md:text-5xl">
+                <p className="text-3xl font-light tracking-tight md:text-4xl">
                   {plan.price}
                   {plan.period && (
-                    <span className="text-lg font-normal text-muted-foreground">
+                    <span className="text-base font-normal text-muted-foreground">
                       {" "}{plan.period}
                     </span>
                   )}
@@ -125,6 +154,9 @@ export function PricingSection() {
                   </li>
                 ))}
               </ul>
+              <p className="mt-4 text-xs text-muted-foreground italic">
+                Best for: {plan.bestFor}
+              </p>
             </CardContent>
             <CardFooter className="flex gap-3">
               {plan.actions.map((action) => (
@@ -140,9 +172,7 @@ export function PricingSection() {
                     />
                   }
                 >
-                  {"icon" in action && action.icon && (
-                    <action.icon data-icon="inline-start" />
-                  )}
+                  <action.icon data-icon="inline-start" />
                   {action.label}
                 </Button>
               ))}

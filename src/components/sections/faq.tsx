@@ -8,60 +8,55 @@ import {
 
 const faqs = [
   {
-    question:
-      "How do you usually approach a new design project from start to finish?",
+    question: "What exactly does a fractional CTO do?",
     answer:
-      "Every project begins with clarity — understanding your goals, target users, and the problem you're solving. From there, I move into UX flow mapping, wireframing, and high-fidelity UI design. Once the concept feels right, I prototype interactions and collaborate with your team until everything aligns perfectly.",
+      "I act as your startup's technical leader on a part-time basis. That means I make architecture decisions, choose your tech stack, review code, plan sprints, and hire engineers — everything a full-time CTO would do, without the $150k+ salary. I'm embedded in your team, not hovering above it.",
   },
   {
     question:
-      "What design tools and platforms do you typically use in your workflow?",
+      "How is this different from hiring an agency or freelance developer?",
     answer:
-      "I primarily use Figma for design and prototyping, paired with tools like Notion for documentation, Slack for communication, and VS Code for any front-end development. For analytics and research, I leverage hotjar, Google Analytics, and user testing platforms.",
+      "An agency builds what you tell them to build. A freelancer writes the code you spec out. I ask 'should we even build this?' before writing a single line. You get strategic thinking and technical execution from the same person — no game of telephone between a project manager, designer, and three junior developers.",
+  },
+  {
+    question: "How long does it take to build an MVP?",
+    answer:
+      "Most MVPs ship in 6-10 weeks. I use AI-assisted development to move at 2-3x traditional speed, but I don't cut corners on architecture. A chef booking marketplace took 10 weeks. A RAG pipeline took 6. The timeline depends on scope — and I'll be honest if your scope needs trimming.",
   },
   {
     question:
-      "How long does it usually take to complete a project or deliver an MVP?",
+      "I'm a non-technical founder. Do I need a fractional CTO or a technical co-founder?",
     answer:
-      "It depends on scope, but most projects take 2–6 weeks. A simple landing page or UI audit can be done in a week, while a full MVP design with prototyping typically takes 4–6 weeks. I always set clear timelines upfront so there are no surprises.",
+      "If you're pre-product, exploring ideas, and need someone with skin in the game — look for a co-founder. If you have a validated idea, funding (or revenue), and need someone to build it right and fast — a fractional CTO gets you moving without giving up equity. Most of my clients are in the second camp.",
   },
   {
-    question: "Do you also handle development, or just design?",
+    question: "What tech stack do you recommend for an early-stage startup?",
     answer:
-      "I'm a full-stack designer and developer. I can take a project from concept through to a working product using modern frameworks like Astro, React, and Tailwind CSS. If you already have a dev team, I'm happy to hand off polished designs with developer-ready specs.",
+      "It depends on what you're building, but my default stack for most startups is Go + React + PostgreSQL on AWS. It's fast, scales well, and doesn't lock you in. I've also shipped production apps with TypeScript, .NET MAUI, Flutter, and Laravel — I pick the stack based on your constraints, not my preferences.",
   },
   {
-    question: "How does the payment process work for your services?",
+    question: "You're based in Indonesia — how does the remote work?",
     answer:
-      "For subscription plans, billing is monthly with no long-term commitment — you can pause or cancel anytime. For custom projects, I typically work with a 50% upfront deposit and 50% upon completion. All payments are handled through secure invoicing.",
-  },
-  {
-    question:
-      "Can I start with a smaller project before committing to a full subscription?",
-    answer:
-      "Absolutely. Many clients start with a one-off project like a UX audit or a single feature design to see how we work together. If you're happy with the results, you can always move to a subscription plan for ongoing support.",
+      "I've been working remotely with US, European, and Southeast Asian clients for years. I'm currently embedded in a San Francisco AI company as a full-stack developer — fully remote from East Java. Async by default, with live sessions when they matter. Time zone overlap has never been an issue.",
   },
 ]
 
 export function FaqSection() {
   return (
-    <section
-      id="faq"
-      className="snap-start px-6 py-12 md:px-10 md:py-16"
-    >
+    <section id="faq" className="snap-start px-6 py-12 md:px-10 md:py-16">
       {/* Header */}
       <div className="flex items-start justify-between">
         <h2 className="max-w-lg text-4xl font-light leading-tight tracking-tight md:text-5xl">
-          Things You Might{" "}
+          Questions founders{" "}
           <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            Want to Know
+            usually ask
           </span>
         </h2>
         <Badge
           variant="outline"
           className="hidden shrink-0 rounded-none border-0 font-mono text-xs uppercase tracking-widest md:inline-flex"
         >
-          [ Frequently Asked Questions ]
+          [ FAQ ]
         </Badge>
       </div>
 

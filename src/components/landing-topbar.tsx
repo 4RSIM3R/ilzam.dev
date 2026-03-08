@@ -8,7 +8,7 @@ export function LandingTopbar() {
       <div className="flex items-center gap-3">
         <SidebarTrigger className="md:hidden" />
         <img
-          src="https://picsum.photos/seed/ilzam/200/200"
+          src="/profile.jpeg"
           alt="Ilzam - Software Engineer"
           width={32}
           height={32}
@@ -17,21 +17,27 @@ export function LandingTopbar() {
         />
         <div>
           <h1 className="text-sm font-semibold leading-tight">
-            Hello, Ilzam's here!
+            Ilzam
           </h1>
           <p className="text-xs text-muted-foreground">
-            Software Engineer
+            Fractional CTO
           </p>
         </div>
       </div>
       <div className="flex items-center gap-2">
-        <Button variant="outline" size="default" render={<a href="mailto:ilzammulkhaq85@gmail.com" />}>
-          <MailIcon data-icon="inline-start" />
-          Mail Me
+        <Button variant="outline" size="icon" className="md:hidden" render={<a href="mailto:ilzammulkhaq85@gmail.com" />}>
+          <MailIcon />
         </Button>
-        <Button size="default" render={<a href="https://cal.com/ilzam/intro" target="_blank" rel="noopener noreferrer" />}>
+        <Button size="icon" className="md:hidden" render={<a href="https://cal.com/ilzam/intro" target="_blank" rel="noopener noreferrer" />}>
+          <PhoneCallIcon />
+        </Button>
+        <Button variant="outline" size="default" className="hidden md:inline-flex" render={<a href="mailto:ilzammulkhaq85@gmail.com" />}>
+          <MailIcon data-icon="inline-start" />
+          Get in Touch
+        </Button>
+        <Button size="default" className="hidden md:inline-flex" render={<a href="https://cal.com/ilzam/intro" target="_blank" rel="noopener noreferrer" />}>
           <PhoneCallIcon data-icon="inline-start" />
-          Call with Me
+          Book a Call
         </Button>
       </div>
     </header>
