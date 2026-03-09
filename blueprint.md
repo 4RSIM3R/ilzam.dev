@@ -152,7 +152,7 @@ URL: `/notes/[decision-founders-face]`
 - `/notes/when-to-hire-fractional-cto`
 - `/notes/build-vs-buy-early-stage-startup`
 - `/notes/how-to-evaluate-agency-proposal`
-- `/notes/mvp-stack-choice-2025`
+- `/notes/mvp-stack-choice-2026`
 - `/notes/how-much-does-mvp-cost`
 - `/notes/technical-co-founder-vs-fractional-cto`
 - `/notes/when-to-rewrite-vs-refactor`

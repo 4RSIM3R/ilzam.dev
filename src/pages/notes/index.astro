@@ -2,121 +2,11 @@
 import ContentLayout from '@/layouts/content-layout.astro'
 
 const notes = [
-	// Published
 	{
-		title: "How to Build Your Startup's Website in 2025",
-		slug: "how-to-build-startup-website-2025",
+		title: "How to Build Your Startup's Website in 2026",
+		slug: "how-to-build-startup-website-2026",
 		category: "Founder Decisions",
 		description: "WordPress, Webflow, Next.js, or Astro? A real comparison — and how this site was actually built.",
-		soon: false,
-	},
-	// Tier 1 — Money pages (founder decisions)
-	{
-		title: "How Much Does an MVP Cost?",
-		slug: "how-much-does-mvp-cost",
-		category: "Founder Decisions",
-		description: "A real breakdown from someone who's shipped 15+ of them.",
-		soon: true,
-	},
-	{
-		title: "When to Hire a Fractional CTO",
-		slug: "when-to-hire-fractional-cto",
-		category: "Founder Decisions",
-		description: "Signs you need one, and when you probably don't.",
-		soon: true,
-	},
-	{
-		title: "Fractional CTO vs Technical Co-founder",
-		slug: "technical-co-founder-vs-fractional-cto",
-		category: "Founder Decisions",
-		description: "Different problems, different solutions.",
-		soon: true,
-	},
-	{
-		title: "Build vs Buy for Early-Stage Startups",
-		slug: "build-vs-buy-early-stage-startup",
-		category: "Founder Decisions",
-		description: "A framework for the decision that defines your first year.",
-		soon: true,
-	},
-	{
-		title: "How to Evaluate an Agency Proposal",
-		slug: "how-to-evaluate-agency-proposal",
-		category: "Founder Decisions",
-		description: "Red flags, green flags, and what to actually ask.",
-		soon: true,
-	},
-	// Tier 2 — Traffic drivers (comparisons)
-	{
-		title: "Go vs Node for REST APIs in Startups",
-		slug: "go-vs-node-rest-api-startup",
-		category: "Comparisons",
-		description: "Performance, developer experience, and what actually matters at your stage.",
-		soon: true,
-	},
-	{
-		title: "Next.js vs Astro for Content Sites",
-		slug: "nextjs-vs-astro-content-site",
-		category: "Comparisons",
-		description: "When to reach for each, and why I picked Astro for this site.",
-		soon: true,
-	},
-	{
-		title: "pgvector vs Pinecone for RAG",
-		slug: "pgvector-vs-pinecone-rag",
-		category: "Comparisons",
-		description: "When you need a dedicated vector database, and when PostgreSQL is enough.",
-		soon: true,
-	},
-	{
-		title: "Flutter vs .NET for Cross-Platform",
-		slug: "flutter-vs-maui-cross-platform",
-		category: "Comparisons",
-		description: "Two approaches to one codebase. Tradeoffs from production experience.",
-		soon: true,
-	},
-	{
-		title: "Laravel vs Go for API Performance",
-		slug: "laravel-vs-go-api-performance",
-		category: "Comparisons",
-		description: "When PHP is fine and when you need something faster.",
-		soon: true,
-	},
-	// Tier 3 — Authority builders (technical)
-	{
-		title: "pgvector Hybrid Search in Go",
-		slug: "pgvector-hybrid-search-go",
-		category: "Technical",
-		description: "Combining vector similarity and BM25 in PostgreSQL.",
-		soon: true,
-	},
-	{
-		title: "RAG Chunking with Markdown AST",
-		slug: "rag-chunking-markdown-ast",
-		category: "Technical",
-		description: "Why character splitting destroys retrieval quality, and what to do instead.",
-		soon: true,
-	},
-	{
-		title: "Stripe Connect Marketplace Gotchas",
-		slug: "stripe-connect-marketplace-gotchas",
-		category: "Technical",
-		description: "Lessons from building a two-sided marketplace with Stripe.",
-		soon: true,
-	},
-	{
-		title: "MVP Stack Choice in 2025",
-		slug: "mvp-stack-choice-2025",
-		category: "Founder Decisions",
-		description: "What I'd pick today, and why.",
-		soon: true,
-	},
-	{
-		title: "When to Rewrite vs Refactor",
-		slug: "when-to-rewrite-vs-refactor",
-		category: "Founder Decisions",
-		description: "The decision that can save — or kill — your product.",
-		soon: true,
 	},
 ]
 
@@ -138,20 +28,12 @@ const categories = [...new Set(notes.map(n => n.category))]
 		<section class="mt-12">
 			<h2 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">{category}</h2>
 			<div class="mt-4 grid gap-4">
-				{notes.filter(n => n.category === category).map((note) => {
-					const Tag = note.soon ? 'div' : 'a';
-					return (
-						<Tag href={note.soon ? undefined : `/notes/${note.slug}`} class={`block rounded-lg border p-5 ${note.soon ? '' : 'group transition-shadow hover:shadow-md'}`}>
-							<div class="flex items-center justify-between">
-								<h3 class={`font-semibold ${note.soon ? '' : 'group-hover:underline'}`}>{note.title}</h3>
-								{note.soon && (
-									<span class="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">Coming soon</span>
-								)}
-							</div>
-							<p class="mt-1 text-sm text-muted-foreground">{note.description}</p>
-						</Tag>
-					)
-				})}
+				{notes.filter(n => n.category === category).map((note) => (
+					<a href={`/notes/${note.slug}`} class="group block rounded-lg border p-5 transition-shadow hover:shadow-md">
+						<h3 class="font-semibold group-hover:underline">{note.title}</h3>
+						<p class="mt-1 text-sm text-muted-foreground">{note.description}</p>
+					</a>
+				))}
 			</div>
 		</section>
 	))}
