@@ -1,0 +1,212 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+import { EtlPipelineViz } from '@/components/etl-pipeline-viz'
+---
+
+<ContentLayout
+	title="Dapo Vokasi - Ilzam"
+	description="Unified data platform for Indonesia's vocational education directorate. Consolidated 20M+ teaching records across 7 national training centers into a single source of truth."
+>
+	<a href="/work" class="text-sm text-muted-foreground hover:text-foreground">&larr; All work</a>
+
+	<div class="mt-6 flex items-center justify-between">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Government Tech</span>
+		<span class="text-sm text-muted-foreground">Indonesia / 2024 - 2025</span>
+	</div>
+
+	<h1 class="mt-4 text-4xl font-light leading-tight tracking-tight md:text-5xl">
+		Dapo Vokasi
+	</h1>
+	<p class="mt-2 text-lg text-muted-foreground">
+		Unifying vocational teacher data across 7 national training centers.
+	</p>
+
+	<div class="mt-4 flex flex-wrap gap-1.5">
+		{["Laravel", "Inertia.js", "React.js", "SQL Server", "ETL Pipeline", "REST API"].map((tech) => (
+			<span class="rounded-full border px-2.5 py-0.5 text-xs">{tech}</span>
+		))}
+	</div>
+
+	<!-- The Problem -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The Problem</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Indonesia's Directorate General of Vocational Education (Direktorat Jenderal Pendidikan Vokasi) under Kemendikdasmen oversees the quality of vocational education across 14,000+ SMK schools nationwide. A critical part of that mission: ensuring <em>guru produktif</em>, the teachers who deliver hands-on, industry-relevant skills, are competent and continuously trained.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			To do this, the Directorate operates 7 specialized training centers (BBPPMPV/BPPMPV), each covering a different vocational domain, from Automotive & Electronics in Malang, to Machinery & Industrial Engineering in Bandung, to Maritime & ICT in Gowa. These centers run upskilling and reskilling programs for SMK teachers across the country.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			But nobody had a clear picture of what was actually happening.
+		</p>
+		<ul class="mt-3 space-y-2 text-muted-foreground">
+			<li class="leading-relaxed">How many guru produktif are trained vs. untrained?</li>
+			<li class="leading-relaxed">Which teachers keep getting invited to training repeatedly, while others never get a chance?</li>
+			<li class="leading-relaxed">Which schools hoard training access, and which are left behind?</li>
+			<li class="leading-relaxed">How is each balai performing? Who's training the most teachers, and who isn't?</li>
+		</ul>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Each balai maintained its own data in its own format, stored in its own systems. There was no shared standard, not even a consistent way to define a teacher's core competency.
+		</p>
+	</section>
+
+	<!-- The Data Chaos -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">The Data Chaos</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			We started with meetings. The challenges started there too.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The data was scattered: different formats, different storage, different definitions across all 7 balai. We didn't even have a reliable way to determine a teacher's primary specialization. A teacher officially registered as a Pendidikan Agama (religious education) teacher might appear as a TKJ (computer networking) teacher in training records, simply because they taught a few hours a week in that subject at their school.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Multiply that ambiguity across the entire national teaching workforce and you get 20 million rows of teaching history with no reliable way to answer even basic questions.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			We spent 2 weeks purely on data analysis, building a custom ETL pipeline in SQL Server with purpose-built algorithms to resolve identity and competency conflicts. The result: <strong>20 million rows distilled into 300,000+ clean teacher records</strong>, each mapped to their verified primary competency. That PA teacher stays classified as a PA teacher, not misidentified as TKJ.
+		</p>
+	</section>
+
+	<!-- ETL Pipeline Animation -->
+	<EtlPipelineViz client:visible />
+
+	<!-- The Platform -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">The Platform</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			With clean data in hand, the next problem was structural: how do you unify 7 independent institutions onto a single platform without breaking their autonomy?
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			And here's where the real challenge lives. Not in the code, but in the bureaucracy. Creating a new data field in a government system is easy. Convincing stakeholders across 7 institutions <em>why that field matters</em> is where the work happens.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			We built a multi-tenant platform where each balai operates as its own tenant with visibility into the national teacher dataset. The stack (Laravel, Inertia.js, React.js, SQL Server) was chosen deliberately for government infrastructure compatibility and long-term maintainability within their existing IT ecosystem.
+		</p>
+	</section>
+
+	<!-- Key Decisions -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">Key Decisions</h2>
+		<ul class="mt-3 space-y-3 text-muted-foreground">
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">Data foundation first, features second.</span>
+				Before building any dashboards or APIs, the data had to be clean and the definitions had to be agreed upon. We invested 2 weeks upfront in data engineering that made everything downstream possible.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">Multi-tenant architecture over separate instances.</span>
+				Each balai needed autonomy over their own data while contributing to a national picture. A multi-tenant design gave them both: isolated views with shared infrastructure.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">API-first for interoperability.</span>
+				Rather than forcing manual data entry, we built an API layer so each balai can feed training records, certification data, and program outcomes directly into the platform from their existing systems.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">Pragmatic stack for government constraints.</span>
+				SQL Server was the mandated database. Laravel + Inertia.js + React.js gave us a modern, maintainable stack that the internal team can extend without specialized knowledge.
+			</li>
+		</ul>
+	</section>
+
+	<!-- The Public Dashboard -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">The Public Dashboard</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Beyond the internal platform, we developed a public-facing dashboard at <a href="https://dapo.vokasi.kemendikdasmen.go.id/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">dapo.vokasi.kemendikdasmen.go.id</a>, giving transparent access to vocational teacher data for policymakers, school administrators, and the public.
+		</p>
+	</section>
+
+	<figure class="mt-8">
+		<img
+			src="https://pub-73710b9deb424415a1922cbd79e42fff.r2.dev/Screenshot%202026-03-09%20at%2020.35.34.png"
+			alt="Dapo Vokasi national overview dashboard showing nationwide vocational teacher statistics, training coverage, and key metrics across Indonesia"
+			class="rounded-lg border"
+			loading="lazy"
+		/>
+		<figcaption class="mt-2 text-center text-sm text-muted-foreground">National overview: key metrics across 14,000+ SMK schools</figcaption>
+	</figure>
+
+	<figure class="mt-6">
+		<img
+			src="https://pub-73710b9deb424415a1922cbd79e42fff.r2.dev/Screenshot%202026-03-09%20at%2020.33.32.png"
+			alt="Dapo Vokasi province-level breakdown dashboard showing vocational teacher distribution and training coverage across Indonesian provinces"
+			class="rounded-lg border"
+			loading="lazy"
+		/>
+		<figcaption class="mt-2 text-center text-sm text-muted-foreground">Province-level breakdown: training coverage and teacher distribution per region</figcaption>
+	</figure>
+
+	<figure class="mt-6">
+		<img
+			src="https://pub-73710b9deb424415a1922cbd79e42fff.r2.dev/Screenshot%202026-03-09%20at%2020.36.34.png"
+			alt="Dapo Vokasi per-UPT breakdown dashboard showing training performance and teacher data for each balai pelatihan"
+			class="rounded-lg border"
+			loading="lazy"
+		/>
+		<figcaption class="mt-2 text-center text-sm text-muted-foreground">Per-UPT breakdown: performance metrics for each balai pelatihan</figcaption>
+	</figure>
+
+	<!-- Impact -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">The Result</h2>
+		<ul class="mt-3 space-y-3 text-muted-foreground">
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">7 balai pelatihan unified.</span>
+				All 7 national training centers now share data through a single platform, the first time these institutions have operated on a shared data standard.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">300,000+ teacher records cleaned and mapped.</span>
+				From 20 million rows of raw teaching history, we produced a verified dataset with each teacher mapped to their primary competency.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">Evidence-based training decisions.</span>
+				Balai can now see which teachers have been trained, which haven't, and who's been invited repeatedly, enabling more equitable distribution of training opportunities.
+			</li>
+			<li class="leading-relaxed">
+				<span class="font-medium text-foreground">National visibility for policymakers.</span>
+				Trained vs. untrained ratios, balai performance metrics, and provincial distribution data, all accessible through the public dashboard.
+			</li>
+		</ul>
+	</section>
+
+	<!-- Timeline & Role -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">Timeline & Role</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			I served as IT Consultant and fullstack developer alongside a small team. The project spanned 6 months: 3 months of active development (data engineering, platform build, API, and dashboard) followed by 3 months of seminars and onboarding sessions across all 7 balai pelatihan nationwide.
+		</p>
+	</section>
+
+	<!-- Lessons Learned -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">Lessons Learned</h2>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The biggest lesson wasn't technical, it was foundational. In government projects, you have to clear the data foundation before building anything. We spent weeks just getting 7 institutions to agree on what a "teacher's primary competency" even means, institutions that had never shared definitions before.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The pattern repeated at every layer. Building the field is easy. Getting 7 different institutions to agree on <em>why that field matters</em>, that's the real engineering.
+		</p>
+	</section>
+
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/build-vs-buy-early-stage-startup" class="text-sm underline underline-offset-4 hover:text-foreground">Build vs Buy for Early-Stage Startups</a></li>
+			<li><a href="/notes/mvp-stack-choice-2026" class="text-sm underline underline-offset-4 hover:text-foreground">MVP Stack Choice in 2026</a></li>
+		</ul>
+	</section>
+
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Need a data platform or government-scale system built?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			I've shipped platforms that unify data across institutions. Let's talk about your project.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Intro Call
+		</a>
+	</section>
+</ContentLayout>

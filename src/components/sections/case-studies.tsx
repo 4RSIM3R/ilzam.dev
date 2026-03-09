@@ -37,15 +37,15 @@ const caseStudies = [
       "Led the technical rebuild of a KOL management platform. Took uptime from 85% to 99%, introduced proper architecture, and scaled to serve 5,000+ daily active users.",
   },
   {
-    title: "Vocational Dashboard",
-    subtitle: "Centralizing education data for a national directorate.",
+    title: "Dapo Vokasi",
+    subtitle: "Unifying vocational teacher data across 7 national training centers.",
     label: "Government Tech",
     region: "Indonesia",
-    year: "2023",
-    slug: "vocational-dashboard",
-    stack: ["REST API", "Recommender system", "Data dashboard"],
+    year: "2024 - 2025",
+    slug: "dapo-vokasi-data-platform",
+    stack: ["Laravel", "Inertia.js", "React.js", "SQL Server", "ETL Pipeline"],
     brief:
-      "Built a centralized dashboard for Indonesia's vocational education directorate — pulling data from multiple sources into a single view with a recommendation engine.",
+      "Built a unified data platform for Indonesia's vocational education directorate. Distilled 20 million rows of teaching records into 300,000+ clean teacher profiles across 7 national training centers.",
   },
 ]
 
