@@ -5,7 +5,7 @@
 ## Core Positioning
 
 **Name:** Ilzam
-**Title:** Fractional CTO & Full-Stack Developer
+**Title:** AI-Native Software Engineer & Fractional CTO
 **Location:** East Java, Indonesia — working remotely with clients worldwide
 
 ---
@@ -42,7 +42,7 @@ Alternatives:
 ## About / Who I Am
 
 **Short version (for header/bio):**
-> Full-stack developer turned fractional CTO. I've shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently work embedded in a San Francisco AI company — remotely from East Java, Indonesia. I build with Go, React, TypeScript, .NET MAUI, and PostgreSQL. I think in systems, not tickets.
+> AI-native software engineer and fractional CTO. I've shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently work embedded in a San Francisco AI company — remotely from East Java, Indonesia. I build with Go, React, TypeScript, .NET, and PostgreSQL. I think in systems, not tickets.
 
 **Long version (for about page):**
 
@@ -83,7 +83,7 @@ I design, build, and ship your product using AI-assisted development. What used 
 
 What I've built: marketplaces, SaaS platforms, mobile apps (iOS + Android), RAG/AI pipelines, government dashboards, booking systems, POS systems, social monitoring tools.
 
-Stack: Go, React, TypeScript, Node.js, .NET MAUI, PostgreSQL, Redis, Stripe, AWS.
+Stack: Go, React, TypeScript, Node.js, .NET, PostgreSQL, Redis, Stripe, AWS.
 
 Best for: Founders with a validated idea ready to build. Companies needing a complete squad (I bring the team).
 
@@ -108,7 +108,7 @@ Best for: Non-technical founders evaluating options. CTOs wanting a peer review.
 - Introduced methodology that cut requirement analysis time by 75%
 - Guided 60+ vocational teachers through Flutter and web development upskilling
 - Shipped government systems, marketplace platforms, and AI pipelines
-- Currently embedded in a San Francisco AI company as full-stack developer
+- Currently embedded in a San Francisco AI company as an AI-native software engineer
 - 3rd place, LKS Cloud Computing Regional Competition
 - Founded first hackathon in a religious boarding school (Hackathon Santri)
 
@@ -119,7 +119,7 @@ Best for: Non-technical founders evaluating options. CTOs wanting a peer review.
 **Headline:** "What I work with"
 
 Languages: Go, TypeScript, JavaScript, PHP, C#, Dart
-Frontend: React, .NET MAUI, Flutter, Inertia.js, Tailwind CSS
+Frontend: React, .NET, Flutter, Inertia.js, Tailwind CSS
 Backend: Go Fiber, Node.js, Express, Laravel, .NET
 Data & Infra: PostgreSQL, MySQL, Redis, Docker, Kubernetes, AWS
 Architecture: Event-driven, microservices, REST APIs, RAG pipelines, hybrid search
@@ -235,10 +235,10 @@ That's exactly what the advisory session is for.
 
 ## SEO Defaults
 
-Site title: `Ilzam — Fractional CTO & Full-Stack Developer`
+Site title: `Ilzam — AI-Native Software Engineer & Fractional CTO`
 
 Meta description:
-`I help early-stage founders build and ship their product — acting as fractional CTO with AI-assisted development. Go, React, TypeScript, .NET MAUI. Based in Indonesia, working globally.`
+`I help early-stage founders build and ship their product — AI-native engineering with fractional CTO-level judgment. Go, React, TypeScript, .NET. Based in Indonesia, working globally.`
 
 OG image text: `Ilzam.dev — Fractional CTO for Early-Stage Founders`
 

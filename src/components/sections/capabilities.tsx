@@ -106,9 +106,9 @@ export function CapabilitiesSection() {
       </div>
 
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        I work as a fractional CTO and full-stack developer for early-stage
-        founders. I make the technical decisions, build the product, and help you
-        ship — so you can focus on customers, not code.
+        I work as an AI-native software engineer and fractional CTO for
+        early-stage founders. I make the technical decisions, build the product,
+        and help you ship — so you can focus on customers, not code.
       </p>
 
       {/* Content grid */}

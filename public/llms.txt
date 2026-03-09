@@ -1,10 +1,10 @@
-# Ilzam — Fractional CTO & Full-Stack Developer
+# Ilzam — AI-Native Software Engineer & Fractional CTO
 
 > I help early-stage founders build and ship their product — acting as fractional CTO with AI-assisted development. Based in Indonesia, working globally.
 
 ## About
 
-Ilzam is a full-stack developer turned fractional CTO. He has shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently works embedded in a San Francisco AI company — remotely from East Java, Indonesia. He builds with Go, React, TypeScript, .NET MAUI, and PostgreSQL. He thinks in systems, not tickets.
+Ilzam is an AI-native software engineer and fractional CTO. He has shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently works embedded in a San Francisco AI company — remotely from East Java, Indonesia. He builds with Go, React, TypeScript, .NET, and PostgreSQL. He thinks in systems, not tickets.
 
 ## Services
 
@@ -20,7 +20,7 @@ A one-time or recurring session for founders who need a second opinion — on a 
 ## Tech Stack
 
 - Languages: Go, TypeScript, JavaScript, PHP, C#, Dart
-- Frontend: React, .NET MAUI, Flutter, Tailwind CSS, Astro
+- Frontend: React, .NET, Flutter, Tailwind CSS, Astro
 - Backend: Go Fiber, Node.js, Express, Laravel, .NET
 - Data & Infra: PostgreSQL, MySQL, Redis, Docker, Kubernetes, AWS
 - Architecture: Event-driven, microservices, REST APIs, RAG pipelines, hybrid search
@@ -32,7 +32,7 @@ A one-time or recurring session for founders who need a second opinion — on a 
 - Rebuilt a KOL platform from 85% to 99% uptime, serving 5,000+ users
 - Introduced methodology that cut requirement analysis time by 75%
 - Guided 60+ vocational teachers through technical upskilling
-- Currently embedded in a San Francisco AI company as full-stack developer
+- Currently embedded in a San Francisco AI company as an AI-native software engineer
 
 ## Things I've Shipped
 

@@ -32,12 +32,12 @@ const faqs = [
   {
     question: "What tech stack do you recommend for an early-stage startup?",
     answer:
-      "It depends on what you're building, but my default stack for most startups is Go + React + PostgreSQL on AWS. It's fast, scales well, and doesn't lock you in. I've also shipped production apps with TypeScript, .NET MAUI, Flutter, and Laravel — I pick the stack based on your constraints, not my preferences.",
+      "It depends on what you're building, but my default stack for most startups is Go + React + PostgreSQL on AWS. It's fast, scales well, and doesn't lock you in. I've also shipped production apps with TypeScript, .NET, Flutter, and Laravel — I pick the stack based on your constraints, not my preferences.",
   },
   {
     question: "You're based in Indonesia — how does the remote work?",
     answer:
-      "I've been working remotely with US, European, and Southeast Asian clients for years. I'm currently embedded in a San Francisco AI company as a full-stack developer — fully remote from East Java. Async by default, with live sessions when they matter. Time zone overlap has never been an issue.",
+      "I've been working remotely with US, European, and Southeast Asian clients for years. I'm currently embedded in a San Francisco AI company as an AI-native software engineer — fully remote from East Java. Async by default, with live sessions when they matter. Time zone overlap has never been an issue.",
   },
 ]
 
