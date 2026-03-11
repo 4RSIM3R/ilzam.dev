@@ -4,39 +4,6 @@ import { ArrowUpRightIcon } from "lucide-react"
 
 const caseStudies = [
   {
-    title: "Chef Booking Marketplace",
-    subtitle: "Two-sided marketplace, 10 weeks, one engineer.",
-    label: "Marketplace",
-    region: "Scandinavia",
-    year: "2024",
-    slug: "chef-booking-marketplace",
-    stack: ["Go", "React", "PostgreSQL", "Stripe Connect", "Redis"],
-    brief:
-      "Built a complete chef booking platform from zero — matching customers with private chefs, handling payments through Stripe Connect, and managing real-time availability.",
-  },
-  {
-    title: "AI Knowledge Pipeline",
-    subtitle: "RAG that actually retrieves the right thing.",
-    label: "AI / RAG",
-    region: "San Francisco, US",
-    year: "2025",
-    slug: "ai-knowledge-pipeline",
-    stack: ["Go", "PostgreSQL", "pgvector", "BM25", "Markdown AST"],
-    brief:
-      "Designed and built a retrieval-augmented generation pipeline with hybrid search — combining vector similarity and BM25 keyword matching for accurate document retrieval.",
-  },
-  {
-    title: "KOL Platform Rebuild",
-    subtitle: "85% to 99% uptime. 5,000+ users. One team.",
-    label: "Platform Rebuild",
-    region: "Jakarta, Indonesia",
-    year: "2024",
-    slug: "kol-platform-rebuild",
-    stack: ["Full-stack rebuild", "Team lead"],
-    brief:
-      "Led the technical rebuild of a KOL management platform. Took uptime from 85% to 99%, introduced proper architecture, and scaled to serve 5,000+ daily active users.",
-  },
-  {
     title: "Dapo Vokasi",
     subtitle: "Unifying vocational teacher data across 7 national training centers.",
     label: "Government Tech",
@@ -123,7 +90,7 @@ export function CaseStudiesSection() {
 
       {/* Footer */}
       <p className="mt-8 text-center text-sm text-muted-foreground">
-        Working on something that could be case study #5?{" "}
+        Working on something that could be the next case study?{" "}
         <a
           href="https://cal.com/ilzam/intro"
           target="_blank"
