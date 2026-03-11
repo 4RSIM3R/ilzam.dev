@@ -13,7 +13,7 @@ export function CtaSection() {
           </h2>
 
           <p className="mt-6 max-w-sm text-sm leading-relaxed text-white/70">
-            Book a free 30-minute intro call. No pitch, no pressure — just a
+            Book a free 30-minute intro call. No pitch, no pressure  - just a
             real conversation about what you're building and whether I can help.
           </p>
 

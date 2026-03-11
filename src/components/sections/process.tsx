@@ -9,17 +9,17 @@ const steps = [
   {
     title: "Make the Hard Calls",
     description:
-      "Stack selection. Build vs buy. Monolith vs microservices. I make these decisions with you based on your stage, budget, and timeline — not based on what's trendy. I've seen what works at startup scale and what becomes technical debt by month six.",
+      "Stack selection. Build vs buy. Monolith vs microservices. I make these decisions with you based on your stage, budget, and timeline  - not based on what's trendy. I've seen what works at startup scale and what becomes technical debt by month six.",
   },
   {
     title: "Ship It",
     description:
-      "I build with AI-assisted development — moving at 2-3x the speed of a traditional agency while writing production-quality code. Go, React, TypeScript, PostgreSQL. You get weekly updates, working demos, and zero surprises.",
+      "I build with AI-assisted development  - moving at 2-3x the speed of a traditional agency while writing production-quality code. Go, React, TypeScript, PostgreSQL. You get weekly updates, working demos, and zero surprises.",
   },
   {
     title: "Measure and Improve",
     description:
-      "Launch isn't the finish line. I set up monitoring, review real user data, and help you prioritize what to build next. The goal is a product that works in production — not just in a demo.",
+      "Launch isn't the finish line. I set up monitoring, review real user data, and help you prioritize what to build next. The goal is a product that works in production  - not just in a demo.",
   },
 ]
 

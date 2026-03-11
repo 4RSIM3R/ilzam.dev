@@ -11,7 +11,7 @@ const testimonials = [
     image: "https://picsum.photos/seed/mara/400/600",
     tags: ["Fractional CTO", "MVP Build"],
     quote:
-      "We needed someone who could make real technical decisions, not just write code. Ilzam became our remote CTO — he chose our stack, built the first version, and shipped it in under 8 weeks. We went from idea to paying customers.",
+      "We needed someone who could make real technical decisions, not just write code. Ilzam became our remote CTO  - he chose our stack, built the first version, and shipped it in under 8 weeks. We went from idea to paying customers.",
   },
   {
     name: "Alex Hartanto",
@@ -87,7 +87,7 @@ export function TestimonialsSection() {
 
       {/* Testimonial carousel */}
       <div className="mt-12 grid items-start gap-8 md:grid-cols-[1fr_1fr]">
-        {/* Left — avatar strip */}
+        {/* Left  - avatar strip */}
         <div className="flex items-end gap-0">
           {testimonials.map((t, i) => {
             const isActive = i === active
@@ -126,7 +126,7 @@ export function TestimonialsSection() {
           })}
         </div>
 
-        {/* Right — quote */}
+        {/* Right  - quote */}
         <div className="flex flex-col justify-between">
           <AnimatePresence mode="wait">
             <motion.div

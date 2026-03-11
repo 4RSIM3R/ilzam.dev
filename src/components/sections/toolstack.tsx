@@ -20,7 +20,7 @@ export function ToolstackSection() {
       className="snap-start min-h-[calc(100vh-3.5rem)] px-6 py-12 md:px-10 md:py-16"
     >
       <div className="grid items-start gap-8 md:grid-cols-[1fr_1.5fr]">
-        {/* Left — heading + description */}
+        {/* Left  - heading + description */}
         <div className="flex h-full flex-col justify-between">
           <div>
             <Badge
@@ -47,12 +47,12 @@ export function ToolstackSection() {
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
               Event-driven architectures, microservices, REST APIs, RAG
-              pipelines — the infrastructure that makes products work at scale.
+              pipelines  - the infrastructure that makes products work at scale.
             </p>
           </div>
         </div>
 
-        {/* Right — tool grid */}
+        {/* Right  - tool grid */}
         <div
           className="grid gap-2 md:gap-3"
           style={{

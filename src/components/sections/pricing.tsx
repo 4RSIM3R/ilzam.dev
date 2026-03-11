@@ -12,7 +12,7 @@ import { PhoneCallIcon, MailIcon } from "lucide-react"
 const plans = [
   {
     label: "Fractional CTO",
-    price: "Starting at $3,000",
+    price: "$1,250",
     period: "/ Month",
     description:
       "Ongoing technical leadership for your startup. I embed in your team, make architecture decisions, review code, and keep your product on track.",
@@ -37,7 +37,7 @@ const plans = [
   },
   {
     label: "MVP Build",
-    price: "From $8,000",
+    price: "From $2,500",
     period: "",
     description:
       "I scope, build, and ship your MVP to production. AI-assisted development means startup speed without agency prices. Most MVPs ship in 6-10 weeks.",
@@ -60,8 +60,8 @@ const plans = [
     ],
   },
   {
-    label: "Technical Advisory",
-    price: "$500",
+    label: "Advisory Session",
+    price: "$250",
     period: "/ Session",
     description:
       "A focused session where I review your vendor proposal, evaluate your tech stack, or give you a second opinion on a big technical decision.",
@@ -76,7 +76,37 @@ const plans = [
     actions: [
       {
         label: "Book Advisory Session",
-        href: "https://cal.com/ilzam/advisory",
+        href: "https://cal.com/ilzam/intro",
+        variant: "outline" as const,
+        full: false,
+        icon: PhoneCallIcon,
+      },
+      {
+        label: "Email Me",
+        href: "mailto:ilzammulkhaq85@gmail.com",
+        variant: "default" as const,
+        full: false,
+        icon: MailIcon,
+      },
+    ],
+  },
+  {
+    label: "Custom",
+    price: "Let's Talk",
+    period: "",
+    description:
+      "Need something that doesn't fit the boxes above? Larger builds, ongoing retainers, or team augmentation  - let's figure out the right scope together.",
+    features: [
+      "Tailored scope and deliverables",
+      "Flexible engagement length",
+      "Dedicated availability windows",
+      "Custom SLA and communication cadence",
+    ],
+    bestFor: "Larger projects. Unique requirements. Teams that need a custom arrangement.",
+    actions: [
+      {
+        label: "Book Intro Call",
+        href: "https://cal.com/ilzam/intro",
         variant: "outline" as const,
         full: false,
         icon: PhoneCallIcon,
@@ -103,7 +133,7 @@ export function PricingSection() {
         <h2 className="max-w-md text-4xl font-light leading-tight tracking-tight md:text-5xl">
           Three ways to{" "}
           <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            work together
+            work with me
           </span>
         </h2>
         <Badge
@@ -116,11 +146,11 @@ export function PricingSection() {
 
       <p className="mt-4 max-w-xl text-sm text-muted-foreground">
         Whether you need ongoing CTO-level support, a product built from
-        scratch, or a one-time technical gut check — there's a clear path.
+        scratch, a one-time technical gut check, or something custom  - there's a clear path.
       </p>
 
       {/* Cards */}
-      <div className="mt-12 grid gap-6 md:grid-cols-3">
+      <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {plans.map((plan) => (
           <Card key={plan.label} className="flex flex-col">
             <CardHeader className="space-y-4">

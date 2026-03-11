@@ -20,7 +20,7 @@ const capabilities = [
     icon: BrainCircuitIcon,
     title: "Fractional CTO",
     description:
-      "You need someone to own the technical side — architecture, stack choices, vendor evaluation, hiring — without committing to a $150k/year executive. I act as your startup CTO on a fractional basis, embedded in your team weekly.",
+      "You need someone to own the technical side  - architecture, stack choices, vendor evaluation, hiring  - without committing to a $150k/year executive. I act as your startup CTO on a fractional basis, embedded in your team weekly.",
     card: {
       badge: "Technical Leadership",
       heading: "What You Get",
@@ -40,12 +40,12 @@ const capabilities = [
     icon: RocketIcon,
     title: "MVP Development",
     description:
-      "I design, build, and ship your product using AI-assisted development. What used to take a 3-person team 3 months, I move through in weeks — without the technical debt that kills products at scale.",
+      "I design, build, and ship your product using AI-assisted development. What used to take a 3-person team 3 months, I move through in weeks  - without the technical debt that kills products at scale.",
     card: {
       badge: "Build",
       heading: "What You Get",
       message:
-        "A working product shipped to production — built fast, built right.",
+        "A working product shipped to production  - built fast, built right.",
       items: [
         "Core feature scoping and startup tech stack selection",
         "Full-stack development with Go, React, TypeScript, PostgreSQL",
@@ -53,25 +53,25 @@ const capabilities = [
         "Deployment to production infrastructure (AWS/Cloudflare)",
         "Analytics and monitoring from day one",
       ],
-      tip: "15+ MVPs shipped. Chef booking marketplace — two-sided platform, 10 weeks, one engineer.",
+      tip: "15+ MVPs shipped. Chef booking marketplace  - two-sided platform, 10 weeks, one engineer.",
     },
   },
   {
     icon: ShieldCheckIcon,
     title: "Technical Advisory",
     description:
-      "A one-time or recurring session for founders who need a second opinion — on a vendor proposal, an agency quote, a build vs buy decision, or a technology choice. I'll tell you what I actually think.",
+      "A one-time or recurring session for founders who need a second opinion  - on a vendor proposal, an agency quote, a build vs buy decision, or a technology choice. I'll tell you what I actually think.",
     card: {
       badge: "Advisory",
       heading: "What You Get",
       message:
-        "Clarity on the technical decision in front of you — before you commit.",
+        "Clarity on the technical decision in front of you  - before you commit.",
       items: [
         "Vendor and agency proposal review",
         "Build vs buy analysis for your specific case",
         "Stack recommendation based on your constraints",
         "Architecture review for existing systems",
-        "Honest assessment — even if it means 'don't build this yet'",
+        "Honest assessment  - even if it means 'don't build this yet'",
       ],
       tip: "Reduced infrastructure costs by 80% for a healthcare network.",
     },
@@ -108,12 +108,12 @@ export function CapabilitiesSection() {
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
         I work as an AI-native software engineer and fractional CTO for
         early-stage founders. I make the technical decisions, build the product,
-        and help you ship — so you can focus on customers, not code.
+        and help you ship  - so you can focus on customers, not code.
       </p>
 
       {/* Content grid */}
       <div className="mt-12 grid gap-10 md:grid-cols-[2fr_3fr]">
-        {/* Left — capability list */}
+        {/* Left  - capability list */}
         <div className="flex flex-col">
           {capabilities.map((item, i) => {
             const isActive = i === active
@@ -141,7 +141,7 @@ export function CapabilitiesSection() {
           })}
         </div>
 
-        {/* Right — dynamic card */}
+        {/* Right  - dynamic card */}
         <div className="flex items-start justify-center md:sticky md:top-20">
           <AnimatePresence mode="wait">
             <motion.div
