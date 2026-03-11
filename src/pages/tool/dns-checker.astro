@@ -1,0 +1,20 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+import { DnsChecker } from '@/components/dns-checker'
+---
+
+<ContentLayout
+	title="DNS Checker — Free DNS Lookup Tool"
+	description="Look up DNS records for any domain. Check A, AAAA, CNAME, MX, NS, TXT, SOA, SRV, CAA, and PTR records instantly."
+>
+	<h1 class="text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		DNS Checker
+	</h1>
+	<p class="mt-3 text-muted-foreground">
+		Look up DNS records for any domain. Enter a domain name, choose a record type, and get results instantly.
+	</p>
+
+	<div class="mt-8">
+		<DnsChecker client:load />
+	</div>
+</ContentLayout>

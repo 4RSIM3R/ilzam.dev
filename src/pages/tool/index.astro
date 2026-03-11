@@ -1,0 +1,35 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+
+const tools = [
+	{
+		title: 'DNS Checker',
+		description: 'Look up A, AAAA, CNAME, MX, NS, TXT, and other DNS records for any domain.',
+		href: '/tool/dns-checker',
+	},
+]
+---
+
+<ContentLayout
+	title="Free Developer Tools — ilzam.dev"
+	description="A collection of free developer tools. DNS checker, and more coming soon."
+>
+	<h1 class="text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		Tools
+	</h1>
+	<p class="mt-3 text-muted-foreground">
+		Free utilities for developers and site owners.
+	</p>
+
+	<div class="mt-8 grid gap-4">
+		{tools.map((tool) => (
+			<a
+				href={tool.href}
+				class="group rounded-lg border p-5 transition-shadow hover:shadow-md"
+			>
+				<p class="font-semibold group-hover:underline">{tool.title}</p>
+				<p class="mt-1 text-sm text-muted-foreground">{tool.description}</p>
+			</a>
+		))}
+	</div>
+</ContentLayout>
