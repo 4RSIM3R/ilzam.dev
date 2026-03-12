@@ -1,5 +1,120 @@
 ---
 import ContentLayout from '@/layouts/content-layout.astro'
+
+const codeBoxCreate = `const box = await Box.create({
+  runtime: "node",
+  agent: {
+    runner: Agent.Codex,
+    model: OpenAICodex.GPT_5_3_Codex,
+    apiKey: process.env.OPENAI_API_KEY!,
+  },
+});`
+
+const codeCloneScan = `await box.git.clone({ repo: repoUrl });
+
+const stream = await box.agent.stream({
+  prompt: SCAN_PROMPT,
+  timeout: 300_000,
+  onToolUse(tool) {
+    logTool(tool.name, tool.input);
+  },
+});`
+
+const codeToolIcons = `const TOOL_ICONS: Record<string, string> = {
+  Read: "📄",
+  Write: "✏️",
+  Bash: "⚡",
+  Glob: "🔍",
+  Grep: "🔎",
+};
+
+function logTool(name: string, input: Record<string, unknown>) {
+  const icon = TOOL_ICONS[name] || "🔧";
+  let detail = "";
+
+  if (name === "Bash" && input.command) {
+    detail = \` $ \${input.command}\`;
+  } else if (name === "Read" && input.file_path) {
+    detail = \` \${input.file_path}\`;
+  } else if (name === "Grep" && input.pattern) {
+    detail = \` /\${input.pattern}/\`;
+  }
+
+  console.log(\`  \${icon} \${name}\${detail}\`);
+}`
+
+const codeStreamConsumer = `for await (const chunk of stream) {
+  if (chunk.type === "reasoning") {
+    process.stdout.write(".");
+  }
+}`
+
+const codeScanPrompt = `const SCAN_PROMPT = \`You are a security auditor. Analyze the cloned
+repository in /work for security risks.
+
+PHASE 1 — Static Analysis:
+- Check for obfuscated code, base64-encoded strings, eval(), exec(),
+  Function() constructors
+- Inspect install hooks: postinstall, preinstall, prepare scripts
+  in package.json, setup.py, Makefile, etc.
+- Look for environment variable harvesting (process.env, os.environ)
+- Detect suspicious network calls (fetch, http, axios, requests)
+  to hardcoded external URLs
+- Check for filesystem access outside the project directory
+- Identify minified or bundled files that could hide malicious intent
+- Look for crypto mining patterns, reverse shells, data exfiltration
+- Check for typosquatting in dependency names
+- Examine GitHub Actions workflows for supply chain risks
+
+PHASE 2 — Dynamic Analysis:
+- Run the install step (npm install / pip install / go mod download)
+  and observe what happens
+- Check what files were created or modified after install
+- Look at any network-related code that runs on import or install
+
+IMPORTANT: After your analysis, output your final result as a single
+JSON block:
+{
+  "riskLevel": "safe" | "warning" | "dangerous",
+  "summary": "one-line summary of what you found",
+  "findings": [
+    {
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "title": "short description of the issue",
+      "location": "file/path:line",
+      "detail": "A detailed explanation of the vulnerability..."
+    }
+  ]
+}
+
+Be specific about file paths and line numbers.
+If the repo looks clean, return riskLevel "safe" with empty findings.
+Only flag real, concrete issues — not hypothetical ones.\`;`
+
+const codeInterfaces = `interface Finding {
+  severity: "HIGH" | "MEDIUM" | "LOW";
+  title: string;
+  location: string;
+  detail: string;
+}
+
+interface ScanReport {
+  riskLevel: "safe" | "warning" | "dangerous";
+  summary: string;
+  findings: Finding[];
+  cost?: { totalUsd: number; computeMs: number };
+}`
+
+const codeSaveReport = `const slug = repoSlug(repoUrl);
+const filename = \`safescan-\${slug}-\${Date.now()}.md\`;
+const md = generateMarkdown(repoUrl, report);
+await Bun.write(filename, md);`
+
+const codeCleanup = `try {
+  // ... scan logic
+} finally {
+  await box.delete();
+}`
 ---
 
 <ContentLayout
@@ -145,14 +260,7 @@ import ContentLayout from '@/layouts/content-layout.astro'
 			The first thing safescan does is create a box with an OpenAI Codex agent
 			attached:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const box = await Box.create({
-  runtime: "node",
-  agent: {
-    runner: Agent.Codex,
-    model: OpenAICodex.GPT_5_3_Codex,
-    apiKey: process.env.OPENAI_API_KEY!,
-  },
-});</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeBoxCreate} /></pre>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			One call. A fresh Alpine Linux container with 2 vCPU, 2GB RAM, 10GB
 			disk, and an AI agent ready to go.
@@ -166,15 +274,7 @@ import ContentLayout from '@/layouts/content-layout.astro'
 			Next, clone the target repo and hand it off to the agent with a security
 			audit prompt:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>await box.git.clone({ repo: repoUrl });
-
-const stream = await box.agent.stream({
-  prompt: SCAN_PROMPT,
-  timeout: 300_000,
-  onToolUse(tool) {
-    logTool(tool.name, tool.input);
-  },
-});</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeCloneScan} /></pre>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			I used <code>stream()</code> instead of <code>run()</code> here. This
 			was a deliberate choice. With streaming, I can watch the agent work in
@@ -229,36 +329,11 @@ const stream = await box.agent.stream({
 			This is the part that made me appreciate the <code>stream()</code> API.
 			I set up tool icons so each agent action gets a clean log line:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const TOOL_ICONS: Record&lt;string, string&gt; = {
-  Read: "📄",
-  Write: "✏️",
-  Bash: "⚡",
-  Glob: "🔍",
-  Grep: "🔎",
-};
-
-function logTool(name: string, input: Record&lt;string, unknown&gt;) {
-  const icon = TOOL_ICONS[name] || "🔧";
-  let detail = "";
-
-  if (name === "Bash" &amp;&amp; input.command) {
-    detail = ` $ ${input.command}`;
-  } else if (name === "Read" &amp;&amp; input.file_path) {
-    detail = ` ${input.file_path}`;
-  } else if (name === "Grep" &amp;&amp; input.pattern) {
-    detail = ` /${input.pattern}/`;
-  }
-
-  console.log(`  ${icon} ${name}${detail}`);
-}</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeToolIcons} /></pre>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			Then consume the stream and show reasoning progress:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>for await (const chunk of stream) {
-  if (chunk.type === "reasoning") {
-    process.stdout.write(".");
-  }
-}</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeStreamConsumer} /></pre>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			In the terminal, you see the agent thinking and acting. Reading
 			<code>package.json</code>, globbing for shell scripts, grepping for
@@ -274,47 +349,7 @@ function logTool(name: string, input: Record&lt;string, unknown&gt;) {
 			The security audit prompt is the core of the whole thing. Here's what
 			I send to the agent:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const SCAN_PROMPT = `You are a security auditor. Analyze the cloned
-repository in /work for security risks.
-
-PHASE 1 — Static Analysis:
-- Check for obfuscated code, base64-encoded strings, eval(), exec(),
-  Function() constructors
-- Inspect install hooks: postinstall, preinstall, prepare scripts
-  in package.json, setup.py, Makefile, etc.
-- Look for environment variable harvesting (process.env, os.environ)
-- Detect suspicious network calls (fetch, http, axios, requests)
-  to hardcoded external URLs
-- Check for filesystem access outside the project directory
-- Identify minified or bundled files that could hide malicious intent
-- Look for crypto mining patterns, reverse shells, data exfiltration
-- Check for typosquatting in dependency names
-- Examine GitHub Actions workflows for supply chain risks
-
-PHASE 2 — Dynamic Analysis:
-- Run the install step (npm install / pip install / go mod download)
-  and observe what happens
-- Check what files were created or modified after install
-- Look at any network-related code that runs on import or install
-
-IMPORTANT: After your analysis, output your final result as a single
-JSON block:
-{
-  "riskLevel": "safe" | "warning" | "dangerous",
-  "summary": "one-line summary of what you found",
-  "findings": [
-    {
-      "severity": "HIGH" | "MEDIUM" | "LOW",
-      "title": "short description of the issue",
-      "location": "file/path:line",
-      "detail": "A detailed explanation of the vulnerability..."
-    }
-  ]
-}
-
-Be specific about file paths and line numbers.
-If the repo looks clean, return riskLevel "safe" with empty findings.
-Only flag real, concrete issues — not hypothetical ones.`;</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeScanPrompt} /></pre>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			That last line is a hard-won lesson. Without "only flag real, concrete
 			issues," the agent over-reports everything. It flags every theoretical
@@ -333,19 +368,7 @@ Only flag real, concrete issues — not hypothetical ones.`;</code></pre>
 			After the stream completes, I parse the agent's output into a typed
 			report:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>interface Finding {
-  severity: "HIGH" | "MEDIUM" | "LOW";
-  title: string;
-  location: string;
-  detail: string;
-}
-
-interface ScanReport {
-  riskLevel: "safe" | "warning" | "dangerous";
-  summary: string;
-  findings: Finding[];
-  cost?: { totalUsd: number; computeMs: number };
-}</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeInterfaces} /></pre>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			Each finding includes a <code>detail</code> field with a 2-4 sentence
 			explanation of what the code does, why it's dangerous, how it could be
@@ -356,10 +379,7 @@ interface ScanReport {
 			The report renders in the terminal with color-coded severity and gets
 			saved as a Markdown file you can share with your team or attach to a PR:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const slug = repoSlug(repoUrl);
-const filename = `safescan-${slug}-${Date.now()}.md`;
-const md = generateMarkdown(repoUrl, report);
-await Bun.write(filename, md);</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeSaveReport} /></pre>
 	</section>
 
 	<!-- Cleanup -->
@@ -369,11 +389,7 @@ await Bun.write(filename, md);</code></pre>
 			No matter what happens (success, failure, timeout) the box gets
 			destroyed:
 		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>try {
-  // ... scan logic
-} finally {
-  await box.delete();
-}</code></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeCleanup} /></pre>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			Whatever the repo tried to do, it's gone. No cleanup scripts, no
 			leftover containers, no dangling processes.
