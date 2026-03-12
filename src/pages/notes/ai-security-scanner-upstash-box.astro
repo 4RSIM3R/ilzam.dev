@@ -1,0 +1,519 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+---
+
+<ContentLayout
+	title="I Built an AI Agent That Runs Untrusted Code to Find Security Threats — Ilzam"
+	description="How I used Upstash Box to build safescan, a CLI that clones any GitHub repo into a sandboxed container, lets an AI agent perform static and dynamic security analysis, and outputs a structured report."
+>
+	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<div class="mt-6 flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Engineering</span>
+		<span class="text-xs text-muted-foreground">March 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		I Built an AI Agent That Runs Untrusted Code to Find Security Threats
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			I built <strong>safescan</strong>, a CLI that clones any GitHub repo into
+			a sandboxed <a href="https://upstash.com/docs/box/overall/quickstart" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">Upstash Box</a>
+			container, lets an AI agent perform both static and dynamic security
+			analysis, and outputs a structured report. The agent reads files, greps
+			for patterns, runs install scripts, and observes what happens. All inside
+			a throwaway environment that gets destroyed when it's done.
+		</p>
+	</blockquote>
+
+	<!-- Hook: The problem -->
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			The npm ecosystem has a malware problem. And it's getting worse.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Sonatype's Q3 2025 report counted
+			<a href="https://www.sonatype.com/press-releases/open-source-malware-index-q3-2025" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">877,522 malicious packages</a>
+			across open-source registries since they started tracking. In Q2 alone,
+			they found
+			<a href="https://www.sonatype.com/press-releases/q2-2025-open-source-malware-index" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">16,279 new malicious packages</a>,
+			a 188% surge over the same period last year.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			These aren't theoretical risks. In September 2025, a self-replicating
+			worm called Shai-Hulud
+			<a href="https://www.cisa.gov/news-events/alerts/2025/09/23/widespread-supply-chain-compromise-impacting-npm-ecosystem" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">infiltrated over 500 npm packages</a>,
+			stole developer credentials, and used those credentials to propagate to
+			even more packages. CISA issued a formal alert. That same month, 20
+			packages including <code>chalk</code> and <code>debug</code> were
+			<a href="https://thehackernews.com/2025/09/20-popular-npm-packages-with-2-billion.html" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">hijacked through a phishing attack</a>,
+			compromising packages with over 2 billion weekly downloads combined.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The scariest part? Many of these attacks are invisible to static analysis.
+			Attackers use
+			<a href="https://www.veracode.com/blog/malicious-npm-package-hiding-in-plain-pixels/" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">steganographic payloads hidden in PNG pixel data</a>,
+			multi-layer obfuscation that splits commands across hundreds of variables,
+			and runtime code fetching from remote servers. The malicious payload never
+			exists in the published source. <code>npm audit</code> finds nothing.
+			Grep finds nothing. The code only reveals itself when it runs.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			So I asked a simple question: what if you could safely
+			<span class="font-medium text-foreground">run</span> untrusted code,
+			and let an AI agent watch what happens?
+		</p>
+	</section>
+
+	<!-- The idea -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The idea behind safescan</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Most security scanners work by reading code. They pattern-match against
+			known bad signatures: <code>eval()</code>, suspicious URLs, encoded
+			strings. That catches the obvious stuff. But the sophisticated attacks
+			happen at install time, when a <code>postinstall</code> script downloads
+			a payload, decodes it, and exfiltrates your <code>.env</code> file. None
+			of that shows up in a static scan.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			safescan does both. It clones a repo into an isolated container, runs
+			static analysis first, then actually executes the install step and
+			observes what changes. An AI agent handles the entire process
+			autonomously: reading files, running commands, reasoning about what it
+			finds.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The key ingredient is
+			<a href="https://upstash.com/docs/box/overall/quickstart" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">Upstash Box</a>.
+			It gave me sandboxed containers with a built-in AI agent in a single
+			API call. No Docker setup, no container orchestration, no agent
+			framework wiring.
+		</p>
+	</section>
+
+	<!-- Why Upstash Box -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Why Upstash Box is a good fit for this</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Before diving into the code, here's why I picked
+			<a href="https://upstash.com/docs/box/overall/quickstart" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">Upstash Box</a>
+			for this project:
+		</p>
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">True isolation</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Each box is a Docker container with its own filesystem, processes,
+					and network stack. Code inside can't reach anything outside. You can
+					run the sketchiest package on earth and it can't touch your machine.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Built-in AI agent</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Attach a Codex or Claude agent that can read files, run bash, use
+					git, grep, and glob. All autonomously inside the container. No need
+					to wire up an agent framework yourself.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Ephemeral by design</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					One call to <code>box.delete()</code> and everything is gone. Whatever
+					the repo tried to do (write files, spawn processes, phone home) none
+					of it persists.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Pay-per-use economics</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					CPU is billed only during active execution. A typical scan costs
+					fractions of a cent in compute. Idle boxes cost almost nothing.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Spinning up the sandbox -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Spinning up the sandbox</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The first thing safescan does is create a box with an OpenAI Codex agent
+			attached:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const box = await Box.create({
+  runtime: "node",
+  agent: {
+    runner: Agent.Codex,
+    model: OpenAICodex.GPT_5_3_Codex,
+    apiKey: process.env.OPENAI_API_KEY!,
+  },
+});</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			One call. A fresh Alpine Linux container with 2 vCPU, 2GB RAM, 10GB
+			disk, and an AI agent ready to go.
+		</p>
+	</section>
+
+	<!-- Clone and scan -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Clone and let the agent loose</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Next, clone the target repo and hand it off to the agent with a security
+			audit prompt:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>await box.git.clone({ repo: repoUrl });
+
+const stream = await box.agent.stream({
+  prompt: SCAN_PROMPT,
+  timeout: 300_000,
+  onToolUse(tool) {
+    logTool(tool.name, tool.input);
+  },
+});</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I used <code>stream()</code> instead of <code>run()</code> here. This
+			was a deliberate choice. With streaming, I can watch the agent work in
+			real-time through the <code>onToolUse</code> callback. Every time the
+			agent reads a file, runs a command, or greps for a pattern, I see it.
+			The scan isn't a black box.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The agent performs two phases:
+		</p>
+
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">Phase 1: Static analysis</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					The agent scans for known patterns: obfuscated code,
+					<code>eval()</code>, <code>exec()</code>,
+					<code>Function()</code> constructors. It checks
+					<code>postinstall</code> and <code>preinstall</code> scripts. It
+					looks for environment variable harvesting, hardcoded network calls
+					to unknown endpoints, filesystem access outside the project
+					directory, crypto mining patterns, reverse shells, and typosquatting
+					in dependency names. It also examines GitHub Actions workflows for
+					supply chain risks.
+				</p>
+			</div>
+			<div>
+				<h3 class="font-semibold">Phase 2: Dynamic analysis</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					This is where sandboxing really matters. The agent actually runs
+					<code>npm install</code> (or <code>pip install</code>,
+					<code>go mod download</code>) and observes what happens. It checks
+					what files were created or modified after install. It looks at
+					network-related code that runs on import.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Some packages only do malicious things at install time. A
+					<code>postinstall</code> script that curls a remote endpoint and
+					pipes the response to <code>sh</code> won't show up in any static
+					scan. Inside the box, the agent can just run it and see what happens.
+					That single capability is what makes this approach different from
+					tools like <code>npm audit</code> or Snyk.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Watching the agent work -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Watching the agent work</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is the part that made me appreciate the <code>stream()</code> API.
+			I set up tool icons so each agent action gets a clean log line:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const TOOL_ICONS: Record&lt;string, string&gt; = {
+  Read: "📄",
+  Write: "✏️",
+  Bash: "⚡",
+  Glob: "🔍",
+  Grep: "🔎",
+};
+
+function logTool(name: string, input: Record&lt;string, unknown&gt;) {
+  const icon = TOOL_ICONS[name] || "🔧";
+  let detail = "";
+
+  if (name === "Bash" &amp;&amp; input.command) {
+    detail = ` $ ${input.command}`;
+  } else if (name === "Read" &amp;&amp; input.file_path) {
+    detail = ` ${input.file_path}`;
+  } else if (name === "Grep" &amp;&amp; input.pattern) {
+    detail = ` /${input.pattern}/`;
+  }
+
+  console.log(`  ${icon} ${name}${detail}`);
+}</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Then consume the stream and show reasoning progress:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>for await (const chunk of stream) {
+  if (chunk.type === "reasoning") {
+    process.stdout.write(".");
+  }
+}</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			In the terminal, you see the agent thinking and acting. Reading
+			<code>package.json</code>, globbing for shell scripts, grepping for
+			<code>eval(</code>, running <code>npm install</code>, inspecting what
+			changed. You know exactly what the agent is doing at every step.
+		</p>
+	</section>
+
+	<!-- The prompt -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The prompt that makes or breaks it</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The security audit prompt is the core of the whole thing. Here's what
+			I send to the agent:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const SCAN_PROMPT = `You are a security auditor. Analyze the cloned
+repository in /work for security risks.
+
+PHASE 1 — Static Analysis:
+- Check for obfuscated code, base64-encoded strings, eval(), exec(),
+  Function() constructors
+- Inspect install hooks: postinstall, preinstall, prepare scripts
+  in package.json, setup.py, Makefile, etc.
+- Look for environment variable harvesting (process.env, os.environ)
+- Detect suspicious network calls (fetch, http, axios, requests)
+  to hardcoded external URLs
+- Check for filesystem access outside the project directory
+- Identify minified or bundled files that could hide malicious intent
+- Look for crypto mining patterns, reverse shells, data exfiltration
+- Check for typosquatting in dependency names
+- Examine GitHub Actions workflows for supply chain risks
+
+PHASE 2 — Dynamic Analysis:
+- Run the install step (npm install / pip install / go mod download)
+  and observe what happens
+- Check what files were created or modified after install
+- Look at any network-related code that runs on import or install
+
+IMPORTANT: After your analysis, output your final result as a single
+JSON block:
+{
+  "riskLevel": "safe" | "warning" | "dangerous",
+  "summary": "one-line summary of what you found",
+  "findings": [
+    {
+      "severity": "HIGH" | "MEDIUM" | "LOW",
+      "title": "short description of the issue",
+      "location": "file/path:line",
+      "detail": "A detailed explanation of the vulnerability..."
+    }
+  ]
+}
+
+Be specific about file paths and line numbers.
+If the repo looks clean, return riskLevel "safe" with empty findings.
+Only flag real, concrete issues — not hypothetical ones.`;</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			That last line is a hard-won lesson. Without "only flag real, concrete
+			issues," the agent over-reports everything. It flags every theoretical
+			risk it can imagine: "this package <em>could</em> be used maliciously,"
+			"this function <em>could</em> leak data if called with the wrong
+			arguments." The signal-to-noise ratio tanks. Telling the agent to stick
+			to concrete, observed issues was the single biggest improvement to
+			output quality.
+		</p>
+	</section>
+
+	<!-- Structured output -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Structured output and the report</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			After the stream completes, I parse the agent's output into a typed
+			report:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>interface Finding {
+  severity: "HIGH" | "MEDIUM" | "LOW";
+  title: string;
+  location: string;
+  detail: string;
+}
+
+interface ScanReport {
+  riskLevel: "safe" | "warning" | "dangerous";
+  summary: string;
+  findings: Finding[];
+  cost?: { totalUsd: number; computeMs: number };
+}</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Each finding includes a <code>detail</code> field with a 2-4 sentence
+			explanation of what the code does, why it's dangerous, how it could be
+			exploited, and the recommended fix. The agent writes these because it
+			actually read and understood the code, not because it matched a regex.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The report renders in the terminal with color-coded severity and gets
+			saved as a Markdown file you can share with your team or attach to a PR:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>const slug = repoSlug(repoUrl);
+const filename = `safescan-${slug}-${Date.now()}.md`;
+const md = generateMarkdown(repoUrl, report);
+await Bun.write(filename, md);</code></pre>
+	</section>
+
+	<!-- Cleanup -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Destroy the box</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			No matter what happens (success, failure, timeout) the box gets
+			destroyed:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>try {
+  // ... scan logic
+} finally {
+  await box.delete();
+}</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Whatever the repo tried to do, it's gone. No cleanup scripts, no
+			leftover containers, no dangling processes.
+		</p>
+	</section>
+
+	<!-- Demo -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Demo</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Here's what a scan looks like in action. I pointed safescan at a real
+			PHP repository and let the agent do its thing:
+		</p>
+
+		<figure class="mt-6">
+			<img
+				src="https://r2.ilzam.dev/safe-scan-progress.jpeg"
+				alt="safescan terminal output showing the AI agent scanning a repository in real-time, with tool calls for reading files, running bash commands, and grepping for patterns"
+				class="w-full rounded-lg border"
+				loading="lazy"
+			/>
+			<figcaption class="mt-2 text-center text-sm text-muted-foreground">
+				The agent working through a scan. Each line is a real tool call: reading files, grepping for patterns, running commands inside the sandbox.
+			</figcaption>
+		</figure>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			The scan completed in about 80 seconds. You can see the
+			<a href="https://github.com/njiplak/upstash-box-poc/blob/main/result/safescan-4RSIM3R-MIDU-1773323587375.md" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">full generated report here</a>,
+			complete with severity badges, file locations, and detailed
+			explanations for each finding.
+		</p>
+	</section>
+
+	<!-- Try it yourself -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Try it yourself</h2>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code># Clone the repo
+git clone https://github.com/njiplak/upstash-box-poc.git
+cd upstash-box-poc
+
+# Install dependencies
+bun install
+
+# Set your API keys
+cp .env.example .env
+# Edit .env with your keys:
+#   UPSTASH_BOX_API_KEY=abx_...
+#   OPENAI_API_KEY=sk-...
+
+# Run
+bun run index.ts</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			You'll need:
+		</p>
+		<ul class="mt-2 space-y-2 text-muted-foreground">
+			<li class="leading-relaxed">
+				An <a href="https://console.upstash.com/" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">Upstash account</a>
+				with a Box API key. See the
+				<a href="https://upstash.com/docs/box/overall/quickstart" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">Upstash Box quickstart</a>
+				for setup.
+			</li>
+			<li class="leading-relaxed">
+				An <a href="https://platform.openai.com/" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">OpenAI API key</a>
+				for the Codex agent.
+			</li>
+		</ul>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Full source code:
+			<a href="https://github.com/njiplak/upstash-box-poc" class="font-medium underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">github.com/njiplak/upstash-box-poc</a>
+		</p>
+	</section>
+
+	<!-- What I learned -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">What I learned</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Building safescan taught me three things worth sharing:
+		</p>
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">Dynamic analysis catches what static analysis misses</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					This isn't a new insight for security researchers, but experiencing
+					it firsthand made it visceral. A <code>postinstall</code> script
+					that downloads a payload from a remote server and executes it leaves
+					zero trace in the source code. You have to run it to see it.
+					Sandboxed containers make that safe to do.
+				</p>
+			</div>
+			<div>
+				<h3 class="font-semibold">AI agents need constraints, not just capabilities</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					The biggest quality improvement came from a single line in the
+					prompt: "Only flag real, concrete issues." Without it, the agent
+					produced exhaustive reports full of hypothetical risks that drowned
+					out actual findings. More capability without better constraints
+					produces noise, not signal.
+				</p>
+			</div>
+			<div>
+				<h3 class="font-semibold">The building blocks for autonomous security tooling are here</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Upstash Box handled the hard parts: container isolation, agent tool
+					calling, ephemeral environments. I wrote the prompt and the CLI
+					around it. The pieces are there for something bigger: CI/CD
+					integration that scans every new dependency before it enters your
+					lockfile, batch scanning with <code>Promise.all()</code> across
+					multiple boxes, multi-model comparison where you spin up one box
+					with Claude and another with Codex and compare their findings.
+				</p>
+			</div>
+		</div>
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			877,000 malicious packages and counting. The tools to fight back are
+			getting better. This is one small piece of that puzzle.
+		</p>
+	</section>
+
+	<!-- Related -->
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/how-to-build-startup-website-2026" class="text-sm underline underline-offset-4 hover:text-foreground">How to Build Your Startup's Website in 2026</a></li>
+		</ul>
+	</section>
+
+	<!-- CTA -->
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Building something that needs security-conscious architecture?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			I help startups make smart infrastructure decisions. Let's talk.
+		</p>
+		<a
+			href="https://cal.com/ilzam/advisory"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Advisory Session
+		</a>
+	</section>
+</ContentLayout>
