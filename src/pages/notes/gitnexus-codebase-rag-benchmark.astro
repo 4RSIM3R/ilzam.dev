@@ -3,8 +3,8 @@ import ContentLayout from '@/layouts/content-layout.astro'
 ---
 
 <ContentLayout
-	title="GitNexus Benchmark: Graph-Indexed Retrieval vs Claude Code's Native Exploration | Ilzam"
-	description="A structured comparison of GitNexus graph RAG against Claude Code's native heuristic-guided codebase traversal on a mid-sized Flutter project. Token costs, tool call overhead, KuzuDB internals, and the architectural case for graph-indexed retrieval."
+	title="GitNexus vs Claude Code's Native Exploration: A Real Benchmark | Ilzam"
+	description="I ran the same architectural question through Claude Code's built-in exploration and GitNexus graph-indexed retrieval on a Flutter project. 25% cheaper, 68% fewer tool calls, 43% fewer tokens. Here's what actually happened and why."
 >
 	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
 
@@ -14,92 +14,59 @@ import ContentLayout from '@/layouts/content-layout.astro'
 	</div>
 
 	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
-		GitNexus Benchmark: Graph-Indexed Retrieval vs Claude Code's Native Exploration
+		GitNexus vs Claude Code's Native Exploration: A Real Benchmark
 	</h1>
 
 	<blockquote class="mt-6">
 		<p class="text-sm font-medium">TL;DR</p>
 		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-			This note documents a structured comparison of two codebase exploration strategies applied
-			to the same architectural question on a mid-sized Flutter project: Claude Code's native
-			heuristic-guided tool invocation (the Explore subagent in very thorough mode), and
-			<strong>GitNexus</strong>, a graph-indexed code intelligence layer backed by
-			<strong>KuzuDB</strong>, an embedded columnar property graph database [1]. The graph-indexed
-			approach reduced total session cost by 25% ($0.52 to $0.39), reduced tool calls by
-			approximately 68% (38 to ~12), and consumed 43% fewer tokens, without loss of
-			architectural depth. The analysis additionally examines where the current GitNexus index
-			ceiling lies and what index conditions are required to realize its full retrieval potential.
+			I ran the same architectural question through two different codebase exploration approaches on a mid-sized Flutter project. First: Claude Code's built-in Explore subagent (very thorough mode). Second: <strong>GitNexus</strong>, a graph-indexed code intelligence layer backed by <strong>KuzuDB</strong>. The graph approach was 25% cheaper ($0.52 vs $0.39), used 68% fewer tool calls (38 vs ~12), and consumed 43% fewer tokens, with no loss in answer quality. Both approaches read roughly the same source files. The difference was how fast each figured out <em>which</em> files to read.
 		</p>
 	</blockquote>
 
 	<!-- Context / Motivation -->
 	<section class="mt-10">
 		<p class="text-lg leading-relaxed">
-			Evaluating retrieval tooling for architectural reasoning is not a straightforward exercise.
+			Testing retrieval tooling for architectural questions is tricky, because most retrieval benchmarks aren't designed for code.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Most retrieval benchmarks operate on document-centric corpora (legal texts, support ticket
-			archives, technical documentation) where relevance correlates meaningfully with semantic
-			proximity. A query about authentication surfaces documents that discuss authentication.
+			The typical benchmark uses document collections (legal texts, support tickets, documentation) where finding the right answer is largely a vocabulary problem. Search for "authentication" and you surface documents about authentication. Close enough works.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Codebase retrieval operates under materially different conditions. The questions that matter
-			most to a software architect are not semantic but structural: which components depend on this
-			interface, what execution path connects a user action to data persistence, what is the
-			blast radius of modifying a given abstraction. These questions are, in a precise sense,
-			graph traversal problems. The degree to which a retrieval system can answer them depends
-			less on embedding quality and more on whether relational structure is preserved in the index
-			at all.
+			Code questions are different. The questions that actually matter to someone reasoning about an architecture aren't about vocabulary, they're about structure: which components depend on this interface, what path connects a user action to the database, what breaks if I change this abstraction. These are graph traversal problems. Whether a retrieval system can answer them depends on whether it preserved the relational structure of the codebase when it built its index, not just the text content.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			This benchmark evaluates two retrieval strategies against this class of structural query:
-			Claude Code's native tool-based exploration and GitNexus graph-indexed retrieval.
+			So I ran both approaches against exactly that kind of structural question and measured what happened.
 		</p>
 	</section>
 
 	<!-- The fundamental limitation of vector search for code -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">The fundamental limitation of vector-based retrieval for code</h2>
+		<h2 class="text-xl font-semibold">Why vector search misses the point for code</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Vector-based retrieval encodes text as geometric representations in high-dimensional space
-			and retrieves candidates by cosine similarity to a query embedding. This approach is
-			well-suited to unstructured prose where vocabulary co-occurrence and semantic overlap
-			reliably approximate relevance.
+			Vector retrieval converts text into points in a high-dimensional space and finds matches by geometric proximity. It works well for prose, where similar vocabulary generally means similar meaning.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Three structural properties of source code systematically undermine this assumption.
+			Three things about source code make this break down.
 		</p>
 
 		<div class="mt-6 space-y-4">
 			<div class="rounded-lg bg-muted/50 p-5">
-				<p class="font-medium">Chunking severs cross-file relationships</p>
+				<p class="font-medium">Chunking cuts cross-file relationships</p>
 				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-					Vector indexing requires decomposing files into bounded chunks. This decomposition
-					necessarily destroys the edges that give code its meaning: caller-callee relationships,
-					import chains, interface implementations. A function's chunk encodes its body; it does
-					not encode that it is the sole upstream path for write operations, a fact that resides
-					in its callers, not in the function itself.
+					To build a vector index, you have to split files into chunks. That splitting destroys exactly what makes code meaningful: the caller-callee links, import chains, interface implementations. A function's chunk captures what the function does. It doesn't capture that it's the only write path in the entire app, because that fact lives in its callers, not in the function itself.
 				</p>
 			</div>
 			<div class="rounded-lg bg-muted/50 p-5">
-				<p class="font-medium">Semantic proximity does not imply structural connectivity</p>
+				<p class="font-medium">Closely related code doesn't always look similar</p>
 				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-					Two components that are tightly coupled in execution may be semantically distant. An
-					authentication lifecycle handler and a sync connection provider share little vocabulary
-					yet one directly triggers the other at a critical point in the application flow. Their
-					relationship is an edge in a call graph. It is not recoverable from geometric proximity
-					in embedding space.
+					Two components can be tightly coupled at runtime while sharing almost no vocabulary. An authentication lifecycle handler and a sync connection provider don't use the same terms, yet one directly triggers the other at a critical point in the app flow. That relationship is an edge in a call graph. You can't recover it from text similarity.
 				</p>
 			</div>
 			<div class="rounded-lg bg-muted/50 p-5">
-				<p class="font-medium">Retrieval imprecision degrades to context inflation</p>
+				<p class="font-medium">Imprecise retrieval leads to context bloat</p>
 				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-					When vector retrieval fails to surface precisely relevant files, the compensating
-					strategy is to expand context: loading additional files and delegating the filtering
-					burden to the language model. The empirical consequence is visible in the benchmark
-					data below, where cache reads constituted 88-96% of total token consumption across both
-					experimental runs. The model was not retrieving targeted information; it was scanning
-					an inflated context window to locate relevant content.
+					When vector retrieval can't pinpoint the right files, the workaround is to load more files and let the language model sort through them. You can see this in the benchmark numbers: cache reads were 88-96% of total token consumption across both runs. The model wasn't fetching targeted information, it was scanning a large context window looking for what mattered.
 				</p>
 			</div>
 		</div>
@@ -107,50 +74,29 @@ import ContentLayout from '@/layouts/content-layout.astro'
 
 	<!-- Claude Code's native exploration approach -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Claude Code's native codebase exploration</h2>
+		<h2 class="text-xl font-semibold">How Claude Code's built-in exploration works</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Before examining GitNexus, it is important to characterize the baseline accurately. Claude
-			Code's Explore subagent does not perform random or undirected traversal. It executes a
-			principled, heuristic-guided iterative retrieval strategy using three primary tools:
-			<code>Glob</code> for pattern-based file discovery, <code>Grep</code> for keyword and
-			symbol search within file contents, and <code>Read</code> for file ingestion.
+			Before getting to GitNexus, it's worth being precise about the baseline. Claude Code's Explore subagent isn't doing random file traversal. It runs a structured, iterative search using three tools: <code>Glob</code> for finding files by pattern, <code>Grep</code> for searching file contents by keyword or symbol, and <code>Read</code> for loading files.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The process is iterative and reactive. An initial set of search terms, derived from the
-			query, drives the first round of Glob and Grep invocations. The content of discovered
-			files yields new candidate symbols and filenames, which drive subsequent rounds. This
-			continues until coverage is deemed sufficient, accumulating discovered files into the
-			model's context window as the session progresses.
+			The process is iterative. It starts with search terms derived from the question, runs Glob and Grep, reads the files it finds, extracts new candidate symbols and filenames from those files, then searches again. This continues until coverage seems sufficient, with each discovered file added to the model's context as the session goes on.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			This strategy is effective and general-purpose. Its cost structure, however, reflects its
-			reactive nature: each iteration requires a model inference step to determine what to search
-			for next, and file content must be loaded in full to yield new search terms. The discovery
-			overhead scales with codebase complexity and with the number of indirect relationships
-			between relevant components.
+			It's an effective, general approach. The cost is that every round of discovery requires an inference step to decide what to look for next, and every file has to be loaded in full to yield new search terms. The more indirect the connections between relevant components, the more rounds it takes.
 		</p>
 	</section>
 
 	<!-- What GitNexus is -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">GitNexus: graph-indexed codebase retrieval</h2>
+		<h2 class="text-xl font-semibold">What GitNexus does differently</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			GitNexus indexes a codebase as a labeled property graph rather than a vector store or a
-			flat file corpus. Symbols (functions, classes, interfaces, modules) are represented as
-			nodes with typed properties. Relationships (call edges, import edges, inheritance edges,
-			implementation edges) are represented as directed, labeled arcs. Execution flows, where
-			indexed, become traversable paths through the graph.
+			GitNexus indexes a codebase as a property graph rather than a vector store or a flat file corpus. Functions, classes, interfaces, and modules become nodes. Calls, imports, inheritance, and interface implementations become directed, labeled edges. Execution flows, where indexed, become traversable paths.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			This representation preserves precisely the structural information that chunked vector
-			indices discard. A query against the graph returns nodes matching a concept and their
-			relationship neighborhood: not "text similar to this description" but "the exact files
-			participating in this feature, along with the typed edges connecting them."
+			This is the structural information that chunked vector indexes throw away. When you query the graph, you get back the nodes matching a concept and their full relationship neighborhood: not "text similar to this description" but "the exact files involved in this feature, and here's how they connect" [1].
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			GitNexus exposes this graph through a Model Context Protocol server, allowing a language
-			model to issue structured graph queries during a session without reverting to sequential
-			file traversal.
+			GitNexus exposes this through an MCP server, so a language model can issue structured graph queries during a session instead of running iterative file searches.
 		</p>
 	</section>
 
@@ -158,99 +104,52 @@ import ContentLayout from '@/layouts/content-layout.astro'
 	<section class="mt-12">
 		<h2 class="text-xl font-semibold">The storage engine: KuzuDB</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The performance characteristics of GitNexus's graph queries are determined in substantial
-			part by its underlying storage engine: <strong>KuzuDB</strong>, an embedded columnar
-			property graph database developed at the University of Waterloo and formally described by
-			Feng et al. at CIDR 2023 [1]. KuzuDB has been positioned in the literature as a graph
-			analogue to DuckDB, an in-process, analytically optimized engine that eliminates the
-			network overhead of client-server graph databases such as Neo4j.
+			GitNexus's query performance comes largely from its storage engine: <strong>KuzuDB</strong>, an embedded columnar property graph database out of the University of Waterloo [1]. Think of it as DuckDB for graphs, an in-process engine that skips the network overhead of client-server databases like Neo4j.
 		</p>
 
-		<h3 class="mt-8 text-base font-semibold">Columnar adjacency storage via CSR</h3>
+		<h3 class="mt-8 text-base font-semibold">How it stores graph structure</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			KuzuDB stores graph structure using Compressed Sparse Row (CSR) adjacency indices [1].
-			Node properties are stored in columnar disk files, consistent with OLAP storage conventions.
-			Edge relationships are encoded as double-indexed CSR structures: for each source node, the
-			set of destination node IDs and associated edge properties are stored contiguously on disk.
-			This layout enables edge traversal in time proportional to node degree, avoiding the
-			hash-based lookups or B-tree traversals required by relation-table designs.
+			KuzuDB uses Compressed Sparse Row (CSR) adjacency indexes to store edges [1]. Node properties sit in columnar disk files. For each source node, the destination node IDs and edge properties are stored contiguously on disk. This means traversing edges takes time proportional to how many connections a node has, not the size of the whole graph, because you're not doing hash lookups or B-tree scans to find neighbors.
 		</p>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			For code intelligence, this is structurally significant. A query of the form "find all
-			callers of function <em>f</em> across the call graph" resolves to a reverse-edge traversal
-			followed by a property filter, an operation that the CSR index can execute without scanning
-			unrelated portions of the symbol table.
+			For code intelligence, this matters. A query like "find every caller of function <em>f</em> across the whole codebase" is a reverse-edge traversal plus a property filter. KuzuDB runs that without touching unrelated parts of the symbol table.
 		</p>
 
 		<h3 class="mt-8 text-base font-semibold">Factorized query execution</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			The more consequential architectural contribution is KuzuDB's factorized query processor,
-			grounded in worst-case optimal join theory [2, 3]. Traditional binary join execution
-			materializes intermediate result tables at each join step; in many-to-many graph patterns
-			this produces intermediate results that are exponentially larger than the final output, a
-			well-documented pathology in graph workloads [1].
+			The more interesting piece is KuzuDB's query execution model. Traditional join execution builds a full intermediate result table at each join step. In graph queries with many-to-many relationships, those intermediate tables can get exponentially larger than the final answer, a known performance problem with graph workloads [1].
 		</p>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			KuzuDB's multiway ASP-Join (Accumulate-Semijoin-Probe) operator processes joins
-			column-at-a-time rather than relation-at-a-time, maintaining factorized representations
-			of intermediate results [1]. Redundant tuple replication is suppressed; intermediate result
-			sets are reported to compress by 50-100x on multi-hop queries compared to binary join
-			execution [1]. This is directly relevant to GitNexus: queries like "find the full
-			dependency subgraph of component <em>X</em>" or "enumerate all execution paths from
-			entry point <em>A</em> to persistence layer <em>B</em>" are exactly the cyclic,
-			multi-hop patterns that factorized execution handles efficiently.
+			KuzuDB's multiway ASP-Join operator (Accumulate-Semijoin-Probe) processes joins column-by-column rather than table-by-table, keeping intermediate results in a compressed form [1, 2, 3]. Redundant copies are suppressed. On multi-hop queries, intermediate result sets compress by 50-100x compared to standard join execution. This is directly relevant to GitNexus: questions like "give me the full dependency subgraph of component <em>X</em>" or "trace all paths from entry point <em>A</em> to the persistence layer" are exactly the multi-hop, cyclic patterns this handles well.
 		</p>
 
-		<h3 class="mt-8 text-base font-semibold">Vectorized processing and in-process execution</h3>
+		<h3 class="mt-8 text-base font-semibold">Vectorized batches and in-process execution</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			Query execution proceeds through vectorized batches (default capacity: 2,048 values per
-			vector, sized to fit CPU L3 cache), enabling SIMD optimization and reducing interpreted
-			overhead per tuple, consistent with columnar OLAP processing principles described by
-			Abadi et al. [4]. Multi-core parallelism is managed through a task scheduler using
-			morsel-driven parallelism with minimal synchronization overhead [1].
+			Query execution uses vectorized batches (2,048 values per batch, sized to fit L3 cache), which enables CPU-level SIMD optimization [4]. Multi-core work is scheduled with minimal coordination overhead.
 		</p>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			Critically, KuzuDB is embedded: it runs in-process within the GitNexus MCP server with no
-			network round-trips between the graph query engine and the calling application. For
-			interactive agent sessions where latency compounds across tool calls, this distinction
-			is material.
+			The in-process part matters: KuzuDB runs inside the GitNexus MCP server with no network round-trips to a separate database. In an agent session where tool call latency accumulates, that's a real difference.
 		</p>
 
 		<div class="mt-6 rounded-lg border p-5">
-			<p class="text-sm font-medium">How GitNexus uses KuzuDB</p>
+			<p class="text-sm font-medium">How GitNexus builds and uses the index</p>
 			<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-				GitNexus runs a multi-phase indexing pipeline over a repository: tree-sitter extracts
-				abstract syntax trees from source files, which are mapped to a property graph schema
-				(files, symbols, and typed relationship edges), persisted into KuzuDB, and annotated
-				with precomputed metadata (community assignments, confidence scores). At query time,
-				the MCP server translates a natural-language concept query into a KuzuDB Cypher query,
-				returning the relevant symbol nodes and their relationship neighborhoods directly,
-				without loading any source file into the language model's context window.
+				GitNexus runs a multi-phase pipeline over the repository: tree-sitter parses source files into abstract syntax trees, which get mapped into a property graph schema (files, symbols, typed relationship edges) and stored in KuzuDB, with precomputed metadata like community assignments and confidence scores attached. At query time, the MCP server translates a natural-language concept into a Cypher query against KuzuDB, returning the relevant symbol nodes and their relationship neighborhoods directly, without loading any source file into the model's context.
 			</p>
 		</div>
 	</section>
 
 	<!-- Benchmark methodology -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Benchmark methodology</h2>
+		<h2 class="text-xl font-semibold">What I tested</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The evaluation subject was a mid-sized Flutter project implementing an offline-first sync
-			architecture: bidirectional real-time synchronization with a remote service, local SQLite
-			persistence via a typed ORM layer, and Riverpod-managed application state. The query posed
-			was architectural in scope, examining how the sync integration functions end-to-end, from
-			application bootstrap through credential acquisition to upstream and downstream data
-			exchange.
+			The codebase was a mid-sized Flutter project with an offline-first sync architecture: bidirectional real-time sync with a remote service, local SQLite persistence through a typed ORM layer, and Riverpod-managed state. The question was architectural, asking how the sync integration works end-to-end, from app startup through credential acquisition to upstream and downstream data exchange.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Two experimental conditions were evaluated in sequence. The first condition employed Claude
-			Code's Explore subagent in very thorough mode, representing the default high-coverage
-			exploration strategy. The second condition used GitNexus as the primary discovery layer,
-			with source file reads performed only on files the graph query identified as relevant.
+			I ran two sessions on the same question. First, Claude Code's Explore subagent in very thorough mode. Second, GitNexus as the primary discovery layer, reading source files only after the graph query identified them as relevant.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Token consumption and session cost were measured as deltas from usage telemetry snapshots
-			captured immediately before and after each experimental run, isolating per-session overhead
-			from cumulative baseline consumption.
+			Token consumption and cost were measured as deltas from usage snapshots taken immediately before and after each run, so the numbers reflect only that session's activity.
 		</p>
 	</section>
 
@@ -303,102 +202,54 @@ import ContentLayout from '@/layouts/content-layout.astro'
 		</div>
 
 		<p class="mt-6 leading-relaxed text-muted-foreground">
-			The most informative observation is that both conditions read approximately the same number
-			of source files. The reduction in token consumption and tool call overhead did not derive
-			from reading less; it derived from spending fewer inference steps to determine <em>what</em>
-			to read.
+			The most telling number is that both sessions read roughly the same source files. The token savings didn't come from reading less, they came from spending fewer inference steps figuring out <em>what</em> to read.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The Explore subagent's 38 tool calls reflect its iterative discovery methodology: Glob
-			invocations across naming patterns, Grep calls across keyword sets, Read operations on
-			candidate files, and subsequent search refinement conditioned on file content. The GitNexus
-			condition issued a single <code>gitnexus_query</code> call that returned 9 relevant files
-			directly, with no false positives requiring further elimination. Remaining tool calls
-			consisted of targeted Read operations on the identified files.
+			The Explore subagent's 38 tool calls are the iterative discovery process in action: Glob runs across naming patterns, Grep runs across keyword sets, Read operations on candidate files, then more searches based on what those files revealed. GitNexus issued a single <code>gitnexus_query</code> call that returned 9 relevant files directly, with no false positives to filter out. The remaining tool calls were targeted Read operations on those files.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The baseline condition additionally employed a secondary Haiku subagent for the indexing
-			pass: 158k cache tokens created and 1M cache tokens read, accounting for $0.32 of the
-			$0.52 total. The GitNexus condition required no secondary model; discovery overhead was
-			absorbed by the pre-built KuzuDB index rather than delegated to a subagent at query time.
+			The baseline session also spun up a secondary Haiku subagent for the indexing pass: 158k cache tokens created and 1M cache tokens read, which accounted for $0.32 of the $0.52 total. GitNexus didn't need a secondary model at all. That discovery work happened at index build time, not at query time.
 		</p>
 	</section>
 
 	<!-- Ceiling and limitations -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Index fidelity and the current ceiling</h2>
+		<h2 class="text-xl font-semibold">Where the current index hits its ceiling</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The GitNexus index at the time of this evaluation contained 338 symbols and 322
-			relationship edges, but <strong>0 indexed execution flows</strong>.
+			The GitNexus index at the time of this test had 338 symbols and 322 relationship edges, but <strong>0 indexed execution flows</strong>.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Execution flows constitute the highest-value artifact a graph index can provide for
-			architectural reasoning. A complete flow entry for the sync initialization path, covering
-			authentication event through connection establishment to active data exchange, would allow
-			the architectural query to be answered in a single KuzuDB path traversal, without reading
-			any source file. This is precisely the capability that KuzuDB's factorized join execution
-			and CSR-indexed adjacency structures are architected to serve efficiently [1].
+			Execution flows are the highest-value thing a graph index can provide for architectural reasoning. A complete flow for the sync initialization path, covering the auth event through connection establishment to active data exchange, would let the architectural question get answered in a single path traversal, without opening any source file. That's what KuzuDB's CSR adjacency structures and factorized join execution are built to handle efficiently [1].
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Without flows, the graph functioned as a high-precision file locator rather than a full
-			architectural reasoning substrate. It eliminated the iterative discovery overhead but did
-			not eliminate the reading burden. The analytical synthesis required to answer the
-			end-to-end architectural question still depended on traversing source files, identical
-			in structure to the baseline condition, though more precisely targeted.
+			Without flows, the graph acted as a precise file locator rather than a full architectural reasoning layer. It cut the iterative discovery overhead, but didn't cut the reading step. Synthesizing the end-to-end answer still required going through source files, just more targeted ones than the baseline.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Projected forward: with flows fully indexed, the 5-6 source file reads required for
-			architectural synthesis would be replaceable by a single path query. Estimated cost for
-			the same task under that condition would likely fall to the $0.25-0.30 range, with
-			proportional reductions in elapsed time and model reasoning load.
+			With flows fully indexed, the 5-6 source file reads needed for architectural synthesis could be replaced by a single path query. Estimated cost for the same task would likely drop to the $0.25-0.30 range, with proportional reductions in time and reasoning load.
 		</p>
 
 		<div class="mt-6 rounded-lg border p-5">
-			<p class="text-sm font-medium">Index health verification</p>
+			<p class="text-sm font-medium">Checking index health before relying on flows</p>
 			<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-				Prior to relying on GitNexus for execution flow queries, verify that the index has been
-				built with process analysis enabled. Run <code>gitnexus analyze</code> and inspect the
-				reported process count. An index reporting 0 processes will provide file discovery
-				benefits but will not support path traversal. The file discovery benefit alone, as
-				this benchmark demonstrates, remains material.
+				Before using GitNexus for execution flow queries, check that the index was built with process analysis enabled. Run <code>gitnexus analyze</code> and look at the reported process count. An index with 0 processes will still give you the file discovery benefit shown here, but won't support path traversal queries.
 			</p>
 		</div>
 	</section>
 
 	<!-- Architectural implications -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Architectural implications</h2>
+		<h2 class="text-xl font-semibold">What this means in practice</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The results support a broader principle with practical consequences for teams adopting
-			AI-assisted development at architectural scale.
+			Claude Code's native exploration is solid for general-purpose investigation. The limitation is structural: because it discovers relationships by searching iteratively, it pays an inference cost proportional to how many indirect connections exist between the relevant components. On complex architectures, distributed sync systems, multi-layered dependency graphs, event-driven flows, that cost compounds quickly.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Claude Code's native exploration strategy is sound and effective for general-purpose
-			investigation. Its limitation is structural: because it discovers relationships reactively
-			through iterative search, it incurs inference overhead proportional to the number of
-			indirect connections between relevant components. On complex architectures such as
-			distributed sync systems, multi-layered dependency graphs, and event-driven flows, that
-			overhead compounds.
+			Graph-indexed retrieval solves this at the index level. GitNexus precomputes the symbol graph using KuzuDB's CSR adjacency structures and factorized joins [1], so each query session starts with the relational structure already built. It doesn't reconstruct that structure from scratch through iterative tool calls.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Graph-indexed retrieval addresses this at the index layer. By precomputing the symbol graph
-			using KuzuDB's CSR adjacency structures and factorized join execution [1], GitNexus amortizes
-			the relational discovery cost across all subsequent queries. Individual query sessions inherit
-			a precomputed structural view of the codebase rather than reconstructing it from scratch
-			through iterative tool invocation.
+			The tradeoff is upfront cost: index build time, keeping the index current across commits, tooling integration. That's a fixed investment that pays off more the more frequently you ask architectural questions. For smaller codebases or single-file queries, the difference is marginal.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The overhead of graph indexing (index construction time, maintenance across commits,
-			tooling integration) represents a fixed cost that amortizes favorably on codebases where
-			architectural questions are asked frequently. For smaller codebases or single-file queries,
-			the differential remains marginal.
-		</p>
-		<p class="mt-4 leading-relaxed text-muted-foreground">
-			For the classes of projects encountered in production, including offline-first mobile
-			applications, distributed sync architectures, and multi-service backends with complex
-			dependency graphs, the dominant questions are relational: "what calls this," "what depends
-			on this," "where does this data originate." These are graph questions. The appropriate
-			retrieval substrate is a graph index.
+			For the kinds of projects I work on, offline-first mobile apps, distributed sync architectures, multi-service backends with layered dependencies, the questions that come up most are relational: "what calls this," "what depends on this," "where does this data come from." Those are graph questions. The right retrieval layer for graph questions is a graph index.
 		</p>
 	</section>
 
