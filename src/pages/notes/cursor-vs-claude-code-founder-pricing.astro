@@ -1,0 +1,595 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+---
+
+<ContentLayout
+	title="Cursor vs Claude Code: A Founder's Pricing Teardown — Ilzam"
+	description="Cursor pays Anthropic $650M/year while earning $500M. I break down what that means for founders choosing between Cursor and Claude Code, with real pricing data, trust timelines, and the business model question nobody asks."
+>
+	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<div class="mt-6 flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Founder Decisions</span>
+		<span class="text-xs text-muted-foreground">March 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		Your AI Coding Tool's Biggest Risk Isn't the Price. It's the Business Model.
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			I pay $100/month for Claude Code (via Claude Max). Cursor Pro starts at $20/month. On paper, I'm paying 5x more. In practice, Cursor pays Anthropic
+			<strong>~$650M/year in API costs while earning ~$500M in revenue</strong>. That's a negative 30% gross margin. When you pay a middleman that
+			loses money on every transaction, your pricing is one board meeting away from changing. I chose the tool built by the company that makes the model. Here's
+			the full breakdown, with receipts.
+		</p>
+	</blockquote>
+
+	<!-- Hook -->
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			Let me show you a number that should change how you think about AI coding tools.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Cursor, the AI code editor that 19% of developers say they love (per the
+			<a href="https://newsletter.pragmaticengineer.com/p/ai-tooling-2026" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Pragmatic Engineer's March 2026 survey</a>),
+			spends roughly <span class="font-medium text-foreground">$650 million per year on Anthropic API costs</span>. Their
+			annual revenue? About $500 million. One investment firm described the business as a
+			<a href="https://canartuc.medium.com/cursor-raised-2-3b-in-5-months-but-the-math-doesnt-work-2a3294039b47" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">"VC-subsidized wealth transfer mechanism."</a>
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			When you pay Cursor $20/month, more than $20 worth of that goes to Anthropic for the AI model that powers it. The math does not work. It only works right
+			now because venture capitalists are covering the gap, and VCs don't cover gaps forever.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			When you pay Anthropic $100/month for Claude Max, you're paying the company that makes the model. Their cost to serve you their own model? Marginal. There's
+			no middleman. No margin pressure. No board meeting where someone says "we need to cut included requests by half."
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			That already happened with Cursor. Three times, in eight months.
+		</p>
+	</section>
+
+	<!-- The trust timeline -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The trust timeline</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Founders care about pricing stability. When you're bootstrapping or pre-revenue, a surprise 2x increase in your tooling costs isn't an inconvenience. It's a
+			budget crisis. Here's what happened to Cursor's pricing in under a year:
+		</p>
+
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">June 2025: The credit switch</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Cursor replaced its fixed 500-request Pro plan with a
+					<a href="https://cursor.com/blog/june-2025-pricing" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">credit-based system</a>.
+					The $20/month price stayed the same. The effective capacity dropped from ~500 requests to
+					<a href="https://www.vantage.sh/blog/cursor-pricing-explained" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">~225 with Claude models</a>.
+					No advance warning. One Medium author documented it as a
+					<a href="https://medium.com/@jimeng_57761/when-cursor-silently-raised-their-price-by-over-20-and-more-what-is-the-message-the-users-are-6af93385f362" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">"20x silent price increase"</a>
+					for heavy users.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">July 2025: The apology</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					CEO Michael Truell published a
+					<a href="https://techcrunch.com/2025/07/07/cursor-apologizes-for-unclear-pricing-changes-that-upset-users/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">public apology</a>:
+					"We recognize that we didn't handle this pricing rollout well and we're sorry." Cursor offered refunds for unexpected charges. One user had already
+					<a href="https://forum.cursor.com/t/the-new-pricing-system-is-insane-a-main-reason-i-ll-switch-platforms/135489" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">racked up $350 in overages in a single week</a>.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">September 2025: Unlimited dies</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Cursor
+					<a href="https://forum.cursor.com/t/cursor-auto-is-no-longer-unlimited/148185" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">removed unlimited Auto mode</a>,
+					the feature many users had specifically subscribed for. It now consumes credits like everything else. Users who bought annual plans for unlimited Auto
+					scrambled to understand whether they'd be grandfathered in.
+					<a href="https://forum.cursor.com/t/feedback-on-removal-of-unlimited-access-to-auto-model/150362" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">They weren't.</a>
+				</p>
+			</div>
+		</div>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			The forum thread that captures the sentiment best:
+		</p>
+		<blockquote class="mt-3 border-l-2 pl-4">
+			<p class="text-sm leading-relaxed text-muted-foreground italic">
+				"I no longer trust Cursor. I would rather pay $200 for Claude Code than $200 for Cursor, even though I prefer the Cursor system."
+			</p>
+			<p class="mt-1 text-xs text-muted-foreground">
+				&mdash; <a href="https://forum.cursor.com/t/why-i-m-forced-to-switch-to-claude-code-despite-loving-cursor-s-vibe-coding-pricing-policy-issues/144216" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Cursor Forum</a>
+			</p>
+		</blockquote>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			If a company changes pricing three times in eight months, what does your Q3 budget look like?
+		</p>
+	</section>
+
+	<!-- The real pricing comparison -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The real pricing comparison</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Forget feature lists. Here's what each company charges, what you actually get, and what the business model behind it means for you.
+		</p>
+
+		<div class="mt-6 overflow-x-auto">
+			<table class="w-full text-sm">
+				<thead>
+					<tr class="border-b text-left">
+						<th class="py-3 pr-4 font-medium"></th>
+						<th class="py-3 pr-4 font-medium">Cursor</th>
+						<th class="py-3 pr-4 font-medium">Claude (Max)</th>
+					</tr>
+				</thead>
+				<tbody class="text-muted-foreground">
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Entry tier</td>
+						<td class="py-3 pr-4">$20/mo (Pro)</td>
+						<td class="py-3 pr-4">$20/mo (Pro)</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Mid tier</td>
+						<td class="py-3 pr-4">$60/mo (Pro+)</td>
+						<td class="py-3 pr-4">$100/mo (Max 5x)</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Top tier</td>
+						<td class="py-3 pr-4">$200/mo (Ultra)</td>
+						<td class="py-3 pr-4">$200/mo (Max 20x)</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">What you get</td>
+						<td class="py-3 pr-4">Credit pool that depletes at different rates per model</td>
+						<td class="py-3 pr-4">Usage multiplier (5x or 20x Pro limits) across all surfaces</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Model access</td>
+						<td class="py-3 pr-4">Claude, GPT-4o, Gemini, others</td>
+						<td class="py-3 pr-4">Claude Sonnet 4.6, Opus 4.6 (1M context)</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">When credits run out</td>
+						<td class="py-3 pr-4">Slow queue (wait times) or pay-as-you-go overages</td>
+						<td class="py-3 pr-4">Optional overage at API rates, never hard-capped</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Includes</td>
+						<td class="py-3 pr-4">Code editor only</td>
+						<td class="py-3 pr-4">Chat + Claude Code CLI + Desktop app</td>
+					</tr>
+					<tr>
+						<td class="py-3 pr-4 font-medium text-foreground">Pricing changes (last 12mo)</td>
+						<td class="py-3 pr-4">3 major changes, 1 public apology</td>
+						<td class="py-3 pr-4">Stable since launch</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			The middle tier tells the story. Cursor has nothing between $60 and $200. Claude has a $100 sweet spot. For a solo technical founder who codes daily but
+			isn't running background agents around the clock, that $100 tier is the one that actually fits.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			And there's a consolidation angle. With Claude Max at $100, you get Claude chat for thinking through problems, Claude Code for implementing them, and
+			Claude Desktop for everything else. One subscription, one context. With Cursor at $60, you get the editor, but if you also want Claude for non-coding
+			work, that's a separate $20/month Pro subscription. Real cost: $80. For $20 more, Max gives you everything in one place.
+		</p>
+	</section>
+
+	<!-- The business model question -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The business model question nobody asks</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Cursor raised a
+			<a href="https://www.businesswire.com/news/home/20251113939996/en/Cursor-Secures-$2.3-Billion-Series-D-Financing-at-$29.3-Billion-Valuation-to-Redefine-How-Software-is-Written" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">$2.3B Series D at a $29.3B valuation</a>
+			in November 2025. As of March 2026, they're in talks for a
+			<a href="https://www.bloomberg.com/news/articles/2026-03-12/ai-coding-startup-cursor-in-talks-for-about-50-billion-valuation" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">round valuing them at ~$50B</a>.
+			Revenue exceeded $1B ARR in 24 months. Impressive numbers.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			But the cost structure underneath is brutal. Cursor is a middleman: it builds a UI on top of models it doesn't make. When you use Claude through Cursor,
+			Cursor pays Anthropic per token. When you use GPT through Cursor, Cursor pays OpenAI per token. The
+			<a href="https://techcrunch.com/2025/08/07/the-high-costs-and-thin-margins-threatening-ai-coding-startups/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">margins are razor-thin to negative</a>.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Cursor knows this. In October 2025, they launched "Composer," their first proprietary coding model, to reduce dependency on Anthropic. That's a bet, not a
+			solution. Building a model that matches Claude Sonnet's coding ability is a multi-year, multi-billion-dollar project. In the meantime, every Cursor user
+			running Claude models is sending money from Cursor's pocket to Anthropic's.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Now look at Anthropic. Their
+			<a href="https://finance.yahoo.com/news/anthropic-arr-surges-19-billion-151028403.html" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">ARR surged to $19B</a>
+			as of February 2026. Claude Code alone runs at
+			<a href="https://www.uncoveralpha.com/p/anthropics-claude-code-is-having" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">over $2.5B run-rate revenue</a>.
+			They raised a
+			<a href="https://www.anthropic.com/news/anthropic-raises-30-billion-series-g-funding-380-billion-post-money-valuation" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">$30B Series G at $380B valuation</a>.
+			They make the model AND the tool. Their model cost to themselves is marginal. They can price Claude Code aggressively because every Claude Code user also
+			drives API consumption across the ecosystem.
+		</p>
+
+		<div class="mt-6 rounded-lg border p-5">
+			<p class="text-sm font-medium">The founder question</p>
+			<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+				Do you want your primary development tool priced by a profitable model maker, or by a middleman racing to find margins before investors lose patience?
+				That's not a features question. That's a business risk question.
+			</p>
+		</div>
+	</section>
+
+	<!-- What seamless integration actually means -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">What "seamless integration" actually means</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Most comparisons frame this as "Cursor has a nice GUI" vs "Claude Code is terminal-only." That's the surface. The real question is:
+			<span class="font-medium text-foreground">how many layers sit between you and the intelligence you're paying for?</span>
+		</p>
+
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">Cursor: integration through abstraction</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Cursor is a VS Code fork with AI woven into the editor. Inline completions, a composer panel, chat sidebar. The experience is polished. If you've
+					used VS Code, the learning curve is near zero.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					But the AI reaches you through Cursor's abstraction layer. When Anthropic ships a new capability (extended thinking, 1M context window, agent
+					improvements), it shows up in Claude Code the same day. Cursor has to integrate it, test it, ship it. That lag matters when models improve monthly.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					There's also a practical limit. While Cursor advertises a 200K token context window, users consistently report hitting effective limits at
+					<a href="https://www.qodo.ai/blog/claude-code-vs-cursor/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">70K-120K tokens due to internal truncation</a>.
+					Claude Code's 200K window (and Opus's 1M on Max) delivers what it promises. For large codebases, that's the difference between the tool understanding
+					your architecture and the tool understanding a fragment of it.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">Claude Code: integration through directness</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Claude Code is a terminal agent. You describe what you want. It reads files, makes coordinated edits across the codebase, runs tests, fixes failures,
+					and commits changes. The whole loop happens without you touching the editor.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					As the
+					<a href="https://www.56kode.com/posts/moving-from-cursor-to-claude-code/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">56kode team put it</a>
+					after switching from Cursor: "This migration is not just a tool change, it's a job change. I spend less time typing code and more time designing,
+					orchestrating, and validating."
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Claude Code also runs in
+					<a href="https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">VS Code</a>,
+					JetBrains, and even as a desktop app. The "terminal-only" framing is outdated. But even when running inside VS Code, Claude Code talks directly to
+					Anthropic's API. There's no middleman interpreting the model's output or wrapping it in a proprietary UI layer.
+				</p>
+			</div>
+		</div>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			The deeper split is philosophical.
+			<a href="https://www.builder.io/blog/cursor-vs-claude-code" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Cursor is an accelerator</a>:
+			you drive, AI assists with completions and suggestions. Claude Code is a delegator: you describe what you want, AI drives, you review results. A
+			<a href="https://www.builder.io/blog/claude-code" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">year-long Cursor power user at Builder.io</a>
+			abandoned Cursor after trying Claude Code, noting his workflow evolved "from Claude as a small sidebar to defaulting to Claude first and only peeking at
+			code when reviewing changes."
+		</p>
+	</section>
+
+	<!-- The efficiency data -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The efficiency data</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Not opinions. Numbers.
+		</p>
+
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">5.5x fewer tokens for the same task</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Independent benchmarks found Claude Code uses
+					<a href="https://codeaholicguy.com/2026/01/10/claude-code-vs-cursor/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">5.5x fewer tokens than Cursor</a>
+					for identical tasks, finishing faster with fewer errors.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">30% less rework</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Claude Code produces 30% less code churn (code rewritten or deleted within two weeks). It gets things right in the first or second iteration more
+					often than Cursor does.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">46% vs 19% developer satisfaction</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					The
+					<a href="https://newsletter.pragmaticengineer.com/p/ai-tooling-2026" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Pragmatic Engineer's March 2026 survey</a>
+					of 906 engineers: 46% named Claude Code as their "most loved" tool. Cursor: 19%. GitHub Copilot: 9%. Claude Code overtook both in just 8 months
+					after public launch.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">The counterintuitive finding</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					A
+					<a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">rigorous METR study</a>
+					with 16 experienced developers found they were actually <strong>19% slower</strong> with AI coding tools, despite self-reporting they felt 20%
+					faster. The gap came from time spent reviewing and rejecting generated code. This means the tool that produces less rework wins. That's Claude Code.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- The risk dimension -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The risk dimension founders skip</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Pricing and features get all the attention. Risk gets almost none. But for a founder handling user data or anything under compliance, these matter:
+		</p>
+
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">Security vulnerabilities</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Cursor has had two notable CVEs.
+					<a href="https://www.reco.ai/learn/cursor-security" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">CurXecute (CVE-2025-54135)</a>
+					let attackers craft messages that, when summarized by Cursor's AI, rewrote MCP configuration files and executed arbitrary commands. MCPoison
+					(CVE-2025-54136) enabled persistent team-wide compromise through shared repository configs. Both required Cursor's AI layer to be the attack
+					vector, because that layer processes and transforms content in ways the user can't fully inspect.
+				</p>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Claude Code runs in your terminal. Your code doesn't pass through a third-party editor layer that can be exploited as an intermediary.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">Privacy defaults</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Cursor's
+					<a href="https://www.mintmcp.com/blog/cursor-security" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Privacy Mode is off by default</a>
+					for Free and Pro users. That means Cursor collects prompts, code snippets, and telemetry unless you're on the Business tier ($40/user/month)
+					or manually toggle it on. If you're writing code that touches user data, payment processing, or anything regulated, that default matters.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">Platform dependency</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Cursor is a VS Code fork. In April 2025, Microsoft
+					<a href="https://devclass.com/2025/04/08/vs-code-extension-marketplace-wars-cursor-users-hit-roadblocks/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">quietly blocked Cursor from accessing certain VS Code extensions</a>,
+					including the C/C++ extension. Users found
+					<a href="https://news.ycombinator.com/item?id=43587420" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">only 31 of 39 extensions available</a>
+					when importing from VS Code. Your editor depends on a company that views it as a competitor. Claude Code depends on nothing. It's a CLI that works
+					alongside any editor you choose.
+				</p>
+			</div>
+
+			<div>
+				<h3 class="font-semibold">Credit depletion opacity</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Cursor forum users report
+					<a href="https://forum.cursor.com/t/disappointment-problem-with-the-credits-usage/149264" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">credits disappearing while the app is closed</a>,
+					<a href="https://forum.cursor.com/t/running-out-of-ultra-plan-credits-before-renewal/150012" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Ultra plan credits exhausted in 20 days</a>,
+					and "abnormal usage on particular days that doesn't match actual activity." A team of 5 spent
+					<a href="https://www.wearefounders.uk/cursors-pricing-disaster-how-a-routine-update-turned-into-a-developer-exodus/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">$4,600 in 6 weeks</a>,
+					roughly double their entire 2025 spend. When you can't predict or explain your costs, you can't budget.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- The honest counterpoint -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">When Cursor is the better choice</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is not a "Cursor is bad" piece. Cursor is genuinely the right tool for certain situations:
+		</p>
+
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">You have a non-technical team</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					If your co-founder, designer, or junior developers need to use AI coding tools, Cursor's GUI is more accessible. The visual editor, inline
+					suggestions, and familiar VS Code interface lower the barrier. Claude Code's terminal-first approach assumes comfort with command-line workflows.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">You want model flexibility</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Cursor lets you switch between Claude, GPT-4o, Gemini, and others within the same interface. If you value being able to pick the best model for
+					each task, that optionality matters. Claude Code is Claude-only. You're betting on one model family.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">You want inline tab completions</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Claude Code doesn't do ambient inline completions while you type. If you want real-time predictive suggestions as you write code, Cursor's
+					autocomplete is better. This is, per multiple reviews, the single biggest reason some developers bounce off Claude Code and go back.
+				</p>
+			</div>
+		</div>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Worth noting: 70% of developers use 2-4 AI tools simultaneously (per the
+			<a href="https://newsletter.pragmaticengineer.com/p/ai-tooling-2026" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Pragmatic Engineer survey</a>).
+			The hybrid play is real. But for a solo founder optimizing spend, consolidation wins.
+		</p>
+	</section>
+
+	<!-- What I chose -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">What I chose and why</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I use Claude Code on the $100/month Max plan. Here's why, in order of importance:
+		</p>
+
+		<div class="mt-6 space-y-6">
+			<div>
+				<h3 class="font-semibold">1. I trust the business model</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Anthropic makes money when I use their model. The incentive is aligned: make the model better, I use it more, they earn more. Cursor makes money by
+					reselling someone else's model at a loss. That only works while VC funding covers the gap. I don't want my primary development tool to depend on a
+					company's ability to raise its next round.
+				</p>
+			</div>
+			<div>
+				<h3 class="font-semibold">2. The cost is predictable</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					$100/month. One bill. Claude chat, Claude Code, Claude Desktop, all included. I don't track credit burn rates across different models. I don't
+					worry about which AI model depletes my credits faster. I don't wake up to surprise overages.
+				</p>
+			</div>
+			<div>
+				<h3 class="font-semibold">3. The terminal is fine</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					I'm a technical founder. I live in the terminal anyway. Claude Code doesn't ask me to change my workflow. It works alongside my editor (VS Code),
+					my terminal, my git setup. If anything, the terminal-first approach is faster for me because I can pipe commands, script automations, and run
+					multiple instances on different projects simultaneously. As one developer
+					<a href="https://www.56kode.com/posts/moving-from-cursor-to-claude-code/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">put it</a>:
+					"I literally feel like a superhero who can work on 2 or 3 projects at the same time."
+				</p>
+			</div>
+			<div>
+				<h3 class="font-semibold">4. Direct to the source</h3>
+				<p class="mt-2 leading-relaxed text-muted-foreground">
+					Anthropic makes the model and the tool. When they find a limitation in Claude Code, they can improve the model itself. When Cursor finds a limitation,
+					they can only file a feature request. As
+					<a href="https://blog.whiteprompt.com/from-cursor-to-claude-code-why-im-paying-5x-more-and-getting-10x-value-1d61710df356" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">one developer wrote</a>:
+					"Anthropic can give you the most possible value for the least possible price because you only have to worry about paying them."
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- The bigger picture -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The bigger picture</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The AI coding tool market is going through the same pattern every middleware market goes through. First, wrappers emerge around a new technology (Cursor
+			wrapping LLMs). Then the technology makers ship their own tools (Anthropic shipping Claude Code). Then the wrappers either find a defensible niche or get
+			squeezed out.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Cursor sees this coming. They're building their own model. They're raising at $50B. They have real users and real revenue. I'm not predicting their
+			failure. But I am saying that as a founder, I'd rather bet on the company that
+			<a href="https://saastr.com/anthropic-just-hit-14-billion-in-arr-up-from-1-billion-just-14-months-ago/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">went from $1B to $19B ARR in 14 months</a>
+			by making the best coding model, than on the company that depends on that model to exist.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			YC CEO Garry Tan said it plainly:
+			<a href="https://x.com/garrytan/status/1897303270311489931" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">"25% of our Winter 2025 batch had codebases that were 95% AI-generated."</a>
+			The founders using AI coding tools aren't optimizing for tab-complete speed. They're asking: which tool lets me build the most with the least overhead,
+			the least risk, and the most predictable cost?
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			For me, that answer is $100/month, a terminal, and no middleman.
+		</p>
+	</section>
+
+	<!-- Sources -->
+	<section class="mt-12 border-t pt-8">
+		<h2 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Sources</h2>
+		<ul class="mt-4 space-y-2 text-sm text-muted-foreground">
+			<li>
+				<a href="https://newsletter.pragmaticengineer.com/p/ai-tooling-2026" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					Pragmatic Engineer: AI Tooling Survey 2026
+				</a>
+			</li>
+			<li>
+				<a href="https://canartuc.medium.com/cursor-raised-2-3b-in-5-months-but-the-math-doesnt-work-2a3294039b47" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					Cursor Raised $2.3B, But the Math Doesn't Work
+				</a>
+			</li>
+			<li>
+				<a href="https://techcrunch.com/2025/07/07/cursor-apologizes-for-unclear-pricing-changes-that-upset-users/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					TechCrunch: Cursor Apologizes for Pricing Changes
+				</a>
+			</li>
+			<li>
+				<a href="https://techcrunch.com/2025/08/07/the-high-costs-and-thin-margins-threatening-ai-coding-startups/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					TechCrunch: High Costs and Thin Margins of AI Coding Startups
+				</a>
+			</li>
+			<li>
+				<a href="https://finance.yahoo.com/news/anthropic-arr-surges-19-billion-151028403.html" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					Yahoo Finance: Anthropic ARR Surges to $19B
+				</a>
+			</li>
+			<li>
+				<a href="https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					METR: AI-Experienced Developer Productivity Study
+				</a>
+			</li>
+			<li>
+				<a href="https://www.56kode.com/posts/moving-from-cursor-to-claude-code/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					56kode: Moving from Cursor to Claude Code
+				</a>
+			</li>
+			<li>
+				<a href="https://blog.whiteprompt.com/from-cursor-to-claude-code-why-im-paying-5x-more-and-getting-10x-value-1d61710df356" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					White Prompt: From Cursor to Claude Code, 5x More and 10x Value
+				</a>
+			</li>
+			<li>
+				<a href="https://www.builder.io/blog/claude-code" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					Builder.io: How I Use Claude Code
+				</a>
+			</li>
+			<li>
+				<a href="https://www.reco.ai/learn/cursor-security" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					Reco.ai: Cursor Security Risks
+				</a>
+			</li>
+			<li>
+				<a href="https://devclass.com/2025/04/08/vs-code-extension-marketplace-wars-cursor-users-hit-roadblocks/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					DevClass: VS Code Extension Marketplace Wars
+				</a>
+			</li>
+			<li>
+				<a href="https://x.com/garrytan/status/1897303270311489931" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					Garry Tan on 95% AI-Generated Codebases (YC W25)
+				</a>
+			</li>
+			<li>
+				<a href="https://www.vantage.sh/blog/cursor-pricing-explained" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					Vantage: Cursor Pricing Explained 2026
+				</a>
+			</li>
+			<li>
+				<a href="https://www.wearefounders.uk/cursors-pricing-disaster-how-a-routine-update-turned-into-a-developer-exodus/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">
+					We Are Founders: Cursor's Pricing Disaster
+				</a>
+			</li>
+		</ul>
+	</section>
+
+	<!-- Related -->
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/how-to-build-startup-website-2026" class="text-sm underline underline-offset-4 hover:text-foreground">How to Build Your Startup's Website in 2026 (Without Overpaying)</a></li>
+			<li><a href="/notes/gitnexus-codebase-rag-benchmark" class="text-sm underline underline-offset-4 hover:text-foreground">GitNexus vs Claude Code's Native Exploration: A Real Benchmark</a></li>
+		</ul>
+	</section>
+
+	<!-- CTA -->
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Not sure which AI tools fit your workflow?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			I've shipped production code with both Cursor and Claude Code. If you want a
+			second opinion on your AI-assisted development setup, book a call.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Advisory Session
+		</a>
+	</section>
+</ContentLayout>
