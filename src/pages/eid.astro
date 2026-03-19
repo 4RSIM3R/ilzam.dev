@@ -1,0 +1,30 @@
+---
+export const prerender = false
+
+import "@/styles/global.css"
+import { EidGreeting } from "@/components/eid-greeting"
+
+const name = Astro.url.searchParams.get("for") ?? ""
+const title = name ? `Eid Mubarak, ${name}!` : "Eid Mubarak!"
+const description =
+  "Wishing you a blessed Eid al-Fitr filled with joy, peace, and countless blessings."
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+  </head>
+  <body class="bg-blue-800">
+    <EidGreeting name={name} client:load />
+  </body>
+</html>
