@@ -1,0 +1,634 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+import { Mermaid } from '@/components/mermaid'
+
+const chartStealOverview = `flowchart LR
+    subgraph W1["Worker 1 (busy)"]
+        D1["taskA · taskB · taskC"]
+    end
+    subgraph W2["Worker 2 (idle)"]
+        D2[" "]
+    end
+    subgraph W3["Worker 3 (busy)"]
+        D3["taskD · taskE"]
+    end
+    subgraph W4["Worker 4 (idle)"]
+        D4[" "]
+    end
+
+    W2 -. "steal" .-> W1
+    W4 -. "steal" .-> W3`
+
+const chartSharedQueue = `flowchart TD
+    subgraph shared["Shared Queue: Every Pop Contends"]
+        direction LR
+        SQ["Task Queue"]
+        S1["Worker 1"] <-->|"lock"| SQ
+        S2["Worker 2"] <-->|"lock"| SQ
+        S3["Worker 3"] <-->|"lock"| SQ
+        S4["Worker 4"] <-->|"lock"| SQ
+    end`
+
+const chartPerWorkerDeques = `flowchart TD
+    subgraph stealing["Per-Worker Deques: Steal Only When Idle"]
+        direction LR
+        W1["Worker 1"] ---|owns| D1["Deque 1"]
+        W2["Worker 2"] ---|owns| D2["Deque 2"]
+        W3["Worker 3"] ---|owns| D3["Deque 3"]
+        W4["Worker 4"] ---|owns| D4["Deque 4"]
+    end
+    W2 -.->|"steal (rare)"| D1`
+
+const chartCasSequence = `sequenceDiagram
+    participant Thief1 as Thief 1
+    participant D as Deque (top = 0)
+    participant Thief2 as Thief 2
+
+    Thief1->>D: read top = 0
+    Thief2->>D: read top = 0
+    Thief1->>D: read buffer[0] = taskA
+    Thief2->>D: read buffer[0] = taskA
+    Thief1->>D: CAS(top, 0, 1)
+    Note over D: top is now 1
+    D-->>Thief1: SUCCESS, returns taskA
+    Thief2->>D: CAS(top, 0, 1)
+    D-->>Thief2: FAIL, top != 0
+    Note over Thief2: Discards taskA, retries`
+
+const chartMemoryOrdering = `sequenceDiagram
+    participant Owner
+    participant Mem as Shared Memory
+    participant Thief
+
+    Owner->>Mem: write task to buffer[i]
+    Owner->>Mem: store bottom (Release)
+    Note over Owner,Mem: Release fence: all prior writes are visible before this store
+
+    Thief->>Mem: load bottom (Acquire)
+    Note over Mem,Thief: Acquire fence: guaranteed to see all writes before the Release
+    Thief->>Mem: read buffer[i]
+    Note over Thief: Gets the correct task`
+
+const pseudoDequeStruct = `pub struct WorkStealDeque<T> {
+    bottom: usize           // the owner's end
+    top: usize              // the thieves' end
+    buffer: Vec<Option<T>>  // circular buffer holding tasks
+}
+
+impl WorkStealDeque {
+    pub fn new(capacity) -> create empty deque with given capacity
+    pub fn push(item)    -> owner adds a task (writes to bottom)
+    pub fn pop()         -> owner takes a task (reads from bottom)
+    pub fn steal()       -> thief takes a task (reads from top)
+}`
+
+const pseudoPushPopSteal = `pub fn push(item) {
+    let index = bottom % buffer.len()
+    buffer[index] = Some(item)
+    bottom += 1
+}
+
+pub fn pop() -> Option<T> {
+    if bottom == top -> return None
+
+    bottom -= 1
+    let index = bottom % buffer.len()
+    buffer[index].take()
+}
+
+pub fn steal() -> Option<T> {
+    if top >= bottom -> return None
+
+    let index = top % buffer.len()
+    top += 1
+    buffer[index].take()
+}`
+
+const pseudoThreadPool = `let num_of_threads = 4
+let deques = create num_of_threads deques, each with capacity 1024
+
+for i in 0..num_of_threads:
+    spawn_thread(|| {
+        loop {
+            if shutdown -> stop
+
+            let task = deques[i].pop()       // try my own deque first
+            if task -> task()                 // got work, run it
+            else {
+                for j in 0..num_of_threads {
+                    if i == j -> continue     // skip myself
+
+                    let task = deques[j].steal()
+                    if task -> {
+                        task()               // stole work, run it
+                        break
+                    }
+                }
+            }
+        }
+    })`
+
+const rustPush = `pub fn push(&self, item: T) {
+    let bottom = self.bottom.load(Ordering::Relaxed);
+    let index = bottom % self.buffer.len();
+
+    unsafe {
+        *self.buffer[index].get() = Some(item);
+    }
+
+    // Release: guarantees the buffer write above is visible
+    // to any thread that later reads this bottom value
+    self.bottom.store(bottom + 1, Ordering::Release);
+}`
+
+const rustSteal = `pub fn steal(&self) -> Option<T> {
+    // Acquire: pairs with the Release in push(),
+    // guarantees we see the data behind these indices
+    let top = self.top.load(Ordering::Acquire);
+    let bottom = self.bottom.load(Ordering::Acquire);
+
+    if top >= bottom {
+        return None;
+    }
+
+    let index = top % self.buffer.len();
+    let item = unsafe { (*self.buffer[index].get()).take() };
+
+    // CAS: only one thief wins. Losers get None.
+    match self.top.compare_exchange(
+        top, top + 1, Ordering::SeqCst, Ordering::SeqCst
+    ) {
+        Ok(_) => item,
+        Err(_) => None,
+    }
+}`
+
+const rustPop = `pub fn pop(&self) -> Option<T> {
+    let bottom = self.bottom.load(Ordering::Relaxed);
+
+    if bottom == 0 {
+        return None;
+    }
+
+    // Decrement first: signals to thieves "I'm claiming this slot"
+    self.bottom.store(bottom - 1, Ordering::SeqCst);
+    let top = self.top.load(Ordering::Acquire);
+    let new_bottom = bottom - 1;
+
+    if new_bottom > top {
+        // Multiple items remain. No conflict with thieves possible.
+        unsafe { (*self.buffer[new_bottom % self.buffer.len()].get()).take() }
+    } else if new_bottom == top {
+        // Last item. Owner and thief might both reach for it.
+        // Resolve with CAS on top.
+        let item = unsafe {
+            (*self.buffer[new_bottom % self.buffer.len()].get()).take()
+        };
+        let result = match self.top.compare_exchange(
+            top, top + 1, Ordering::SeqCst, Ordering::SeqCst
+        ) {
+            Ok(_) => item,    // owner wins
+            Err(_) => None,   // thief already took it
+        };
+        self.bottom.store(top + 1, Ordering::Relaxed);
+        result
+    } else {
+        // Deque was already empty before we decremented.
+        self.bottom.store(top, Ordering::Relaxed);
+        None
+    }
+}`
+
+const rustWorkerLoop = `for i in 0..num_threads {
+    let deques = Arc::clone(&deques);
+    let shutdown = Arc::clone(&shutdown);
+
+    thread::spawn(move || {
+        loop {
+            if shutdown.load(Ordering::Relaxed) {
+                return;
+            }
+
+            // Try own deque first (fast, no contention)
+            if let Some(task) = deques[i].pop() {
+                task();
+            } else {
+                // Own deque empty. Try stealing from others.
+                for j in 0..num_threads {
+                    if j == i { continue; }
+
+                    if let Some(task) = deques[j].steal() {
+                        task();
+                        break;
+                    }
+                }
+                // Nothing anywhere. Yield and retry.
+                thread::yield_now();
+            }
+        }
+    });
+}`
+
+const asciiDequeLayout = `top                              bottom
+ |                                 |
+ v                                 v
+[task1, task2, task3, ..., task99, task100]
+ ^                                  ^
+ thieves steal here                 owner pushes and pops here`
+
+const asciiRaceWithoutCas = `Initial state: top = 0, bottom = 3, buffer = [taskA, taskB, taskC]
+
+Thief 1:                          Thief 2:
+  reads top = 0                     reads top = 0
+  reads buffer[0] = taskA          reads buffer[0] = taskA
+  sets top = 1                      sets top = 1    <-- overwrites!`
+
+const asciiRootCause = `Step 1: read top        -> top is 0
+                            <- another thread changes top to 1
+Step 2: use top          -> we still think top is 0 (stale!)
+Step 3: write top += 1  -> we write 1, but it should be 2`
+
+const asciiCircularBuffer = `buffer capacity = 4
+
+push(A): buffer[0 % 4] = A, bottom = 1
+push(B): buffer[1 % 4] = B, bottom = 2
+push(C): buffer[2 % 4] = C, bottom = 3
+push(D): buffer[3 % 4] = D, bottom = 4
+
+// a thief steals A and B, so top moves to 2
+// slots 0 and 1 are now free
+
+push(E): buffer[4 % 4] = buffer[0] = E, bottom = 5   // wraps around!
+push(F): buffer[5 % 4] = buffer[1] = F, bottom = 6   // reuses slot 1`
+
+const asciiReleaseAcquire = `Owner (push):                      Thief (steal):
+  buffer[i] = task    // write
+  store bottom (Release) --------->  load bottom (Acquire)
+                        handoff       // guaranteed to see buffer[i]
+                                      read buffer[i] -> gets the task`
+---
+
+<ContentLayout
+	title="Work-Stealing from First Principles | Ilzam"
+	description="Work-stealing powers Tokio, Go, and Java's ForkJoinPool. I learned the algorithm by implementing the Chase-Lev variant from scratch in Rust, building up from load distribution to per-worker deques, CAS, and Release/Acquire memory ordering."
+>
+	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<div class="mt-6 flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Engineering</span>
+		<span class="text-xs text-muted-foreground">April 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		Work-Stealing from First Principles
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			Work-stealing is the scheduling algorithm behind <strong>Tokio</strong>, <strong>Go's goroutine scheduler</strong>, and <strong>Java's ForkJoinPool</strong>. I learned the algorithm by implementing the Chase-Lev variant from scratch in Rust, building up layer by layer: per-worker deques where the owner and thieves operate on opposite ends, compare-and-swap to resolve races without locks, and Release/Acquire memory ordering to guarantee data visibility across threads. This post walks through that process. The implementation is <a href="https://github.com/4RSIM3R/worksteal" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">on GitHub</a>.
+		</p>
+	</blockquote>
+
+	<!-- Why I built this -->
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			Work-stealing shows up in most serious parallel runtimes: Tokio, Rayon, Go's goroutine scheduler, Java's ForkJoinPool, Intel TBB. The concept is straightforward (idle workers take tasks from busy ones), but the implementation requires careful coordination across threads, all the way down to CPU memory ordering semantics.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I wanted to understand what that coordination actually looks like at the instruction level, so I implemented the <a href="https://dl.acm.org/doi/10.1145/1073970.1073974" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">Chase-Lev algorithm</a> from scratch in Rust. This post walks through the five ideas you need to stack on top of each other to arrive at a working implementation: load distribution, per-worker deques, opposite-end access, compare-and-swap, and memory ordering.
+		</p>
+	</section>
+
+	<!-- Load Distribution -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The distribution problem</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Imagine you are a factory manager. To speed up production, you buy five identical machines. Today you have 100 items to process.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">The naive approach</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			You dump all 100 items onto Machine 1 and let the other four sit idle. Machine 1 is working overtime while Machines 2 through 5 collect dust. You paid for five machines but only one is doing anything useful. That is underutilization.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">The "fair split" approach</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			You divide the items evenly: 20 per machine. Sounds perfect. But here is the catch. Some items are simple and take 1 minute, others are complex and take 10 minutes.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Machine 1 gets unlucky. It receives mostly complex items and takes 180 minutes to finish. Meanwhile, Machine 4 got all the easy items and finishes in 20 minutes, then sits idle for 160 minutes waiting for Machine 1 to catch up.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			You divided the work evenly by count, but the effort was lopsided. The result is the same: underutilization.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Static vs dynamic distribution</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Both approaches above are <strong>static distribution</strong>. You decide how to split the work before any machine starts processing. The assignment is fixed. Once Machine 4 finishes its batch, it has no way to help Machine 1 with the remaining work.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Static distribution works when every task takes roughly the same amount of time. In practice, task durations are unpredictable. Network requests, database queries, recursive computations: you rarely know in advance how long each one will take.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			<strong>Dynamic distribution</strong> takes a different approach. Instead of assigning all the work upfront, you let workers grab tasks as they become available. When a worker finishes, it takes the next available task. Work-stealing is one specific strategy for dynamic distribution, and it turns out to be one of the most efficient ones ever designed.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The goal: no machine sits idle while work remains. If Machine 4 finishes early, it should grab some of Machine 1's remaining items. The work flows naturally from where there is too much to where there is none.
+		</p>
+	</section>
+
+	<!-- The Main Idea -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">How work-stealing works</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Every worker has its own local queue of tasks. When a worker finishes everything in its queue, instead of sitting idle, it looks at another worker's queue and steals a task from it.
+		</p>
+
+		<Mermaid client:idle chart={chartStealOverview} className="mt-6" />
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Idle workers steal from busy workers. Every worker stays utilized, and tasks get distributed naturally across the system.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Why each worker gets its own queue</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			You might wonder: why not use a single shared queue that all workers pull from? That would solve the distribution problem too.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The answer is contention. If all workers pull from one shared queue, they constantly fight over access to it. Every pop requires synchronization. With 16 workers all hammering the same queue, the queue itself becomes the bottleneck.
+		</p>
+
+		<Mermaid client:idle chart={chartSharedQueue} className="mt-6" />
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			With work-stealing, each worker has its own queue. In the common case, a worker just pops from its own queue with zero contention. Stealing only happens when a worker runs out of work, which is the uncommon case. Synchronization costs are paid rarely, not on every operation.
+		</p>
+
+		<Mermaid client:idle chart={chartPerWorkerDeques} className="mt-6" />
+
+		<h3 class="mt-8 text-base font-semibold">The thread pool structure</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			A work-stealing thread pool has three components: a fixed number of <strong>workers</strong> (threads, each running in a loop), one <strong>deque</strong> (double-ended queue) per worker holding that worker's tasks, and <strong>the worker loop</strong> where each worker pops from its own deque, tries to steal if empty, and yields if nobody has work.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Here is the minimal pseudocode:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={pseudoThreadPool} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Each worker first tries <code>pop()</code> on its own deque (fast, no contention), and only falls back to <code>steal()</code> from others when its own deque is empty.
+		</p>
+	</section>
+
+	<!-- The Deque -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The work-stealing deque</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The deque is the core data structure. It is a double-ended queue with a twist: only one thread (the owner) can access one end, while other threads (the thieves) can only access the other end.
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={pseudoDequeStruct} /></pre>
+
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The key operations work on different ends. <strong>push</strong> adds a new item at <code>bottom</code>, then increments <code>bottom</code>. Only the owner calls this. <strong>pop</strong> decrements <code>bottom</code>, then reads the item from that position. Only the owner calls this. <strong>steal</strong> reads the item at <code>top</code>, then increments <code>top</code>. Any other worker can call this.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Why opposite ends?</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			This is the most important design decision in the entire algorithm. The owner works from the bottom, thieves steal from the top.
+		</p>
+
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={asciiDequeLayout} /></pre>
+
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			If both the owner and thieves operated on the same end, every operation would require synchronization. They would constantly collide. By using opposite ends, the owner and thieves only conflict when there is exactly one item left in the deque. In all other cases, they access completely different parts of the data structure. The owner can push and pop at full speed without any synchronization overhead in the common case.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This separation is what makes work-stealing lock-free. Every thread is always making progress because they rarely touch the same memory.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">The circular buffer</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The deque stores items in a circular buffer. When the <code>bottom</code> index reaches the end of the array, it wraps around using the modulo operator. The <code>bottom</code> and <code>top</code> indices keep growing forever, and modulo maps them back into valid array positions.
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={asciiCircularBuffer} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			A small fixed-size buffer can handle an endless stream of tasks, as long as the number of active tasks at any moment does not exceed the buffer's capacity.
+		</p>
+	</section>
+
+	<!-- Compare and Swap -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Compare and swap</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Everything above works perfectly in a single-threaded world. The moment multiple threads access the deque at the same time, things break.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Here is what the non-thread-safe version looks like:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={pseudoPushPopSteal} /></pre>
+
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Looks clean. Now simulate what happens when two thieves try to steal at the same time:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={asciiRaceWithoutCas} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Both thieves read <code>top = 0</code> before either one updated it. Both grabbed <code>taskA</code>. When both set <code>top = 1</code>, one overwrites the other. Result: <code>taskA</code> was stolen twice, and <code>taskB</code> was skipped entirely. This will happen in practice. Modern CPUs run billions of operations per second, and multiple threads will absolutely hit the window between reading and writing <code>top</code>.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">What can go wrong</h3>
+		<div class="mt-4 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Duplicate steals</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Two thieves read the same <code>top</code> value and both steal the same task. One task gets executed twice. In the best case, you waste CPU. In the worst case, the task has side effects (writing to a file, sending a network request) and you corrupt data.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Lost tasks</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					When two thieves both write <code>top += 1</code>, the second write overwrites the first. The counter only advances by 1 instead of 2, which means a task gets skipped and sits in the buffer forever.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Owner vs thief race on the last item</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					When only one item remains, <code>top</code> and <code>bottom</code> point to the same slot. The owner calls <code>pop</code> and the thief calls <code>steal</code> at the same time, both reaching for the same item. Without coordination, both could read it, or the item could be corrupted mid-read.
+				</p>
+			</div>
+		</div>
+
+		<h3 class="mt-8 text-base font-semibold">The root cause</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			All of these problems share the same root cause. The operation "read a value, make a decision, then update the value" consists of multiple steps, and another thread can interfere between them.
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={asciiRootCause} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			We need a way to make "read and conditionally update" happen as one indivisible operation.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">What CAS does</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			CAS (Compare and Swap) is a CPU instruction that performs three actions as a single, unbreakable step: <strong>compare</strong> (check if the value at a memory location equals what you expect), <strong>swap</strong> (if it does, replace it with a new value), and <strong>report</strong> (tell you whether the swap happened).
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>{"compare_and_swap(location, expected_value, new_value) -> success or failure"}</code></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			If <code>top</code> is still 0, the swap happens and returns success. If another thread already changed <code>top</code> to something else, the swap does not happen and returns failure. The check and the update are one atomic operation.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">CAS in action</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Here is the same two-thief scenario replayed with CAS:
+		</p>
+		<Mermaid client:idle chart={chartCasSequence} className="mt-4" />
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Thief 1 wins and takes <code>taskA</code>. Thief 2's CAS fails because <code>top</code> is no longer 0. Thief 2 knows it lost the race and backs off. No duplicates, no lost tasks.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The same principle applies to the owner vs thief race on the last item. When only one item remains, both the owner's <code>pop</code> and the thief's <code>steal</code> use CAS on <code>top</code>. Whoever's CAS succeeds gets the item. The other sees the failure and returns empty.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Lock-free vs lock-based</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The alternative to CAS is using a lock (like a mutex). With a lock, only one thread can access the deque at a time. Everyone else waits in line. If 15 threads are waiting for 1 thread to release the lock, you have 15 idle cores. That defeats the entire purpose of parallelism.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			With CAS, every thread attempts the operation simultaneously. The losers find out instantly and move on. All cores stay busy. Instead of preventing conflicts (locks), you detect and resolve them (CAS).
+		</p>
+	</section>
+
+	<!-- Memory Ordering -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Memory ordering</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Even with CAS, there is a subtle problem. Modern CPUs and compilers reorder instructions for performance. You write code in a specific order, but the CPU might execute it differently. For single-threaded code, this is invisible because the CPU guarantees the result looks the same. For multi-threaded code, it can be catastrophic.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">The visibility problem</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Consider the <code>push</code> operation. You expect "write the data" to happen before "publish the new index." But the CPU might reorder them. A thief could see the updated <code>bottom</code> before the data is actually written. The thief reads from the buffer and gets garbage.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Ordering guarantees</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			To prevent this, we use memory ordering annotations on atomic operations.
+		</p>
+		<div class="mt-4 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Relaxed</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					"Just do the atomic read or write. I don't care about ordering." Use this when no other thread depends on the order of surrounding operations. For example, the owner reading its own <code>bottom</code> value, since nobody else writes to <code>bottom</code>.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Release (on writes)</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					"Make sure everything I wrote before this point is visible to other threads before they see this write." The <code>push</code> operation uses Release when storing the new <code>bottom</code> value, guaranteeing the buffer write is visible before the index update.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Acquire (on reads)</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					"Make sure I can see everything the other thread wrote before their Release store." This pairs with Release. The <code>steal</code> operation uses Acquire when loading <code>bottom</code>, guaranteeing it sees the data the owner wrote into the buffer.
+				</p>
+			</div>
+		</div>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Think of Release and Acquire as a handoff:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={asciiReleaseAcquire} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Without this handoff, the thief might see the new <code>bottom</code> value but read stale or empty buffer contents. Release/Acquire guarantees that when the thief sees the updated index, all the data behind that index is already there.
+		</p>
+
+		<Mermaid client:idle chart={chartMemoryOrdering} className="mt-6" />
+	</section>
+
+	<!-- The Rust Implementation -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The Rust implementation</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Here is what these ideas look like as real, runnable Rust. The implementation lives in two files: <code>queue.rs</code> (the deque) and <code>pool.rs</code> (the thread pool).
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">push: owner adds work</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The owner writes data into the buffer, then publishes the new <code>bottom</code> index with <code>Release</code> ordering. Any thief that later loads this value with <code>Acquire</code> is guaranteed to see the buffer write.
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={rustPush} /></pre>
+
+		<h3 class="mt-8 text-base font-semibold">steal: thief takes work</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			A thief loads both indices with <code>Acquire</code>, reads the item, then uses CAS to claim it. If the CAS fails, another thief won the race, and this thief returns empty.
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={rustSteal} /></pre>
+
+		<h3 class="mt-8 text-base font-semibold">pop: owner takes work</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The most complex operation. It handles three cases: multiple items left (no conflict possible, just take it), one item left (use CAS to race against a potential thief), and empty (restore <code>bottom</code> and return).
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={rustPop} /></pre>
+
+		<h3 class="mt-8 text-base font-semibold">The worker loop</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The thread pool spawns workers that each own a deque. Each worker pops from its own deque first, falls back to stealing from others, and yields if nobody has work.
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={rustWorkerLoop} /></pre>
+	</section>
+
+	<!-- Putting It All Together -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Five ideas, one system</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Stepping back, here is how all the pieces connect. <strong>Load distribution</strong> is the problem: how do you split work across multiple workers efficiently? <strong>Work-stealing</strong> is the strategy: each worker has its own deque, idle workers steal from busy ones. <strong>The deque</strong> is the data structure: a circular buffer with the owner on one end and thieves on the other, minimizing contention. <strong>CAS</strong> is the synchronization mechanism: it resolves races between thieves (and between the owner and a thief) without locks. <strong>Memory ordering</strong> ensures visibility: Release/Acquire guarantees that when a thief sees new data is available, the data itself is actually there.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			These five ideas, layered on top of each other, give you a lock-free work-stealing system. Simple in concept, carefully engineered at every level to avoid the bottlenecks it was designed to solve.
+		</p>
+	</section>
+
+	<!-- Where You'll Find This -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Where you will find this in production</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is the algorithm described by David Chase and Yossi Lev in their 2005 paper <a href="https://dl.acm.org/doi/10.1145/1073970.1073974" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">"Dynamic Circular Work-Stealing Deque."</a> It forms the foundation of parallel runtimes used in production today:
+		</p>
+		<ul class="mt-4 space-y-2 text-muted-foreground">
+			<li class="leading-relaxed"><strong class="text-foreground">Tokio</strong> (Rust) uses work-stealing across its async task scheduler</li>
+			<li class="leading-relaxed"><strong class="text-foreground">Rayon</strong> (Rust) uses it for data-parallel iterators</li>
+			<li class="leading-relaxed"><strong class="text-foreground">Go's goroutine scheduler</strong> steals goroutines across OS threads</li>
+			<li class="leading-relaxed"><strong class="text-foreground">Java's ForkJoinPool</strong> is a direct implementation of the Chase-Lev paper</li>
+			<li class="leading-relaxed"><strong class="text-foreground">Intel Threading Building Blocks</strong> uses work-stealing for its task scheduler</li>
+		</ul>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The full Rust implementation is on GitHub. Clone it, run the tests, read the code alongside this post.
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code>git clone https://github.com/4RSIM3R/worksteal.git
+cd worksteal
+cargo run</code></pre>
+	</section>
+
+	<!-- Related -->
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/gitnexus-codebase-rag-benchmark" class="text-sm underline underline-offset-4 hover:text-foreground">GitNexus Benchmark: Graph-Indexed Retrieval vs Claude Code's Native Exploration</a></li>
+		</ul>
+	</section>
+
+	<!-- CTA -->
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Want to read the code?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			The full Rust implementation. Clone it, run it, break it.
+		</p>
+		<a
+			href="https://github.com/4RSIM3R/worksteal"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			View on GitHub
+		</a>
+	</section>
+</ContentLayout>

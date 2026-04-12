@@ -1,5 +1,6 @@
 ---
 import ContentLayout from '@/layouts/content-layout.astro'
+import { Mermaid } from '@/components/mermaid'
 
 const codeBoxCreate = `const box = await Box.create({
   runtime: "node",
@@ -143,6 +144,18 @@ const codeCleanup = `try {
 			a throwaway environment that gets destroyed when it's done.
 		</p>
 	</blockquote>
+
+	<!-- Mermaid test -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">Architecture Overview</h2>
+		<Mermaid client:idle chart={`graph LR
+    CLI[safescan CLI] --> Box[Upstash Box]
+    Box --> Clone[Git Clone]
+    Clone --> Static[Static Analysis]
+    Static --> Dynamic[Dynamic Analysis]
+    Dynamic --> Report[Structured Report]
+    Box --> Destroy[Destroy Box]`} className="mt-4" />
+	</section>
 
 	<!-- Hook: The problem -->
 	<section class="mt-10">

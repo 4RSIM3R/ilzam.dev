@@ -26,6 +26,12 @@ const notes = [
 		category: "Engineering",
 		description: "Does graph-indexed retrieval actually beat Claude Code's native codebase exploration? I ran the same architectural question both ways. $0.52 vs $0.39, 38 tool calls vs 12, and the KuzuDB internals that explain the difference.",
 	},
+	{
+		title: "Work-Stealing from First Principles",
+		slug: "work-stealing",
+		category: "Engineering",
+		description: "Tokio, Go, and Java's ForkJoinPool all use work-stealing. I learned the algorithm by implementing the Chase-Lev variant from scratch in Rust, building up from load distribution to per-worker deques, CAS, and memory ordering.",
+	},
 ]
 
 const categories = [...new Set(notes.map(n => n.category))]
