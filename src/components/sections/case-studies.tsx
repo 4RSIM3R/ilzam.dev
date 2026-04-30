@@ -4,6 +4,17 @@ import { ArrowUpRightIcon } from "lucide-react"
 
 const caseStudies = [
   {
+    title: "kotakpasir",
+    subtitle: "Self-hosted sandboxes for AI agents, on a $5 VPS.",
+    label: "Open Source / Infra",
+    region: "MIT, Pre-1.0",
+    year: "2026, ongoing",
+    slug: "kotakpasir-agent-sandboxes",
+    stack: ["Go", "Docker", "Fiber v3", "SQLite", "MCP", "Prometheus"],
+    brief:
+      "Hardened Docker containers wrapped in a Go control plane with HTTP, MCP, CLI, and SDK surfaces. YAML policy, per-sandbox egress proxy, warm pool, and Prometheus metrics. The middle path between hosted sandboxes and microVM stacks that need KVM.",
+  },
+  {
     title: "Dapo Vokasi",
     subtitle: "Unifying vocational teacher data across 7 national training centers.",
     label: "Government Tech",
