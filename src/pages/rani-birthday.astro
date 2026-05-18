@@ -1,0 +1,35 @@
+---
+export const prerender = true
+
+import "@/styles/global.css"
+import { RaniBirthdayLetter } from "@/components/rani-birthday-letter"
+
+const title = "Selamat Ulang Tahun, Rani"
+const description =
+  "Sebuah surat kecil untuk yang tercinta, di hari ulang tahunnya yang ke-24."
+---
+
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Dancing+Script:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="bg-amber-50">
+    <RaniBirthdayLetter client:load />
+  </body>
+</html>
