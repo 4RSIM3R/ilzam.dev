@@ -2,21 +2,11 @@
 
 import { motion } from "motion/react"
 import { useEffect, useState } from "react"
-import { Check, Copy } from "lucide-react"
 import { SparklesCore } from "@/components/ui/sparkles"
 import { TextGenerateEffect } from "@/components/ui/text-generate-effect"
 
-const ACCOUNT_NUMBER = "101035770682"
-
 export function IdulAdhaGreeting({ name }: { name: string }) {
   const [showMessage, setShowMessage] = useState(false)
-  const [copied, setCopied] = useState(false)
-
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(ACCOUNT_NUMBER)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
 
   useEffect(() => {
     const timer = setTimeout(() => setShowMessage(true), 1500)
@@ -68,34 +58,6 @@ export function IdulAdhaGreeting({ name }: { name: string }) {
         )}
       </div>
 
-      {/* THR section */}
-      <motion.div
-        className="relative z-10 w-full shrink-0 px-8 pb-6 md:pb-8"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 2.5 }}
-      >
-        <div className="mx-auto max-w-xs text-center">
-          <div className="mx-auto mb-3 h-px w-12 bg-emerald-950/30" />
-          <p className="text-sm text-emerald-950/70 md:text-base">
-            If this greeting moved you, my bank account is also open to receiving blessings.
-          </p>
-          <button
-            onClick={handleCopy}
-            className="mt-3 inline-flex items-center gap-2 rounded-full border border-emerald-950/15 bg-emerald-950/5 px-4 py-2 text-sm text-emerald-950/70 transition-colors hover:bg-emerald-950/10"
-          >
-            <span className="font-medium">Bank Jago</span>
-            <span className="font-mono">{ACCOUNT_NUMBER}</span>
-            {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-          </button>
-          {copied && (
-            <p className="mt-1.5 text-xs text-emerald-700">Copied!</p>
-          )}
-          <p className="mt-1.5 text-xs text-emerald-950/50">
-            A/N Muhammad Ilzam Mulkhaq
-          </p>
-        </div>
-      </motion.div>
     </div>
   )
 }
