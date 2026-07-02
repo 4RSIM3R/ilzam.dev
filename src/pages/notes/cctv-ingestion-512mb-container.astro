@@ -1,0 +1,379 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+import { Mermaid } from '@/components/mermaid'
+
+const divisionCalc = `1,000,000 events / 86,400 seconds ≈ 11.6 events/second`
+
+const chartPipeline = `flowchart LR
+    NVR["NVR<br/>~200 cameras"] -->|"one long-lived stream"| A
+
+    subgraph BOX["Shared VM · 8 GB / 4 vCPU"]
+        subgraph ING["Ingestion container · 1 vCPU / 512 MB"]
+            direction TB
+            A["CameraActor"] --> RB["ring buffer<br/>100k · drop-oldest"] --> KS["Kafka sink<br/>single producer"]
+        end
+        KAFKA["Kafka<br/>camera-events"]
+        CONNECT["Kafka Connect"]
+        ES["Elasticsearch"]
+        KIB["Kibana"]
+        KS --> KAFKA --> CONNECT --> ES --> KIB
+    end`
+
+const chartActors = `flowchart TD
+    Node["Ergo node"] --> Root["Root supervisor"]
+    Root --> CamSup["CameraSupervisor<br/>one-for-one · max 5 restarts / 10s"]
+    Root --> Sink["SinkActor<br/>shared Kafka producer"]
+    CamSup --> A1["CameraActor · NVR (today)"]
+    CamSup -.->|"capacity: up to 1000"| An["CameraActor · N"]
+    A1 --> Sink
+    An -.-> Sink`
+
+const chartBackpressure = `flowchart LR
+    P["stream<br/>parser"] -->|"256"| CH["per-source<br/>channel"] -->|"100k"| RB["ring buffer<br/>drop-oldest"] --> DR["drain<br/>goroutine"] --> K["Kafka<br/>acks=1 · LZ4"]
+    RB -.->|"full, drop oldest"| M["dropped_events<br/>metric · alert"]`
+---
+
+<ContentLayout
+	title="One Million CCTV Events a Day in a 512 MB Container | Ilzam"
+	description="A CCTV ingestion service for a national traffic-monitoring platform handles a million camera events a day inside a 1 vCPU, 512 MB container. The hard part wasn't throughput, it was keeping one fragile NVR stream alive. Why Go and the actor model fit the shape of the problem."
+>
+	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<div class="mt-6 flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Engineering</span>
+		<span class="text-xs text-muted-foreground">July 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		One Million CCTV Events a Day in a 512 MB Container
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			A million CCTV events a day sounds like a throughput problem. It isn't: a million a day is only twelve a second. The real work is keeping one fragile, all-important NVR stream alive on the smallest container on a shared box, without letting the ordinary chaos of roadside infrastructure turn into data loss or a blind spot over 200 cameras. This is how Go's cheap concurrency and the actor model fit the shape of that problem, and why the sharpest design decision in the system is a boring one: a reconnect is not a crash.
+		</p>
+	</blockquote>
+
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			We run the event-ingestion backbone for a CCTV network strung along the main roads of Java, feeding a national traffic-monitoring platform. The cameras never stop talking. On a normal day they push <strong>about a million events</strong> into our pipeline: traffic-jam signals, over-speed flags, illegal-parking detections, stream connect/disconnect notices, every one of them landing in Kafka for downstream analytics. (A million a day isn't an estimate; it's the Kafka message count.)
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The ingestion service that does this is boxed into <strong>1 vCPU and 512 MB of RAM.</strong> Not a dedicated machine, a single container, capped that small, sharing one modest VM with the <em>entire rest of the platform</em>: Kafka, Elasticsearch, Kibana, Kafka Connect, two APIs, two frontends, plus host-level Postgres, MinIO, and Nginx. The whole stack lives on one 8 GB / 4 vCPU box, and the piece taking a firehose of camera events gets the smallest slice of it.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This post is about why that's not crazy, what the real hard problem was (it wasn't the one people assume), and why Go and the actor model turned out to fit the shape of this problem.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">What the system actually is</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Before the "why," the "what," because the setup is the part people picture wrong. When you hear "a thousand-camera network," you imagine the ingestion service opening a thousand connections. It does <strong>not</strong>. The roster is effectively <strong>one NVR</strong>, a single network video recorder that aggregates <strong>~200 physical cameras</strong> behind it. The service holds <strong>one persistent HTTP stream</strong> to that NVR, and every one of the ~200 cameras' events comes down that single pipe, each one tagged with the camera that produced it.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			From there the events flow through the ingestion container into Kafka, and on to Elasticsearch and Kibana for the analytics dashboards. Here's the whole pipeline, and where the ingestion service sits in it, the smallest tenant on a shared box:
+		</p>
+		<Mermaid client:idle chart={chartPipeline} className="mt-6" />
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">First, kill the scary number</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			"One million events a day" sounds like a throughput problem. It isn't. Divide it out:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={divisionCalc} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Twelve events a second is nothing. A Raspberry Pi could serialize twelve JSON blobs a second while it sleeps. If steady-state throughput were the whole story, this would be a boring service and there'd be nothing to write about.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The load test we run against the pipeline pushes it to <strong>1,022 events/second sustained</strong>, roughly <strong>88 times</strong> the production average, using 100 emulated cameras, and the ingestion process stays under 16% of its one capped core and under 80 MiB of its 512 MB ceiling while doing it, with <strong>zero dropped events</strong>. Raw headroom is not the problem.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			So where's the difficulty? It's in the <em>shape</em> of the workload, not its volume, and the shape is more interesting than the headline.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The shape that actually matters</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			You now have the whole picture: one stream, ~200 cameras behind it, twelve events a second with room to spare. So where's the difficulty? It's entirely in that word <em>one</em>. Holding a single stream that carries 200 cameras inverts the problem in a way that's worth sitting with:
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">One connection is a single point of blindness</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			If that stream dies and doesn't come back, you don't lose one camera, you lose all ~200 at once. There's no partial degradation, no "most cameras still reporting." Liveness of that one connection is the whole game. This is why the heartbeat watchdog and the reconnect logic (below) are load-bearing <em>today</em>, not as future insurance.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">A dead stream doesn't announce itself</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			An NVR that has silently wedged doesn't send a TCP FIN; the socket sits there looking perfectly healthy while zero events flow. "Is the connection up?" and "are events actually arriving?" are different questions, and only the second one matters.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Bursts, not averages</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Twelve events a second is the mean across the day. When traffic backs up at a junction, a cluster of cameras behind the NVR can fire a rapid series of detections down that one stream while the rest stay quiet. The pipeline has to absorb spikes without blocking the reader or falling over.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">A tiny resource envelope, shared</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			512 MB total, one core, and it's contending for a box that's also running a JVM-heavy Kafka broker and an Elasticsearch node. "Uses little memory" isn't a nice-to-have here; it's a condition of coexistence.
+		</p>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			And one more thing, which is where Go and the actor model come in: the service is <em>designed</em> to scale past the aggregator model entirely. The architecture targets <strong>1,000 cameras per node, one actor per camera</strong>, a future where we subscribe to individual cameras directly instead of through an NVR. So the code has to be correct and cheap at <em>one</em> connection today and at <em>a thousand</em> tomorrow, with no rearchitecting in between. That dual requirement, bulletproof at N=1 and cheap at N=1000, is what drove the technology choices.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Why Go</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The unit of work is a persistent stream: a long-lived socket, mostly idle, blocking on a read waiting for the next multipart chunk. Whether there's one of them or a thousand, that's the textbook case for Go's concurrency model, for three concrete reasons.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Goroutines make "one blocking loop per stream" affordable at any N</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The natural way to write a stream reader is a straight-line blocking loop: read a part, parse it, hand it off, repeat. Today that's one goroutine on one NVR. At the 1,000-camera design target it's a thousand of them. In a thread-per-connection model, a thousand OS threads at megabytes of stack each would blow the memory budget before the first event arrived. In an async/callback model, you'd invert the same logic into a state machine and lose the readability. Goroutines let us keep the simple blocking loop <em>and</em> pay only a few KB of stack each, so the exact same code that costs nothing at one connection costs tens of MB, not hundreds, at a thousand. Scaling down to 1 is free; scaling up to 1000 doesn't change the code.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">One static binary, no runtime to babysit</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The service compiles to a single binary run with <code>GOMAXPROCS=1</code> and a <code>GOMEMLIMIT</code> soft cap. No JVM to tune, no interpreter, no cgo; the Kafka client (franz-go) and the camera-auth library are both pure Go. On a box already hosting two JVMs (Kafka, Elasticsearch), adding one more heavyweight runtime for the ingestion tier would have been a poor neighbour. A lean static binary is a good one.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold"><code>GOMEMLIMIT</code> turns the memory cap into a first-class control</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			We set a soft limit of 450 MiB under the 512 MB container ceiling. The garbage collector treats that as a wall to work against rather than a cliff to fall off, so under memory pressure the runtime collects harder instead of letting the OOM killer make the decision for us. On a shared box where the OOM killer might otherwise reap the wrong container, that difference matters.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">The profiler ships in the box</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			<code>net/http/pprof</code> is mounted on the observability port, so a live goroutine, heap, or CPU profile is one curl away: no rebuild, no special build, no attaching a debugger to production. For a long-lived streaming service, being able to ask "what is every goroutine doing right now?" without a redeploy is worth a lot.
+		</p>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Go didn't win here because it's fast. It won because the <em>cheap-concurrency</em> model makes the same blocking-loop code correct and affordable from one stream to a thousand, and the deployment model, one small static binary, makes it a good citizen on a crowded box.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Why the actor model</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Go gives you goroutines and channels. That's raw material, not architecture. The moment you have more than one stream writing into a shared Kafka producer, or even one stream that has to be supervised, reconnected, and observed independently of the process lifecycle, you want a discipline on top of the primitives. That discipline is the <strong>actor model</strong>, via the <a href="https://ergo.services" class="underline underline-offset-4 hover:text-foreground" target="_blank" rel="noopener noreferrer">Ergo</a> framework, an OTP/Erlang-style supervision runtime for Go.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The core idea maps cleanly onto the domain:
+		</p>
+		<blockquote class="mt-4 border-l-2 pl-4">
+			<p class="leading-relaxed"><strong>One event source is one actor.</strong></p>
+		</blockquote>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Each camera in the roster gets exactly one <code>CameraActor</code>, running in its own goroutine, owning exactly one thing: that source's connection and its lifecycle. In today's deployment that's a single actor holding the NVR stream. At the 1,000-camera target it's a thousand actors, each owning one camera. Either way, the actor owns its connection, parses its events, hands them to the sink, and shares no mutable state with any sibling.
+		</p>
+		<Mermaid client:idle chart={chartActors} className="mt-6" />
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Even at one actor, the model earns its keep, because its benefits aren't only about concurrency:
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">The supervisor encodes a restart <em>policy</em>, not just a restart</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The actor sits under a <code>CameraSupervisor</code> with a bounded restart intensity: at most 5 restarts in 10 seconds before it gives up and escalates. That's a deliberate circuit breaker. A source that's crash-looping because of a real bug should get loud and stop, not silently thrash forever burning the one CPU we have.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Fault isolation is per-source, by construction</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Which is what makes scaling to 1000 safe. The one-for-one supervision strategy means one actor's panic restarts <em>only that actor</em>. Today, with a single NVR, that's a modest benefit. But it's the property that lets us grow to a thousand direct-camera actors without a single misbehaving camera taking down the other 999. The isolation is banked now and cashed at scale.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">A single shared sink, fed by mailboxes, gives clean backpressure boundaries</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Actors don't each open their own Kafka producer; they hand events through a bounded channel (256 deep) into one shared sink. One producer is where batching and per-partition ordering work best, and the message-passing boundary between "reading" and "publishing" is exactly what makes the backpressure story below tractable, at one stream or a thousand.
+		</p>
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			A note on terminology, because precision matters here: these are <strong>classic, statically-provisioned actors</strong>, materialized at startup from the roster, not "virtual actors" in the Orleans/grains sense, where actors are activated on demand and garbage-collected when idle. Our source set is known and long-lived; there's no reason to activate lazily. A fixed fleet of always-on sources maps to a fixed fleet of always-on actors under a supervisor. Same lineage (Erlang/OTP), different activation model, worth being exact about, because the on-demand machinery of true virtual actors would be pure complexity for no benefit here.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The stream: one long-lived connection, many cameras</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The service subscribes to the NVR over a single long-lived HTTP connection that never closes. The NVR streams events down it continuously, and each event is tagged with the index of the physical camera that produced it. That's how ~200 cameras multiplex down one pipe: one connection in, per-camera events out, each resolved to a stable camera identity downstream. Three properties of that stream drove real design decisions:
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Authentication is handled once, correctly</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The NVR requires an authentication scheme that Go's standard library doesn't cover out of the box, so we lean on a dedicated, well-tested library rather than hand-rolling the challenge/response. Auth is exactly the kind of code you don't want to "mostly" get right.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Liveness comes from heartbeats, not from TCP, and here it's everything</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Because a wedged NVR leaves a healthy-looking socket, the stream interleaves periodic heartbeat markers. We set a read deadline of <strong>2.5&times; the heartbeat interval</strong> (12.5s at the default 5s heartbeat). Miss that window and we declare the connection dead and reconnect. On a deployment where one stream carries 200 cameras, this watchdog is the single most important piece of liveness logic in the system: it's the difference between "we reconnected in 12 seconds" and "we went blind on a province's main roads and nobody noticed."
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">A malformed event must never kill the stream</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Across ~200 cameras of varied firmware, you <em>will</em> receive a garbled body or an unexpected binary frame. The parser is layered (frame boundary, then filter, then decode), and a single bad frame is counted (<code>parse_errors</code>) and skipped, never fatal; the reader re-syncs at the next boundary. Frames are size-capped so a confused camera can't make us allocate unbounded memory. One bad frame is isolated to that one frame, critical when dropping the whole stream would blind all 200.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The decision that defines the system: reconnect is not a crash</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is the single most important design choice, and on a one-connection deployment it's the one that keeps the lights on.
+		</p>
+		<blockquote class="mt-4 border-l-2 pl-4">
+			<p class="leading-relaxed"><strong>Routine disconnects are handled <em>inside</em> the actor, not by the supervisor.</strong></p>
+		</blockquote>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			When the NVR reboots or the link flaps, the <code>CameraActor</code> does not panic and does not get restarted by the supervisor. It catches the disconnect in its own stream-supervision loop and reconnects with <strong>jittered exponential backoff</strong> (1s base, 60s cap, AWS-style full jitter). The actor stays alive; only its connection cycles.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The supervisor is reserved for the <em>abnormal</em> path: an actual panic, a real bug, something that shouldn't happen. That's the rare road.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Why draw the line there? Because if every ordinary disconnect were a supervisor restart, the restart-intensity limit (5-in-10s) would trip under normal network churn, and the supervisor would start giving up on a perfectly healthy NVR. The jitter matters even more at the 1,000-camera target: a network hiccup that drops hundreds of camera actors at once must not become a thundering herd of synchronized reconnects hammering the devices and our own CPU. The principle generalizes: <strong>the supervisor handles bugs; the actor handles the world being unreliable.</strong> Conflating the two is how supervised systems get a reputation for being fragile.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The sink: a shock absorber, and an honest durability tradeoff</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Events flow out through a single shared Kafka producer into the <code>camera-events</code> topic (partition key = camera ID, so each physical camera's events stay ordered even though they share one inbound stream). Between the actor and that producer sits a <strong>ring buffer</strong> with a capacity of 100,000 events.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The ring buffer is the shock absorber. The actor drops events into it and moves on; a drain goroutine pulls from it and produces to Kafka. When a burst arrives, or when the co-located broker is briefly slow, the backlog piles up in the ring instead of blocking the stream reader, which, on one connection, would mean stalling all 200 cameras. The backpressure chain is explicit end to end:
+		</p>
+		<Mermaid client:idle chart={chartBackpressure} className="mt-6" />
+
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			Now the honest part. The ring's drop policy is <strong>oldest-first</strong>: if it fills completely (a long broker outage, say) the <em>oldest</em> buffered events are discarded to make room for the newest, and every drop is counted in a <code>dropped_events</code> metric.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			That is a deliberate, documented decision, and it defines what kind of system this is:
+		</p>
+		<blockquote class="mt-4 border-l-2 pl-4">
+			<p class="leading-relaxed">This is <strong>analytics-grade</strong> ingestion, not <strong>evidence-grade</strong>.</p>
+		</blockquote>
+		<p class="mt-4 leading-relaxed text-muted-foreground">The reasoning:</p>
+		<ul class="mt-3 space-y-3 text-muted-foreground">
+			<li class="leading-relaxed"><strong>The NVR cannot be backpressured.</strong> There is no "please slow down" in the stream protocol and no replay. If we block, we don't slow the cameras, we just fall behind and eventually lose our place in the stream anyway. Given that a total outage costs data no matter what, the only question is <em>which</em> data.</li>
+			<li class="leading-relaxed"><strong>For traffic analytics, fresh beats complete.</strong> If Kafka is unreachable for ten minutes, the freshest picture of what's happening on the road <em>right now</em> is worth more than a ten-minute-old snapshot. Drop-oldest preserves the most recent state.</li>
+			<li class="leading-relaxed"><strong>The loss is bounded, visible, and alertable.</strong> It can only happen when the ring is full, it's always counted, and it fires an alert. A bounded, observable gap is a categorically different thing from silent corruption.</li>
+		</ul>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			If a customer needed evidence-grade capture, every event, guaranteed, for forensic use, this would be the wrong architecture, and the fix (a disk spool, acks-all, replayable offsets) is a different, heavier system. We're explicit that v1 is not that. Kafka is configured to match: <strong>leader-ack only</strong> (<code>acks=1</code>), idempotency off, LZ4 compression, tuned for throughput and freshness, not maximal durability. Naming the tradeoff out loud is what keeps it from becoming an unpleasant surprise later.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The numbers</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The load test runs the ingestion process inside a container capped at exactly the production envelope, <strong>1.0 CPU core, 512 MiB memory</strong>, and pushes it far past real load using 100 emulated cameras (a synthetic stand-in for the future direct-camera topology, not today's single NVR):
+		</p>
+		<div class="mt-6 overflow-x-auto">
+			<table class="w-full text-sm">
+				<thead>
+					<tr class="border-b text-left">
+						<th class="py-3 pr-4 font-medium">Scenario</th>
+						<th class="py-3 pr-4 font-medium">Rate</th>
+						<th class="py-3 pr-4 font-medium">Received</th>
+						<th class="py-3 pr-4 font-medium">Dropped</th>
+						<th class="py-3 pr-4 font-medium">CPU (peak)</th>
+						<th class="py-3 pr-4 font-medium">Memory (peak)</th>
+					</tr>
+				</thead>
+				<tbody class="text-muted-foreground">
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Realistic (1 ev/s/cam)</td>
+						<td class="py-3 pr-4">~102 /s</td>
+						<td class="py-3 pr-4">6,100</td>
+						<td class="py-3 pr-4 font-medium text-foreground">0</td>
+						<td class="py-3 pr-4">5.6%</td>
+						<td class="py-3 pr-4">85.8 MiB</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Stress (10 ev/s/cam)</td>
+						<td class="py-3 pr-4">~1,010 /s</td>
+						<td class="py-3 pr-4">60,576</td>
+						<td class="py-3 pr-4 font-medium text-foreground">0</td>
+						<td class="py-3 pr-4">16.0%</td>
+						<td class="py-3 pr-4">134.9 MiB</td>
+					</tr>
+					<tr class="border-b">
+						<td class="py-3 pr-4 font-medium text-foreground">Sustained</td>
+						<td class="py-3 pr-4">~1,022 /s</td>
+						<td class="py-3 pr-4">122,635</td>
+						<td class="py-3 pr-4 font-medium text-foreground">0</td>
+						<td class="py-3 pr-4">15.8%</td>
+						<td class="py-3 pr-4">77.1 MiB</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<p class="mt-6 leading-relaxed text-muted-foreground">
+			At <strong>1,022 events/second sustained</strong>, ~88&times; the real daily average, the process holds under 16% of one core and under 80 MiB, dropping nothing. On the actual production workload (~12 events/second through one NVR), the container is effectively asleep, which is exactly what you want from the smallest tenant on a shared box. The headroom isn't luck; it's the payoff of cheap goroutines and a bounded, backpressure-aware pipeline.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Other decisions worth calling out</h2>
+
+		<h3 class="mt-8 text-base font-semibold">No images, no video, JSON events only</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			v1 forwards event metadata and deliberately skips binary parts (like <code>image/jpeg</code> snapshots). Moving image bytes through the same pipeline would blow both the memory budget and the "analytics-grade" scope. The parser tolerates binary parts, it just drops them, so an NVR configured to attach snapshots doesn't corrupt anything.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">One topic, event type as a field</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Everything lands in a single <code>camera-events</code> topic, with the event type in a <code>code</code> field rather than a topic-per-type. Partitioning by camera ID preserves per-camera ordering while letting consumers filter downstream. Fewer topics, less operational surface, and less to run on a shared box.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Scale-out is static sharding, not a cluster</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			If one node ever isn't enough, you run N instances, each owning a hash slice of the roster (<code>fnv32(camera_id) % SHARD_COUNT</code>). No gossip, no service discovery, no Kubernetes. Going from 1 to N is a config change and a restart. For a source set that changes slowly and is known in advance, coordination infrastructure would be pure overhead.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Observability treated as a feature, not an afterthought</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The metrics are chosen to catch the <em>silent</em> failure modes that a one-connection deployment is most exposed to: <code>last_event_age_seconds</code> catches a stream that's technically connected but has gone quiet (the wedged-NVR case); <code>camera_terminations</code> flags actors the supervisor gave up on; <code>dropped_events</code> makes the durability tradeoff visible and alertable. Plus <code>/healthz</code>, <code>/readyz</code>, live pprof, and Ergo's own web UI showing the process tree and mailbox depths.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The takeaway</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The impressive-sounding headline, a million events a day in a 512 MB container, rests on an unglamorous truth: <strong>a million events a day is only twelve a second, and the real work is keeping one fragile, all-important connection alive without letting the ordinary chaos of the physical world turn into data loss or a blind spot over 200 cameras.</strong>
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Go made the streaming loop cheap and correct whether there's one connection or a thousand, which is what lets the same code serve today's single NVR and tomorrow's thousand-camera fleet. The actor model turned that stream into something supervised, isolated, and observable, with a single shared sink absorbing the backpressure. And the sharpest decision in the whole system was a boring one, a reconnect is not a crash, which keeps the constant low-grade failure of roadside infrastructure from ever reaching the machinery built for real bugs.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Match the tool to the shape of the problem, name your tradeoffs out loud, and you can put a province's worth of roadside cameras onto the smallest container on the box.
+		</p>
+	</section>
+
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/work-stealing" class="text-sm underline underline-offset-4 hover:text-foreground">Work-Stealing from First Principles</a></li>
+		</ul>
+	</section>
+
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Building something that has to stay up on a tight budget?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			That's exactly what the advisory session is for.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Advisory Session
+		</a>
+	</section>
+</ContentLayout>
