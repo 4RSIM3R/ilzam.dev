@@ -70,7 +70,7 @@ const chartWatermark = `flowchart TD
 	</section>
 
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">The reframe: the box on fire held 4.2 GB</h2>
+		<h2 class="text-xl font-semibold">The reframe: the node was healthy, the setup wasn't</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			One number reorganized the whole investigation. Once the node was breathing again, cluster health came back green: 93 of 93 shards active, no <code>read_only_allow_delete</code> block, and an Elasticsearch data footprint of <strong>4.2 GB</strong>. On a 58 GB disk that had just hit 93%. Whatever filled that disk, it was not Elasticsearch.
 		</p>
@@ -160,7 +160,7 @@ const chartWatermark = `flowchart TD
 	<section class="mt-12">
 		<h2 class="text-xl font-semibold">What I actually took away</h2>
 
-		<h3 class="mt-8 text-base font-semibold">Elasticsearch is usually the victim, not the cause</h3>
+		<h3 class="mt-8 text-base font-semibold">The failure is usually in the setup, not the datastore</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
 			Elasticsearch held 4.2 GB at 39% heap while other containers' logs filled its disk and a query pattern its own schema forced burned its CPU. It had not failed. It was the surface every setup gap showed up on. Follow the evidence to where the work is actually happening (<code>df</code>, <code>hot_threads</code>), not to the loudest process.
 		</p>
