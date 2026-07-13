@@ -126,7 +126,7 @@ const chartWatermark = `flowchart TD
 	</section>
 
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Root cause B: <code>_source</code> parsing on an image that was never deployed</h2>
+		<h2 class="text-xl font-semibold">Root cause B: querying un-indexed fields, on an image that was never deployed</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			The dashboard cards needed a per-event identifier, <code>EventID</code>, that originally lived only inside each document's un-indexed <code>raw</code> object. The first implementation grabbed it with a query-time runtime field:
 		</p>
@@ -138,6 +138,9 @@ const chartWatermark = `flowchart TD
 			The fix (commit <code>ed5ea00</code>) promoted the field to a real indexed keyword at ingest time, and rewrote the aggregation to read doc-values instead of scanning <code>_source</code>:
 		</p>
 		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={docValuesNew} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			But <code>event_id</code> was only the visible edge of a deeper design gap. The entire Dahua camera payload was stored in one un-indexed <code>raw</code> object (<code>enabled: false</code>), and <em>every</em> field the dashboards drill on had to be lifted out of <code>_source</code> the same way. Not just <code>event_id</code>, but the whole set: <code>vehicle_category</code>, <code>snap_category</code>, <code>plate_color</code>, <code>vehicle_color</code>, <code>object_type</code>, and <code>sex</code>. The query code even labelled the pattern as correct but slow, tens of seconds over a large match. Storing <code>raw</code> un-indexed was a reasonable call on its own, the heterogeneous payload would otherwise cause mapping explosion and type conflicts, but it should have been paired from the start with promoting the known hot fields to indexed doc-values. Instead, the dashboards aggregated on them through per-document <code>_source</code> scans for a long time, and the cluster paid that cost on every query.
+		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			Here is the part that taught me something. That fix was already merged to <code>main</code>, and had been for a while. But staging was still running an <em>older image</em> built before it, so production-shaped slow queries kept hitting the cluster as if the fix did not exist. We only confirmed the drift by shelling into the container and finding the old Painless string still sitting in the deployed code.
 		</p>
@@ -174,6 +177,11 @@ const chartWatermark = `flowchart TD
 		<h3 class="mt-8 text-base font-semibold">Uncapped logs are latent outages</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
 			Any container on the default <code>json-file</code> driver with no rotation is a slow-motion disk fill waiting to cross a watermark. Capping Docker logs globally (<code>max-size</code>, <code>max-file</code>) is the one change that would have prevented the acute half outright. The disk should have alerted at 80%, not announced itself through a user-visible outage.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Index what you query, before you query it</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			If a field is going to be aggregated or filtered on, it has to be a real indexed field with doc-values, not something lifted out of <code>_source</code> at query time. A runtime <code>_source</code> scan is a fine escape hatch for one-off exploration on data you already have, but it must not become the steady-state path behind a dashboard card. Storing a messy, heterogeneous payload blob un-indexed is fine; querying <em>through</em> it on every request is not. Promote every hot field at ingest, from day one, before you build the dashboard that leans on it.
 		</p>
 	</section>
 
