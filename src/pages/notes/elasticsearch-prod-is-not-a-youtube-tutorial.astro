@@ -16,18 +16,16 @@ const docValuesNew = `// after ed5ea00: event_id promoted to an indexed keyword
 // at ingest time, aggregations read columnar doc-values
 doc['event_id']`
 
-const chartTwoCauses = `flowchart TD
-    S["Elasticsearch unresponsive<br/>queries timing out"] --> A["CPU pegged AND<br/>disk over watermark"]
-    A --> B["(a) CPU pegged"]
-    A --> C["(b) disk at 93%"]
-    B --> B1["queries parse _source.raw<br/>per document"]
-    B1 --> B2["runtime field feeding a<br/>scripted_metric, in Painless"]
-    B2 --> B3["query service running<br/>a stale image"]
-    B3 --> B4["fix was merged to main<br/>but never deployed"]
-    B4 --> B5["mutable :main tag,<br/>no deployed-version visibility"]
-    C --> C1["host disk filled"]
-    C1 --> C2["container stdout logs<br/>grew unbounded"]
-    C2 --> C3["json-file driver,<br/>no max-size / max-file"]`
+const chartGaps = `flowchart TD
+    S["Elasticsearch unresponsive<br/>queries timing out"] --> R["Elasticsearch itself was fine<br/>4.2 GB data · 39% heap"]
+    R --> SETUP["What failed was the setup<br/>around it, never hardened"]
+    SETUP --> G1["Gap 1: schema never<br/>shaped for the queries"]
+    SETUP --> G2["Gap 2: storage<br/>never bounded"]
+    G1 --> G1a["hot fields left inside<br/>the un-indexed raw object"]
+    G1a --> G1b["dashboards scan _source<br/>per document · CPU pegged"]
+    G1b --> G1c["fix merged, but the<br/>image was never redeployed"]
+    G2 --> G2a["Docker json-file logs<br/>uncapped"]
+    G2a --> G2b["disk hits 93%, past the<br/>90% high watermark"]`
 
 const chartWatermark = `flowchart TD
     D["Root filesystem · 58 GB"] --> L85["85% low watermark<br/>stop allocating new shards"]
@@ -39,7 +37,7 @@ const chartWatermark = `flowchart TD
 
 <ContentLayout
 	title="Elasticsearch in Production Is Not a YouTube Tutorial | Ilzam"
-	description="Every YouTube tutorial makes Elasticsearch look easy. Then you run it in production. A node pegged its CPU and stopped answering queries, holding just 4.2 GB at 39% heap. Unbounded Docker logs filled the disk, and a stale image kept parsing _source per document. Here's what the tutorials leave out."
+	description="Every YouTube tutorial makes Elasticsearch look easy. Then you run it in production. A node pegged its CPU and stopped answering queries, holding just 4.2 GB at 39% heap. It hadn't failed. The setup around it had: a schema never shaped for its queries, and storage that was never bounded. Here's what the tutorials leave out."
 >
 	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
 
@@ -55,19 +53,19 @@ const chartWatermark = `flowchart TD
 	<blockquote class="mt-6">
 		<p class="text-sm font-medium">TL;DR</p>
 		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-			An Elasticsearch node pegged its CPU and stopped answering queries. Everyone said the same thing: "Elasticsearch is slow." It wasn't. The node held 4.2 GB of data at 39% heap and had done nothing wrong. Two unrelated failures had landed on it at once. Unbounded Docker logs filled the host disk to 93% and pushed ES past its disk watermark, while the query service burned CPU parsing <code>_source</code> per document, on an image that was never redeployed after the fix merged. The lesson: when a datastore is on fire, follow the evidence (<code>df</code>, <code>hot_threads</code>), not the component that happens to be smoking.
+			An Elasticsearch node pegged its CPU and stopped answering queries. Everyone said the same thing: "Elasticsearch is slow." It wasn't. The node held 4.2 GB of data at 39% heap and had done nothing wrong. What failed was the setup around it, a stack stood up like a YouTube tutorial and never hardened for production. Two gaps came due at once. The schema was never shaped for its queries, so dashboards scanned un-indexed <code>_source</code> per document and pinned the CPU. The storage was never bounded, so unbounded Docker logs filled the disk and pushed ES past its watermark. A tutorial gets you a green cluster; production is everything the tutorial skips.
 		</p>
 	</blockquote>
 
 	<section class="mt-10">
 		<p class="text-lg leading-relaxed">
-			Every YouTube tutorial makes Elasticsearch look easy. Pull the image, point Kibana at it, watch the dashboards fill in, done in fifteen minutes. I believed that. Then you run it for real, on a shared box under a live ingest feed, and it teaches you everything those videos leave out. This is one of those lessons.
+			Every YouTube tutorial makes Elasticsearch look easy. Pull the image, point Kibana at it, watch the dashboards fill in, done in fifteen minutes. I believed that. Then you run it for real, on a shared box under a live ingest feed, and it teaches you everything those videos leave out. The tutorial ends exactly where production begins, and this is a tour of what lives on the other side of that line.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			Here is the setup. A single-node Elasticsearch 8.15.3, fed continuously from Kafka through a Kafka Connect sink (the <code>logs-camera_events-*</code> dataset, ~2M+ documents a day), sharing one 4 vCPU / 7.8 GiB / 58 GB Docker host with Kibana, Kafka, and Filebeat. Same staging stack behind the <a href="/notes/million-cctv-events-512mb-container" class="underline underline-offset-4 hover:text-foreground">CCTV ingestion pipeline</a>. Then the query service started hanging and the node stopped responding.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The obvious reads were "the node is undersized" and "we're out of memory." Both were wrong. A single symptom, "Elasticsearch is slow," was hiding two root causes that had nothing to do with each other, and the component everyone was staring at was the one thing that hadn't failed.
+			The obvious reads were "the node is undersized" and "we're out of memory." Both were wrong. Elasticsearch itself was healthy. Everything that failed lived in the setup around it, and a single symptom, "Elasticsearch is slow," was hiding it.
 		</p>
 	</section>
 
@@ -77,9 +75,9 @@ const chartWatermark = `flowchart TD
 			One number reorganized the whole investigation. Once the node was breathing again, cluster health came back green: 93 of 93 shards active, no <code>read_only_allow_delete</code> block, and an Elasticsearch data footprint of <strong>4.2 GB</strong>. On a 58 GB disk that had just hit 93%. Whatever filled that disk, it was not Elasticsearch.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			That split the incident in two: an acute trigger (the disk) and a chronic condition (the CPU), arriving together by coincidence. Neither was about data volume or node sizing.
+			That pointed the investigation away from Elasticsearch entirely. The node was not undersized and it was not out of data. What had failed was everything around it: how the data was modelled, how the host's storage was managed, how the service was deployed. Stand a stack up like a tutorial and those gaps stay invisible, right up until they collide.
 		</p>
-		<Mermaid client:idle chart={chartTwoCauses} className="mt-6" />
+		<Mermaid client:idle chart={chartGaps} className="mt-6" />
 	</section>
 
 	<section class="mt-12">
@@ -107,12 +105,36 @@ const chartWatermark = `flowchart TD
 			The tempting explanation for a pegged node is GC pressure. <code>_nodes/hot_threads</code> said otherwise. <code>search_worker</code> threads were burning CPU inside Painless, re-parsing <code>_source.raw.EventID</code> per document to feed a <code>scripted_metric</code> aggregation, next to a Lucene merge thread from the live ingest feed. Heap sat at 39%, GC negligible. Not memory-bound, CPU-bound. The node was not starved for RAM; it was doing expensive work on every document.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Three commands, three hypotheses tested. Disk confirmed as the trigger, "out of data space" rejected, "memory pressure" rejected. What remained was a clean split: an acute disk problem and a chronic query problem.
+			Three commands, three hypotheses tested. Disk confirmed as the trigger, "out of data space" rejected, "memory pressure" rejected. What remained was a clean split, and neither half was Elasticsearch's fault: a storage gap that filled the disk, and a schema gap that pinned the CPU.
 		</p>
 	</section>
 
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Root cause A: uncapped logs walk a disk into a watermark</h2>
+		<h2 class="text-xl font-semibold">Gap 1: the schema was never shaped for the queries</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Start with the data model, because that is where this begins. The whole Dahua camera payload was stored in one un-indexed <code>raw</code> object (<code>enabled: false</code>). That was a reasonable call on its own, the heterogeneous payload would otherwise cause mapping explosion and type conflicts. The mistake was never doing the other half: promoting the fields the dashboards actually query to real indexed fields.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Because the hot fields lived only inside <code>raw</code>, every dashboard card had to lift them out of <code>_source</code> at query time with a Painless runtime field. Not just the per-event id, the whole drill set: <code>vehicle_category</code>, <code>snap_category</code>, <code>plate_color</code>, <code>vehicle_color</code>, <code>object_type</code>, and <code>sex</code>. Here is what that looked like for <code>event_id</code>:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={painlessOld} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			For every matching document, Elasticsearch decompressed the stored <code>_source</code>, JSON-parsed the whole heterogeneous <code>raw</code> object, pulled one field, and fed it to a <code>scripted_metric</code> aggregation. Across millions of documents per query, that is brutally CPU-intensive, and it throws away the entire point of columnar doc-values. The query code even labelled it correct but slow, tens of seconds over a large match. It is the kind of pattern that looks fine on a tutorial's sample data and quietly saturates a node once real data lands.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The fix (commit <code>ed5ea00</code>) did the half that was missing from the start. It promoted the hot fields to real indexed keywords at ingest time, and rewrote the aggregations to read doc-values instead of scanning <code>_source</code>:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={docValuesNew} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			And here is where a schema gap turned into a deploy gap. That fix was already merged to <code>main</code>, and had been for a while. But staging was still running an <em>older image</em> built before it, so the slow query pattern kept hitting the cluster as if the fix did not exist. We only confirmed the drift by shelling into the container and finding the old Painless string still sitting in the deployed code.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The container ran the mutable <code>:main</code> tag with no record of the commit inside it. Ask "what version is running right now?" and there was no honest answer short of reading the code in the box. Redeploying from current <code>main</code> (revision <code>659c87a</code>, which includes <code>ed5ea00</code>) took Elasticsearch CPU from <strong>~158% to ~0.7%</strong>. The code was correct and merged. It just was not <em>running</em>.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Gap 2: the storage was never bounded</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			Docker's default <code>json-file</code> driver keeps <strong>unlimited</strong> log history unless you set <code>max-size</code> and <code>max-file</code>. Only Filebeat had an explicit logging config. Every other container inherited the uncapped default and wrote stdout forever into <code>/var/lib/docker/containers/*/*-json.log</code>. Those logs, not any data, walked the 58 GB root filesystem up to 93%.
 		</p>
@@ -126,72 +148,51 @@ const chartWatermark = `flowchart TD
 	</section>
 
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Root cause B: querying un-indexed fields, on an image that was never deployed</h2>
+		<h2 class="text-xl font-semibold">Gap 3: tuned for the wrong workload</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The dashboard cards needed a per-event identifier, <code>EventID</code>, that originally lived only inside each document's un-indexed <code>raw</code> object. The first implementation grabbed it with a query-time runtime field:
-		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={painlessOld} /></pre>
-		<p class="mt-4 leading-relaxed text-muted-foreground">
-			For every matching document, Elasticsearch decompressed the stored <code>_source</code>, JSON-parsed the whole heterogeneous <code>raw</code> object, pulled one field, and fed it to a <code>scripted_metric</code> aggregation. Across millions of documents per query, that is brutally CPU-intensive, and it throws away the entire point of columnar doc-values. It is the kind of pattern that looks fine on a small dataset and quietly saturates a node once real data lands.
+			Two more defaults rounded out the tutorial setup, neither fatal on its own. First, <code>refresh_interval</code> sat at 1 second under a continuous Kafka-sink feed. That cuts a new Lucene segment every second and drives constant background merging, which fights search for the node's limited CPU. An append-heavy log workload does not need one-second search visibility. Setting <code>index.refresh_interval: "30s"</code> on the live <code>camera_events</code> indices, adding it to the index template so rollover indices inherit it, and committing it to the repo lifted a steady background tax. <code>_simulate_index</code> confirmed the next rollover picks it up.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The fix (commit <code>ed5ea00</code>) promoted the field to a real indexed keyword at ingest time, and rewrote the aggregation to read doc-values instead of scanning <code>_source</code>:
-		</p>
-		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={docValuesNew} /></pre>
-		<p class="mt-4 leading-relaxed text-muted-foreground">
-			But <code>event_id</code> was only the visible edge of a deeper design gap. The entire Dahua camera payload was stored in one un-indexed <code>raw</code> object (<code>enabled: false</code>), and <em>every</em> field the dashboards drill on had to be lifted out of <code>_source</code> the same way. Not just <code>event_id</code>, but the whole set: <code>vehicle_category</code>, <code>snap_category</code>, <code>plate_color</code>, <code>vehicle_color</code>, <code>object_type</code>, and <code>sex</code>. The query code even labelled the pattern as correct but slow, tens of seconds over a large match. Storing <code>raw</code> un-indexed was a reasonable call on its own, the heterogeneous payload would otherwise cause mapping explosion and type conflicts, but it should have been paired from the start with promoting the known hot fields to indexed doc-values. Instead, the dashboards aggregated on them through per-document <code>_source</code> scans for a long time, and the cluster paid that cost on every query.
-		</p>
-		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Here is the part that taught me something. That fix was already merged to <code>main</code>, and had been for a while. But staging was still running an <em>older image</em> built before it, so production-shaped slow queries kept hitting the cluster as if the fix did not exist. We only confirmed the drift by shelling into the container and finding the old Painless string still sitting in the deployed code.
-		</p>
-		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The container ran the mutable <code>:main</code> tag with no record of the commit inside it. Ask "what version is running right now?" and there was no honest answer short of reading the code in the box. Redeploying from current <code>main</code> (revision <code>659c87a</code>, which includes <code>ed5ea00</code>) took Elasticsearch CPU from <strong>~158% to ~0.7%</strong>. This was never a code problem. The code was correct and merged. It just was not <em>running</em>.
-		</p>
-	</section>
-
-	<section class="mt-12">
-		<h2 class="text-xl font-semibold">The one contributing factor worth fixing anyway</h2>
-		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Neither root cause was a tuning problem, but one default made everything worse: <code>refresh_interval</code> sat at 1 second under a continuous Kafka-sink feed. That cuts a new Lucene segment every second and drives constant background merging, which fights search for the node's limited CPU. An append-heavy log workload does not need one-second search visibility. Setting <code>index.refresh_interval: "30s"</code> on the live <code>camera_events</code> indices, adding it to the index template so rollover indices inherit it, and committing it to the repo lifted a steady background tax. <code>_simulate_index</code> confirmed the next rollover picks it up.
+			Second, nothing watched the disk. It climbed to 93% in silence, and the first signal anyone got was the outage itself. A production setup pages at 80%, long before a watermark is ever in play.
 		</p>
 	</section>
 
 	<section class="mt-12">
 		<h2 class="text-xl font-semibold">What I actually took away</h2>
 
-		<h3 class="mt-8 text-base font-semibold">The component on fire is often the victim</h3>
+		<h3 class="mt-8 text-base font-semibold">Elasticsearch is usually the victim, not the cause</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			Elasticsearch held 4.2 GB at 39% heap while other containers' logs filled its disk and a stale query pattern burned its CPU. It had not failed. It was just the surface both failures showed up on. Follow the evidence to where the work is actually happening (<code>df</code>, <code>hot_threads</code>), not to the loudest process.
+			Elasticsearch held 4.2 GB at 39% heap while other containers' logs filled its disk and a query pattern its own schema forced burned its CPU. It had not failed. It was the surface every setup gap showed up on. Follow the evidence to where the work is actually happening (<code>df</code>, <code>hot_threads</code>), not to the loudest process.
 		</p>
 
-		<h3 class="mt-8 text-base font-semibold">One symptom can hide two root causes</h3>
+		<h3 class="mt-8 text-base font-semibold">One symptom can hide more than one gap</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
-			"Elasticsearch is slow" was a disk problem <em>and</em> a query problem at once, by coincidence. Fix one and you would leave the node still degraded and the incident half-solved. That single 4.2 GB number forced the split; without it, clearing the disk would have looked like a full fix while the CPU stayed pegged.
-		</p>
-
-		<h3 class="mt-8 text-base font-semibold">A merged fix that isn't deployed doesn't exist</h3>
-		<p class="mt-3 leading-relaxed text-muted-foreground">
-			A performance fix can be reviewed, merged, and celebrated, and still never reach the environment that needs it. A mutable image tag with no version visibility lets a system run old code indefinitely, and nothing surfaces the drift until someone inspects the running container by hand. Track the deployed image by commit SHA, and make redeploy-on-merge explicit.
-		</p>
-
-		<h3 class="mt-8 text-base font-semibold">Uncapped logs are latent outages</h3>
-		<p class="mt-3 leading-relaxed text-muted-foreground">
-			Any container on the default <code>json-file</code> driver with no rotation is a slow-motion disk fill waiting to cross a watermark. Capping Docker logs globally (<code>max-size</code>, <code>max-file</code>) is the one change that would have prevented the acute half outright. The disk should have alerted at 80%, not announced itself through a user-visible outage.
+			"Elasticsearch is slow" was a storage gap <em>and</em> a schema gap at once, colliding by coincidence. Fix one and you would leave the node still degraded and the incident half-solved. That single 4.2 GB number forced the split; without it, clearing the disk would have looked like a full fix while the CPU stayed pegged.
 		</p>
 
 		<h3 class="mt-8 text-base font-semibold">Index what you query, before you query it</h3>
 		<p class="mt-3 leading-relaxed text-muted-foreground">
 			If a field is going to be aggregated or filtered on, it has to be a real indexed field with doc-values, not something lifted out of <code>_source</code> at query time. A runtime <code>_source</code> scan is a fine escape hatch for one-off exploration on data you already have, but it must not become the steady-state path behind a dashboard card. Storing a messy, heterogeneous payload blob un-indexed is fine; querying <em>through</em> it on every request is not. Promote every hot field at ingest, from day one, before you build the dashboard that leans on it.
 		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Bound what a tutorial leaves unbounded</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Any container on the default <code>json-file</code> driver with no rotation is a slow-motion disk fill waiting to cross a watermark. Logs, disk, retention, a tutorial leaves all of them unbounded because on sample data they never fill. Cap Docker logs globally (<code>max-size</code>, <code>max-file</code>), alert on disk before the watermark, and let ILM actually delete aged indices.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">A merged fix that isn't deployed doesn't exist</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			A performance fix can be reviewed, merged, and celebrated, and still never reach the environment that needs it. A mutable image tag with no version visibility lets a system run old code indefinitely, and nothing surfaces the drift until someone inspects the running container by hand. Track the deployed image by commit SHA, and make redeploy-on-merge explicit.
+		</p>
 	</section>
 
 	<section class="mt-12">
 		<h2 class="text-xl font-semibold">The takeaway</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			The headline read like a sizing failure: a datastore pegged and unresponsive, queries timing out, ingestion stalled. The reality was a nearly-empty node caught between two operational gaps, an uncapped logging default that filled a shared disk, and a mutable tag that let a merged fix sit undeployed. Both stayed invisible until the evidence, a disk breakdown and a thread dump, pointed away from the component on fire.
+			The headline read like a sizing failure: a datastore pegged and unresponsive, queries timing out, ingestion stalled. The reality was a healthy node standing on a setup that was never finished. The schema was never shaped for its queries, the host's storage was never bounded, and the deploy pipeline could not say what it was running. None of that is exotic. It is exactly the work a fifteen-minute tutorial ends right before.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Diagnose where the work is happening, not where the smoke is. And keep the boring guardrails in place, log caps, disk alerts, deployed-version visibility, so the next coincidence stays an inconvenience instead of an outage.
+			A green cluster is the start of the job, not the end of it. Index the fields you query before you build on them, bound every resource a default leaves open, tune for the workload you actually have, and always know what version is running. Do that and the next coincidence stays an inconvenience instead of an outage.
 		</p>
 	</section>
 
