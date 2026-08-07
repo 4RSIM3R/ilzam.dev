@@ -27,6 +27,27 @@ const caseStudies = [
   },
 ]
 
+const stats = [
+  {
+    value: "15+",
+    label: "MVPs Shipped",
+    description:
+      "Products built and deployed across marketplaces, SaaS, AI, and government systems.",
+  },
+  {
+    value: "80%",
+    label: "Cost Reduction",
+    description:
+      "Infrastructure cost savings delivered for a healthcare network.",
+  },
+  {
+    value: "99%",
+    label: "Uptime",
+    description:
+      "Platform reliability achieved after rebuilding a system serving 5,000+ users.",
+  },
+]
+
 export function CaseStudiesSection() {
   return (
     <section
@@ -96,6 +117,23 @@ export function CaseStudiesSection() {
               </CardContent>
             </Card>
           </a>
+        ))}
+      </div>
+
+      {/* Stats */}
+      <div className="mt-12 grid grid-cols-1 divide-y border-t md:grid-cols-3 md:divide-x md:divide-y-0">
+        {stats.map((stat) => (
+          <div key={stat.label} className="py-6 md:px-6 md:first:pl-0 md:last:pr-0">
+            <p className="text-3xl font-semibold tracking-tight md:text-4xl">
+              {stat.value}{" "}
+              <span className="text-2xl font-normal md:text-3xl">
+                {stat.label}
+              </span>
+            </p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {stat.description}
+            </p>
+          </div>
         ))}
       </div>
 
