@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react"
-import { DownloadIcon } from "lucide-react"
+import { DownloadIcon, XIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -51,16 +51,20 @@ export function MvpCostEstimator() {
     })
   }
 
+  function clearAll() {
+    setSelected(new Set())
+  }
+
   return (
     <>
-      <div className="grid gap-8 print:hidden lg:grid-cols-[1fr_360px]">
+      <div className="grid gap-8 print:hidden lg:grid-cols-[1fr_380px]">
         <div className="space-y-8">
           {CATEGORIES.map((category) => (
             <div key={category.id}>
               <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                 {category.label}
               </h3>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
                 {(FEATURES_BY_CATEGORY.get(category.id) ?? []).map((feature) => (
                   <label
                     key={feature.id}
@@ -88,9 +92,21 @@ export function MvpCostEstimator() {
         </div>
 
         <div className="h-fit rounded-xl border p-5 lg:sticky lg:top-20">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Your estimate
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Your estimate
+            </p>
+            {hasSelection && (
+              <button
+                type="button"
+                onClick={clearAll}
+                className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <XIcon className="size-3" />
+                Clear all
+              </button>
+            )}
+          </div>
 
           {hasSelection ? (
             <>
