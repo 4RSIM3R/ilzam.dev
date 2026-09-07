@@ -5,7 +5,7 @@
 export const HOURLY_RATE_RANGE: [number, number] = [25, 45]
 
 /** Effective billable hours per week for a solo dev (accounts for client
- * calls, context switching, etc. — not a 40h week). */
+ * calls, context switching, etc., not a 40h week). */
 export const HOURS_PER_BILLABLE_WEEK = 25
 
 /** Every project needs some QA/deploy pass even with zero infra features picked. */

@@ -6,15 +6,15 @@ interface MvpEstimatorCtaProps {
   estimate: EstimateResult
 }
 
-// Cal.com prefills the booking form from `name`, `email`, `notes`, etc. —
+// Cal.com prefills the booking form from `name`, `email`, `notes`, etc.,
 // used here so a booked call already comes in with what they were scoping.
 function buildSummary(estimate: EstimateResult): string {
   const featureList = estimate.selectedFeatures.map((f) => f.label).join(", ") || "none selected yet"
   return [
     `MVP estimate from ilzam.dev/tool/mvp-cost-estimator`,
     `Features: ${featureList}`,
-    `Estimated price: $${estimate.priceMin.toLocaleString()}–$${estimate.priceMax.toLocaleString()}`,
-    `Estimated timeline: ${estimate.timelineMinWeeks}–${estimate.timelineMaxWeeks} weeks`,
+    `Estimated price: $${estimate.priceMin.toLocaleString()}-$${estimate.priceMax.toLocaleString()}`,
+    `Estimated timeline: ${estimate.timelineMinWeeks}-${estimate.timelineMaxWeeks} weeks`,
   ].join("\n")
 }
 
@@ -39,6 +39,7 @@ export function MvpEstimatorCta({ estimate }: MvpEstimatorCtaProps) {
         <div className="mt-6 flex flex-wrap gap-3">
           <Button
             variant="outline"
+            nativeButton={false}
             className="rounded-full border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
             render={<a href={calHref} target="_blank" rel="noopener noreferrer" />}
           >
@@ -47,6 +48,7 @@ export function MvpEstimatorCta({ estimate }: MvpEstimatorCtaProps) {
           </Button>
           <Button
             variant="outline"
+            nativeButton={false}
             className="rounded-full border-white/30 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 hover:text-white"
             render={<a href={mailtoHref} />}
           >

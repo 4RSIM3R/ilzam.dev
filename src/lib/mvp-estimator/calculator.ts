@@ -150,7 +150,7 @@ export function estimateProject(rawSelectedIds: string[], options: EstimateOptio
   if (aiCount >= AI_FEATURE_THRESHOLD) {
     overhead.push({
       id: 'ai-feature-set-overhead',
-      label: `${aiCount} AI features selected — rate limiting, cost controls, and fallback handling compound across them`,
+      label: `${aiCount} AI features selected: rate limiting, cost controls, and fallback handling compound across them`,
       minHours: AI_FEATURE_OVERHEAD_HOURS[0],
       maxHours: AI_FEATURE_OVERHEAD_HOURS[1],
     })
@@ -158,7 +158,7 @@ export function estimateProject(rawSelectedIds: string[], options: EstimateOptio
   if (selectedFeatures.length >= FEATURE_COUNT_THRESHOLD) {
     overhead.push({
       id: 'feature-count-overhead',
-      label: `${selectedFeatures.length} features selected — cross-feature regression surface grows non-linearly past ~${FEATURE_COUNT_THRESHOLD}`,
+      label: `${selectedFeatures.length} features selected: cross-feature regression surface grows non-linearly past ~${FEATURE_COUNT_THRESHOLD}`,
       minHours: FEATURE_COUNT_OVERHEAD_HOURS[0],
       maxHours: FEATURE_COUNT_OVERHEAD_HOURS[1],
     })
