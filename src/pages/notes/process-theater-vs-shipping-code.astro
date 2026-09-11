@@ -1,0 +1,184 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+---
+
+<ContentLayout
+	title="Most of Your Software Process Is Cosplay | Ilzam"
+	description="A project was 5 CRUD screens and 1 screen reading a materialized view. It still took tickets, story points, sprint ceremony, design review, and a pipeline before anyone wrote a line of code. Where does all that process actually come from, and when does it earn its place?"
+>
+	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<div class="mt-6 flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Founder Decisions</span>
+		<span class="text-xs text-muted-foreground">September 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		Most of Your Software Process Is Cosplay
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			A project came in that was, honestly, 5 screens of CRUD and 1 screen reading a materialized view. The actual coding was a few days of work. Getting to
+			the coding took tickets, story points, sprint ceremony, a design review, multiple environments, and a pipeline, before anyone touched an editor. That gap
+			is the thing I want to talk about. Process should scale with how hard a problem actually is. Most of the time, it scales with something else: how
+			anxious the organization is, and how many careers are built on owning the process instead of the output.
+		</p>
+	</blockquote>
+
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			Here's the project. Five screens: create, list, edit, view, delete. One more screen that reads from a materialized view someone already built. No
+			exotic business logic, no distributed system, no third integration that changes the shape of the other two. A competent engineer, left alone, writes
+			this in a few days.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			It didn't ship in a few days. It went through a backlog refinement session to turn "build 5 screens" into six tickets with story points attached. It
+			went through a sprint planning meeting to decide which of those tickets fit in the sprint. It needed a design review before anyone was allowed to
+			start, and a separate environment provisioned before anyone could deploy to it. A pipeline had to exist before the first commit could go anywhere.
+			Standups happened daily to report progress on work that, if you just wrote it, would already be done.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			None of that made the software better. The 5 screens that came out the other end look exactly like the 5 screens a good engineer would have typed
+			directly. What changed is how long it took, and how many people had to be in a room to watch it happen.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			That's the part I want to name directly: a lot of that room is cosplay. Standing in a circle holding a story-point estimate for a screen you could
+			have built in the time it took to estimate it is not engineering. It's dressing up as an engineering org, for an audience that isn't even watching.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Where the ceremony actually comes from</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Agile started as a reaction to something real: the old waterfall model, where a spec got written a year before any code shipped, and by the time it
+			shipped the market had moved. The original point was small, direct, and almost embarrassingly simple. Talk to the customer. Ship something working
+			early. Adjust. That's it. That's the whole insight.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			What we got instead is an industry of certifications, story point estimation debates, retro facilitators, and Jira workflows with more states than
+			the actual code has functions. None of that is the insight. It's a costume built around the insight, and at some point the costume became the job.
+			You can tell, because teams keep doing the ceremony on projects small enough that the ceremony costs more than the work.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Cloud went the same direction. "We need infrastructure" turned into a stack of managed services, IaC modules, and multi-environment pipelines for
+			apps that would run fine on a single box for years. And now the same pattern is repeating with AI. "Use the model to help you code" is turning into
+			its own vocabulary of agents, harnesses, and orchestration layers, some of which earns its keep, plenty of which is people building a title around a
+			tool instead of using the tool.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">sqlite and linux never had an RFC first</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The software most engineers still admire decades later wasn't built by inventing a methodology first. Linus Torvalds wrote a kernel because he
+			wanted a Unix-like system on his own hardware and the existing options didn't fit. D. Richard Hipp wrote SQLite because a client needed a database
+			that didn't require running a server process. Neither of them opened with a framework for how software should be developed. They opened with a
+			problem, and they solved it directly, in code, in public, and let the design get argued about afterward.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The methodology talk came later, from people writing books and giving conference talks about how great software gets made. That's fine as
+			retrospective analysis. It becomes a problem when teams start hiring the vocabulary before they've earned the right to have any, applying a
+			framework built for coordinating hundreds of engineers to a task one engineer could finish before lunch.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The same costume is showing up in the AI era</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Take the 5-CRUD-screens project again, but hand it to a team in 2026. Increasingly, the instinct isn't to open Claude Code and ask it to build the 5
+			screens. It's to first stand up a multi-agent orchestration framework, a prompt-chaining pipeline, an evaluation harness, and a planning layer that
+			decides which sub-agent handles which screen. By the time all of that exists, the actual task, 5 screens and a read from a materialized view, is
+			still sitting there, unbuilt, now underneath another layer of scaffolding.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			For a task this size, you don't need an agent framework. You need to employ Claude directly, describe the 5 screens and the materialized view, let
+			it write the code, and review the output the way you'd review a junior engineer's PR. The orchestration layer earns its place when you're running
+			hundreds of agents against a real production system with real failure modes to coordinate. It's dead weight bolted onto a task one model, used
+			directly, finishes in an afternoon.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is the same pattern as agile and cloud, just wearing a newer costume. The vocabulary changed, agents instead of sprints, harnesses instead of
+			pipelines, but the tell is identical: process and tooling accumulating around a task faster than the task itself grows in difficulty. The fix is
+			also identical. Ask what the scaffolding is actually for, on this specific task, before you build it.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">So is software engineering a made-up job?</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			No, and I don't actually believe that. Writing correct, maintainable code that solves a real problem is a real skill, and it's the part of the job
+			that's always been real. The question worth taking seriously is narrower: does the process layer on top of that skill scale with the actual
+			difficulty of the problem, or with something else?
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			My honest read, after enough projects like the 5-screen one: a meaningful chunk of it scales with organizational anxiety and career incentives.
+			Anxious orgs add process because a checklist feels safer than trusting one engineer to just handle it, even when the task doesn't warrant the risk
+			the checklist is defending against. And once a role exists whose output is "the process was followed" rather than "the thing shipped," that role has
+			every incentive to keep the process alive, on projects that need it and on projects that don't.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Where ceremony actually earns its place</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This isn't an argument for zero process anywhere. A migration touching a production database with no rollback path deserves a review before anyone
+			runs it. A feature that a dozen teams depend on deserves a design doc, because the cost of getting the interface wrong is paid by everyone
+			downstream. A regulated industry has real audit requirements that aren't optional. In each of those cases, the process exists because the blast
+			radius of a mistake is genuinely large, and skipping the process would be the reckless choice, not the fast one.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The 5-CRUD-screens project had none of that. One engineer, one small feature, no other team depending on the interface, a mistake fixable in the
+			next commit. Blast radius near zero. The ceremony applied to it wasn't calibrated to the risk. It was applied because it's the default, and nobody
+			stopped to ask whether this specific task needed it.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The rule I actually use</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Match the process to the blast radius, not to the org chart. Before adding a ticket, a meeting, an environment, or a review step, ask what specific
+			failure it prevents, and whether that failure is even possible on this task. If a 5-screen CRUD app fails, someone fixes it in an afternoon. If a
+			production migration fails, customers lose data. Those two situations do not deserve the same number of steps between "we need this" and "it's
+			live."
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			This is most of what I bring into a fractional CTO engagement: cutting the process a founder inherited from a much bigger company down to the size
+			their actual risk warrants, so the engineers I work with spend their time writing the 5 screens instead of reporting on writing the 5 screens.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The takeaway</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			If the task is genuinely 5 CRUD screens and 1 screen reading a materialized view, the honest move is to open an editor and write the 5 screens. Not
+			cosplay a bigger job around it to make a few days of work feel like a quarter of work. The vocabulary changes every decade, waterfall, agile, cloud, and
+			now AI and agent harnesses, but the underlying question stays the same: is this process here because the problem needs it, or because it makes the
+			problem look bigger than it is?
+		</p>
+	</section>
+
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/notes/elasticsearch-prod-is-not-a-youtube-tutorial" class="text-sm underline underline-offset-4 hover:text-foreground">Elasticsearch in Production Is Not a YouTube Tutorial</a></li>
+			<li><a href="/notes/cursor-vs-claude-code-founder-pricing" class="text-sm underline underline-offset-4 hover:text-foreground">Cursor vs Claude Code: A Founder's Pricing Teardown</a></li>
+		</ul>
+	</section>
+
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Paying for process that doesn't match your risk?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			That's exactly what the advisory session is for.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Advisory Session
+		</a>
+	</section>
+</ContentLayout>
