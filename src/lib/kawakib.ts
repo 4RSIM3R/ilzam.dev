@@ -1,6 +1,7 @@
-// Kawakib ("planets"): products that orbit ilzam.dev. The /kawakib page renders
-// from this list, so adding a product is one entry here. Write taglines for
-// non-technical founders: what it does for them, not how it's built.
+// Kawakib (plural of kaukab, "star"): a constellation of software by Ilzam.
+// The /kawakib page renders from this list, so adding a product is one entry
+// here. Write taglines for non-technical founders: what it does for them, not
+// how it's built.
 
 export type ProductStatus = 'live' | 'building' | 'idea'
 
