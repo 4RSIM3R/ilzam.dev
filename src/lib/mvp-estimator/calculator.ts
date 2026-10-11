@@ -1,4 +1,5 @@
 import {
+  AI_ASSIST_FACTOR,
   AI_FEATURE_OVERHEAD_HOURS,
   AI_FEATURE_THRESHOLD,
   BASELINE_POLISH_HOURS,
@@ -6,6 +7,7 @@ import {
   FEATURE_COUNT_THRESHOLD,
   HOURLY_RATE_RANGE,
   HOURS_PER_BILLABLE_WEEK,
+  MINIMUM_PROJECT_PRICE,
   PRICE_ROUNDING,
 } from './config'
 import { FEATURES } from './features'
@@ -100,8 +102,19 @@ function roundTo(value: number, step: number): number {
   return Math.round(value / step) * step
 }
 
+/** Phase durations in half-week steps. Rounding each phase up to a whole week
+ * inflated short phases (a 6-hour launch pass became a full week). */
 function hoursToWeeks(hours: number, hoursPerWeek: number): number {
+  return hours === 0 ? 0 : Math.max(0.5, Math.round((hours / hoursPerWeek) * 2) / 2)
+}
+
+/** Total timeline rounds up once, on the whole project. */
+function totalWeeks(hours: number, hoursPerWeek: number): number {
   return hours === 0 ? 0 : Math.max(1, Math.ceil(hours / hoursPerWeek))
+}
+
+function priceFor(hours: number, rate: number): number {
+  return Math.max(MINIMUM_PROJECT_PRICE, roundTo(hours * rate, PRICE_ROUNDING))
 }
 
 function buildTimeline(phases: PhaseBreakdown[], key: 'minWeeks' | 'maxWeeks'): TimelineEntry[] {
@@ -134,8 +147,9 @@ export function estimateProject(rawSelectedIds: string[], options: EstimateOptio
   }
   for (const feature of selectedFeatures) {
     const bucket = phaseHours[PHASE_BY_CATEGORY[feature.category]]
-    bucket[0] += feature.minHours
-    bucket[1] += feature.maxHours
+    const factor = AI_ASSIST_FACTOR[feature.category]
+    bucket[0] += feature.minHours * factor
+    bucket[1] += feature.maxHours * factor
   }
 
   // Interaction-rule overhead is integration cost by definition.
@@ -197,10 +211,10 @@ export function estimateProject(rawSelectedIds: string[], options: EstimateOptio
     phases,
     fastTimeline,
     conservativeTimeline,
-    timelineMinWeeks: fastTimeline.at(-1)?.endWeek ?? 0,
-    timelineMaxWeeks: conservativeTimeline.at(-1)?.endWeek ?? 0,
-    priceMin: roundTo(totalMinHours * rateMin, PRICE_ROUNDING),
-    priceMax: roundTo(totalMaxHours * rateMax, PRICE_ROUNDING),
+    timelineMinWeeks: totalWeeks(totalMinHours, hoursPerWeek),
+    timelineMaxWeeks: totalWeeks(totalMaxHours, hoursPerWeek),
+    priceMin: priceFor(totalMinHours, rateMin),
+    priceMax: priceFor(totalMaxHours, rateMax),
     recommendedStack: deriveStack(selectedFeatures),
   }
 }

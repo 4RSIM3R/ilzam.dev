@@ -2,6 +2,7 @@
 import ContentLayout from '@/layouts/content-layout.astro'
 import { MvpCostEstimator } from '@/components/mvp-cost-estimator'
 import {
+	AI_ASSIST_FACTOR,
 	AI_FEATURE_THRESHOLD,
 	BASELINE_POLISH_HOURS,
 	FEATURE_COUNT_THRESHOLD,
@@ -9,9 +10,16 @@ import {
 	HOURLY_RATE_RANGE,
 	HOURS_PER_BILLABLE_WEEK,
 	INTERACTION_RULES,
+	MINIMUM_PROJECT_PRICE,
 } from '@/lib/mvp-estimator'
+import { formatUsd } from '@/lib/pricing'
 
 const [rateMin, rateMax] = HOURLY_RATE_RANGE
+
+// Average build-time saving across the whole feature catalog, weighted by hours.
+const preAiHours = FEATURES.reduce((sum, f) => sum + f.minHours + f.maxHours, 0)
+const aiHours = FEATURES.reduce((sum, f) => sum + (f.minHours + f.maxHours) * AI_ASSIST_FACTOR[f.category], 0)
+const aiSavingPercent = Math.round((1 - aiHours / preAiHours) * 100)
 ---
 
 <ContentLayout
@@ -46,6 +54,13 @@ const [rateMin, rateMax] = HOURLY_RATE_RANGE
 				into the categories above, from user accounts and payments to AI and mobile apps.
 			</li>
 			<li>
+				<strong class="text-foreground">Built with AI in 2026.</strong> Building with AI tools is
+				now standard practice, and it cuts build time by about {aiSavingPercent}% on average
+				compared with a few years ago. The saving is biggest for routine work like screens, forms,
+				and admin panels, and smallest for payments and connections to other tools, where every
+				detail still has to be checked by hand.
+			</li>
+			<li>
 				<strong class="text-foreground">Features that depend on each other.</strong> Some
 				combinations take extra work. For example, company accounts plus subscriptions
 				means billing each company per seat. The calculator checks for
@@ -62,7 +77,7 @@ const [rateMin, rateMax] = HOURLY_RATE_RANGE
 			</li>
 			<li>
 				<strong class="text-foreground">Price.</strong> Total hours multiplied by ${rateMin} to
-				${rateMax} per hour.
+				${rateMax} per hour, with a minimum of {formatUsd(MINIMUM_PROJECT_PRICE)} for any project.
 			</li>
 			<li>
 				<strong class="text-foreground">Timeline.</strong> Based on {HOURS_PER_BILLABLE_WEEK} hours
@@ -75,6 +90,13 @@ const [rateMin, rateMax] = HOURLY_RATE_RANGE
 			connecting to systems you already use, rules you have to follow (for example,
 			handling health or financial data), and how polished the first version needs
 			to be.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Why not a bigger AI saving? Writing code got much faster, but checking it did not. Google's
+			<a href="https://blog.google/technology/developers/dora-report-2025/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">2025 DORA research</a>
+			found that about 90% of software professionals now use AI, and that it magnifies a team's
+			existing strengths and weaknesses. That's why the testing and launch time in this calculator
+			is not reduced.
 		</p>
 	</section>
 </ContentLayout>

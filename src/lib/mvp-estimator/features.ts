@@ -3,6 +3,9 @@ import type { CategoryMeta, Feature } from './types'
 // Labels and help text are written for non-technical founders. Keep jargon out
 // of `label`; if a technical term helps (e.g. when talking to a developer),
 // put it in parentheses or in `helpText`.
+//
+// minHours/maxHours are pre-AI estimates. AI_ASSIST_FACTOR in config.ts scales
+// them per category, so adjust that rather than editing hours here.
 
 export const CATEGORIES: CategoryMeta[] = [
   { id: 'foundation', label: 'The Basics' },

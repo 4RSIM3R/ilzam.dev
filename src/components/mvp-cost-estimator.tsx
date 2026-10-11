@@ -9,6 +9,20 @@ import { CATEGORIES, FEATURES, estimateProject, type Feature } from "@/lib/mvp-e
 
 const FEATURES_BY_ID = new Map(FEATURES.map((f) => [f.id, f]))
 
+function formatWeeks(min: number, max: number) {
+  return min === max ? `${min}` : `${min}-${max}`
+}
+
+function formatPrice(min: number, max: number) {
+  return min === max
+    ? `${min.toLocaleString()}`
+    : `${min.toLocaleString()} - ${max.toLocaleString()}`
+}
+
+function formatTotalWeeks(min: number, max: number) {
+  return `${formatWeeks(min, max)} ${max === 1 ? "week" : "weeks"}`
+}
+
 const FEATURES_BY_CATEGORY = new Map<string, Feature[]>(
   CATEGORIES.map((category) => [category.id, FEATURES.filter((f) => f.category === category.id)])
 )
@@ -116,10 +130,10 @@ export function MvpCostEstimator() {
           {hasSelection ? (
             <>
               <p className="mt-3 text-3xl font-light tracking-tight">
-                ${estimate.priceMin.toLocaleString()} - ${estimate.priceMax.toLocaleString()}
+                {formatPrice(estimate.priceMin, estimate.priceMax)}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
-                {estimate.timelineMinWeeks}-{estimate.timelineMaxWeeks} weeks ·{" "}
+                {formatTotalWeeks(estimate.timelineMinWeeks, estimate.timelineMaxWeeks)} ·{" "}
                 {estimate.selectedFeatures.length} feature
                 {estimate.selectedFeatures.length === 1 ? "" : "s"}
               </p>
@@ -135,7 +149,7 @@ export function MvpCostEstimator() {
                         {i + 1}. {phase.phase}
                       </span>
                       <span className="shrink-0 text-muted-foreground">
-                        {phase.minWeeks}-{phase.maxWeeks}w
+                        {formatWeeks(phase.minWeeks, phase.maxWeeks)}w
                       </span>
                     </li>
                   ))}
@@ -208,19 +222,19 @@ export function MvpCostEstimator() {
 
           <h2 className="mt-6 text-sm font-semibold uppercase tracking-wider">Estimated price</h2>
           <p className="mt-1 text-sm">
-            ${estimate.priceMin.toLocaleString()} - ${estimate.priceMax.toLocaleString()}
+            {formatPrice(estimate.priceMin, estimate.priceMax)}
           </p>
 
           <h2 className="mt-6 text-sm font-semibold uppercase tracking-wider">Timeline</h2>
           <ul className="mt-2 text-sm">
             {estimate.phases.map((phase, i) => (
               <li key={phase.phase}>
-                {i + 1}. {phase.phase}: {phase.minWeeks}-{phase.maxWeeks} weeks
+                {i + 1}. {phase.phase}: {formatWeeks(phase.minWeeks, phase.maxWeeks)} weeks
               </li>
             ))}
           </ul>
           <p className="mt-1 text-sm">
-            Total: {estimate.timelineMinWeeks}-{estimate.timelineMaxWeeks} weeks
+            Total: {formatTotalWeeks(estimate.timelineMinWeeks, estimate.timelineMaxWeeks)}
           </p>
 
           <h2 className="mt-6 text-sm font-semibold uppercase tracking-wider">
