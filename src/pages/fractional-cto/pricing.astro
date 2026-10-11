@@ -1,0 +1,184 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+import {
+	CTO_TIERS,
+	ENGAGEMENT_TERMS,
+	FULL_TIME_CTO_SALARY,
+	MVP_BUILD_FROM,
+	STRATEGY_SESSION,
+	effectiveHourlyRate,
+	formatUsd,
+} from '@/lib/pricing'
+
+const cheapest = CTO_TIERS[0]
+const priciest = CTO_TIERS[CTO_TIERS.length - 1]
+const fractional = CTO_TIERS.find((t) => t.id === 'fractional')!
+const hourlyRates = CTO_TIERS.map(effectiveHourlyRate)
+const minHourly = Math.min(...hourlyRates)
+const maxHourly = Math.max(...hourlyRates)
+const monthlySalary = Math.round(FULL_TIME_CTO_SALARY / 12)
+const salaryShare = Math.round((fractional.monthlyPrice / monthlySalary) * 100)
+
+const description = `Fractional CTO pricing from ${formatUsd(cheapest.monthlyPrice)} a month, or ${formatUsd(minHourly)} to ${formatUsd(maxHourly)} per hour. See what each plan includes and how it compares to a ${formatUsd(FULL_TIME_CTO_SALARY / 1000)}k full-time CTO hire.`
+---
+
+<ContentLayout title="Fractional CTO Cost and Rates (2026 Pricing) | Ilzam" description={description}>
+	<div class="flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Pricing</span>
+		<span class="text-xs text-muted-foreground">Updated October 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		Fractional CTO Cost and Rates
+	</h1>
+
+	<p class="mt-6 text-lg leading-relaxed">
+		My fractional CTO plans cost {formatUsd(cheapest.monthlyPrice)} to {formatUsd(priciest.monthlyPrice)} per
+		month, depending on how many hours you need. That works out to {formatUsd(minHourly)} to
+		{formatUsd(maxHourly)} per hour. If you only need one decision made well, a single
+		{STRATEGY_SESSION.minutes}-minute strategy session is {formatUsd(STRATEGY_SESSION.price)}.
+	</p>
+	<p class="mt-4 leading-relaxed text-muted-foreground">{ENGAGEMENT_TERMS}</p>
+	<p class="mt-4 leading-relaxed text-muted-foreground">
+		New to the term? A fractional CTO is a part-time technology leader: the person who makes
+		your technical decisions and keeps your developers on track, without the cost of a
+		full-time executive.
+	</p>
+
+	<!-- Monthly plans -->
+	<section class="mt-10">
+		<h2 class="text-xl font-semibold">Monthly plans</h2>
+		<div class="mt-6 grid gap-4 md:grid-cols-3">
+			{
+				CTO_TIERS.map((tier) => (
+					<div class="flex flex-col rounded-lg border p-5">
+						<p class="font-medium">{tier.name}</p>
+						<p class="mt-3 text-3xl font-light tracking-tight">
+							{formatUsd(tier.monthlyPrice)}
+							<span class="text-sm text-muted-foreground"> / month</span>
+						</p>
+						<p class="mt-1 text-xs text-muted-foreground">
+							About {tier.hoursPerMonth} hours, {formatUsd(effectiveHourlyRate(tier))}/hour
+						</p>
+						<p class="mt-4 text-sm leading-relaxed">{tier.summary}</p>
+						<ul class="mt-4 flex-1 space-y-2 text-sm text-muted-foreground">
+							{tier.includes.map((item) => (
+								<li class="flex gap-2">
+									<span class="mt-2 size-1.5 shrink-0 rounded-full bg-foreground" />
+									{item}
+								</li>
+							))}
+						</ul>
+						<p class="mt-4 text-xs italic text-muted-foreground">Best for: {tier.bestFor}</p>
+					</div>
+				))
+			}
+		</div>
+
+		<div class="mt-4 rounded-lg bg-muted/50 p-5">
+			<p class="font-medium">
+				Not ready for a monthly plan? {STRATEGY_SESSION.name}, {formatUsd(STRATEGY_SESSION.price)} one-off
+			</p>
+			<ul class="mt-3 space-y-1 text-sm text-muted-foreground">
+				{STRATEGY_SESSION.includes.map((item) => <li>{item}</li>)}
+			</ul>
+		</div>
+	</section>
+
+	<!-- Hourly rate -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Fractional CTO hourly rate</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I price by the month, not by the hour, so you can message me when something comes up
+			without watching a meter. Here is what each plan works out to per hour.
+		</p>
+		<div class="mt-6 overflow-x-auto">
+			<table class="w-full text-left text-sm">
+				<thead>
+					<tr class="border-b">
+						<th class="py-3 pr-4 font-medium">Plan</th>
+						<th class="py-3 pr-4 font-medium">Per month</th>
+						<th class="py-3 pr-4 font-medium">Hours</th>
+						<th class="py-3 font-medium">Per hour</th>
+					</tr>
+				</thead>
+				<tbody class="text-muted-foreground">
+					{
+						CTO_TIERS.map((tier) => (
+							<tr class="border-b">
+								<td class="py-3 pr-4 text-foreground">{tier.name}</td>
+								<td class="py-3 pr-4">{formatUsd(tier.monthlyPrice)}</td>
+								<td class="py-3 pr-4">~{tier.hoursPerMonth}</td>
+								<td class="py-3">{formatUsd(effectiveHourlyRate(tier))}</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Smaller plans cost more per hour because every new client takes some fixed time to learn:
+			your product, your existing code, and your team. I need that context before my advice is
+			worth anything.
+		</p>
+	</section>
+
+	<!-- Savings -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Does a fractional CTO actually save money?</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			A full-time CTO is a {formatUsd(FULL_TIME_CTO_SALARY)}+ salary commitment. That is about
+			{formatUsd(monthlySalary)} a month before equity, benefits, and recruiting. The
+			{fractional.name} plan is {formatUsd(fractional.monthlyPrice)} a month, roughly {salaryShare}% of
+			the salary alone, and you can stop it with 2 weeks' notice instead of running a hiring and
+			firing process.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			It stops saving money when you need a technical leader most of the week for months on end.
+			At that point the {priciest.name} plan costs {formatUsd(priciest.monthlyPrice * 12)} a year, and a
+			full-time hire who owns the role long term is often the better investment. I'll tell you when
+			you've reached that point, and I can help you hire that person.
+		</p>
+	</section>
+
+	<!-- Cost drivers -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">What changes the cost</h2>
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">How much of my time you need</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					This matters most, which is why the plans are sized by hours. A bigger plan means
+					I'm more involved in planning the work, checking it, and hiring.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Whether I'm advising or building</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					The Advisor and Fractional CTO plans cover advice, decisions, and leading your
+					developers. If you also want me to build the product myself, that's the
+					{priciest.name} plan, or a one-time build of your first version (an MVP) starting from
+					{formatUsd(MVP_BUILD_FROM)}. To see what your product would cost to build, try the
+					<a href="/tool/mvp-cost-estimator" class="underline underline-offset-4 hover:text-foreground">app and software development cost calculator</a>.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- CTA -->
+	<section class="mt-12 rounded-lg border p-6">
+		<h2 class="text-xl font-semibold">Not sure which plan fits?</h2>
+		<p class="mt-2 leading-relaxed text-muted-foreground">
+			Book a free 30-minute intro call. No pitch, no pressure, just a real conversation about what
+			you're building.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-flex rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book a free intro call
+		</a>
+	</section>
+</ContentLayout>

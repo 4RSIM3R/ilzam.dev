@@ -11,6 +11,8 @@ Ilzam is an AI-native software engineer and fractional CTO. He has shipped 15+ M
 ### Fractional CTO
 Senior technical judgment, without the full-time salary. For founders who need someone to own the technical side — architecture decisions, stack choices, vendor evaluation, team hiring, sprint planning — without committing to a $150k/year hire.
 
+Pricing (month-to-month, cancel with 2 weeks' notice): Advisor $1,000/month (~8 hours), Fractional CTO $3,000/month (~40 hours), Hands-on CTO $5,500/month (~80 hours, includes building). One-off 90-minute Strategy Session: $300. Details: https://ilzam.dev/fractional-cto/pricing
+
 ### MVP Development
 From whiteboard to deployed. In weeks, not months. AI-assisted development that moves at 2-3x the speed of a traditional agency while writing production-quality code. Most MVPs ship in 6-10 weeks.
 

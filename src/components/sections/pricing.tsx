@@ -7,15 +7,21 @@ import {
   CardHeader,
 } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { PhoneCallIcon, MailIcon } from "lucide-react"
+import { ArrowRightIcon, PhoneCallIcon, MailIcon } from "lucide-react"
+import {
+  CTO_TIERS,
+  MVP_BUILD_FROM,
+  STRATEGY_SESSION,
+  formatUsd,
+} from "@/lib/pricing"
 
 const plans = [
   {
     label: "Fractional CTO",
-    price: "$1,250",
+    price: `From ${formatUsd(CTO_TIERS[0].monthlyPrice)}`,
     period: "/ Month",
     description:
-      "Ongoing technical leadership for your startup. I embed in your team, make architecture decisions, review code, and keep your product on track.",
+      `Ongoing technical leadership for your startup, in plans from ${CTO_TIERS[0].hoursPerMonth} to ${CTO_TIERS[CTO_TIERS.length - 1].hoursPerMonth} hours a month. I make architecture decisions, review code, and keep your product on track.`,
     features: [
       "Weekly async or live check-ins",
       "Architecture and stack decisions",
@@ -27,17 +33,24 @@ const plans = [
     bestFor: "Pre-seed to seed startups. Non-technical founders. Companies between CTOs.",
     actions: [
       {
+        label: "See Plans",
+        href: "/fractional-cto/pricing",
+        variant: "outline" as const,
+        full: false,
+        icon: ArrowRightIcon,
+      },
+      {
         label: "Book Intro Call",
         href: "https://cal.com/ilzam/intro",
         variant: "default" as const,
-        full: true,
+        full: false,
         icon: PhoneCallIcon,
       },
     ],
   },
   {
     label: "MVP Build",
-    price: "From $2,500",
+    price: `From ${formatUsd(MVP_BUILD_FROM)}`,
     period: "",
     description:
       "I scope, build, and ship your MVP to production. AI-assisted development means startup speed without agency prices. Most MVPs ship in 6-10 weeks.",
@@ -60,22 +73,16 @@ const plans = [
     ],
   },
   {
-    label: "Advisory Session",
-    price: "$250",
+    label: STRATEGY_SESSION.name,
+    price: formatUsd(STRATEGY_SESSION.price),
     period: "/ Session",
     description:
       "A focused session where I review your vendor proposal, evaluate your tech stack, or give you a second opinion on a big technical decision.",
-    features: [
-      "60-minute deep-dive session",
-      "Written summary with recommendations",
-      "Follow-up async Q&A (48 hours)",
-      "Vendor/agency proposal review",
-      "Build vs buy analysis",
-    ],
+    features: STRATEGY_SESSION.includes,
     bestFor: "Founders evaluating options. CTOs wanting peer review. Big decisions ahead.",
     actions: [
       {
-        label: "Book Advisory Session",
+        label: "Book Session",
         href: "https://cal.com/ilzam/intro",
         variant: "outline" as const,
         full: false,
@@ -195,11 +202,15 @@ export function PricingSection() {
                   variant={action.variant}
                   className={action.full ? "w-full" : "flex-1"}
                   render={
-                    <a
-                      href={action.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    />
+                    action.href.startsWith("/") ? (
+                      <a href={action.href} />
+                    ) : (
+                      <a
+                        href={action.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      />
+                    )
                   }
                 >
                   <action.icon data-icon="inline-start" />
