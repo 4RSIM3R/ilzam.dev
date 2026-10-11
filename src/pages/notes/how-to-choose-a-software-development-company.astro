@@ -1,0 +1,365 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+import { STRATEGY_SESSION, formatUsd } from '@/lib/pricing'
+
+const questions = [
+	{
+		question: 'Who exactly will build my product?',
+		why: 'The senior person on the sales call is often not the person who writes your code. You want to know who will, before you sign.',
+		good: 'Names and roles of the actual people on your project, and a chance to talk to them.',
+		bad: 'Vague answers like "our team" or "we will assign the best people available".',
+	},
+	{
+		question: 'How do you use AI, and who checks its work?',
+		why: 'Almost every developer uses AI tools now. Used well, they make your product faster and cheaper to build. Used carelessly, they produce code that nobody has properly read, and the problems show up after launch.',
+		good: 'They use AI to move faster, and an experienced person reviews and tests every change before it reaches your users.',
+		bad: 'No AI at all, so you pay for pre-AI timelines. Or AI writes everything and nobody can explain how it works.',
+	},
+	{
+		question: 'Can I see something you built that people still use?',
+		why: 'Screenshots and design mockups are easy to fake or borrow. A live product that real customers use is much harder to fake.',
+		good: 'A link you can click through today, and a past client you can call.',
+		bad: 'Only a portfolio of images, or every past project is "under NDA" with nothing to show at all.',
+	},
+	{
+		question: 'What would you cut from my plan?',
+		why: 'A good partner wants you to launch early and learn from real users. A partner who agrees to everything is either padding the invoice or not thinking about your business.',
+		good: 'Specific suggestions, like launching with email login only and adding Google login later.',
+		bad: '"Yes, we can build all of that."',
+	},
+	{
+		question: 'How will I see progress?',
+		why: 'If the first time you see your product is at the end, every misunderstanding gets discovered when it is most expensive to fix.',
+		good: 'A working version you can click through yourself every one or two weeks.',
+		bad: 'Status reports and percentages, with nothing to try until launch.',
+	},
+	{
+		question: 'Who owns the code and the accounts?',
+		why: 'If the company holds your code, servers, or app store listing, they hold your business. Switching partners later becomes slow and expensive.',
+		good: 'The code lives in your company\'s own account (usually GitHub) from day one, and hosting, domain, and app store accounts are in your name.',
+		bad: '"We will hand everything over at the end of the project."',
+	},
+	{
+		question: 'How do you price, and what happens when plans change?',
+		why: 'Plans always change once you see the product. You need to know what a change costs before it happens.',
+		good: 'A clear model, either a fixed price for a written scope or an hourly rate with a weekly report of hours, plus a simple process for approving changes.',
+		bad: 'A fixed price for a vague scope. Every change then becomes a negotiation.',
+	},
+	{
+		question: 'What happens after launch?',
+		why: 'Bugs show up when real users arrive. And at some point you may want another developer to take over.',
+		good: 'A period of bug fixes included in the price, and written notes that let another developer continue the work.',
+		bad: 'Silence, or support only through a new contract you have not seen yet.',
+	},
+]
+
+const options = [
+	{
+		name: 'Build it yourself with an AI app builder',
+		goodWhen: 'You want a clickable prototype to test the idea with real people before spending real money.',
+		watchOut: 'A demo is easy. Keeping user data secure and growing past the prototype is much harder, and usually means a developer rebuilds large parts of it.',
+	},
+	{
+		name: 'Freelance developer',
+		goodWhen: 'The first version is small and clearly defined.',
+		watchOut: 'One person means one point of failure, and you have to manage the work yourself.',
+	},
+	{
+		name: 'Software development agency',
+		goodWhen: 'You are funded and need design, development, and project management at once.',
+		watchOut: 'Higher prices, and the people doing the work may be more junior than the people who sold it.',
+	},
+	{
+		name: 'Fractional CTO plus a small team',
+		goodWhen: 'You need someone senior making the technical decisions and checking the work, but cannot justify a full-time executive yet.',
+		watchOut: 'You depend on one person\'s judgment and availability, so check both.',
+	},
+	{
+		name: 'Hiring your own developers',
+		goodWhen: 'The product is proven and software is the core of your business.',
+		watchOut: 'Hiring is slow, and judging developers is hard if you are not technical yourself.',
+	},
+]
+
+const scorecard = [
+	['Understands your business', 'Asked about your users and goals before talking about technology'],
+	['Real people you will work with', 'You met the people who will build your product'],
+	['Uses AI responsibly', 'Uses AI to move faster, with a person reviewing every change'],
+	['Live work and references', 'You clicked through a live product and spoke to a past client'],
+	['Pushes back on scope', 'Suggested what to leave out of the first version'],
+	['Shows progress often', 'You will get something to try every one or two weeks'],
+	['You own everything', 'Code and accounts are in your name from day one'],
+	['Clear pricing', 'You understand what a change costs before you ask for one'],
+	['Plan for after launch', 'Bug fixes and handover notes are part of the deal'],
+]
+---
+
+<ContentLayout
+	title="How to Choose a Software Development Company as a Startup | Ilzam"
+	description="8 questions to ask a software development company before you sign, red flags in proposals, and how to compare quotes fairly in the AI era."
+>
+	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<div class="mt-6 flex items-center gap-3">
+		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Founder Decisions</span>
+		<span class="text-xs text-muted-foreground">October 2026</span>
+	</div>
+
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		How to Choose a Software Development Company as a Startup
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			Decide what kind of partner you need first: an AI app builder you use yourself, a
+			freelancer, an agency, a fractional CTO with a small team, or your own hires. Then ask
+			every candidate the eight questions below. The answers that matter most are who will
+			actually do the work, how they use AI and who checks it, how often you will see progress,
+			and whether you own your code and accounts from day one. Compare quotes on the same
+			written feature list, never on the total price alone.
+		</p>
+	</blockquote>
+
+	<!-- Intro -->
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			Picking the company that builds your product is one of the most expensive decisions you
+			will make in your first year, and most founders make it after three sales calls and a
+			gut feeling.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I build first versions of products for founders, and I also review other companies'
+			quotes for founders before they sign. Most of what goes wrong has little to do with
+			technology. It comes down to who does the work, what you can see along the way, and what
+			you own at the end.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			There is also a newer problem. AI tools changed how fast software gets built: by
+			<a href="https://blog.google/technology/developers/dora-report-2025/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">Google's 2025 DORA research</a>,
+			about 90% of software professionals now use them at work. A quote or timeline that looked
+			normal a few years ago can be badly out of date today.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			You do not need to be technical to judge any of this. Here is how to do it.
+		</p>
+	</section>
+
+	<!-- Options -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">First, decide what kind of partner you need</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			"Software development company" covers very different setups. Pick the type before you
+			compare companies, or you will end up comparing a solo freelancer's quote with an
+			agency's and wondering why one is five times the other.
+		</p>
+		<div class="mt-6 space-y-4">
+			{
+				options.map((option) => (
+					<div class="rounded-lg bg-muted/50 p-5">
+						<p class="font-medium">{option.name}</p>
+						<p class="mt-2 text-sm leading-relaxed text-muted-foreground">
+							<span class="font-medium text-foreground">Good when:</span> {option.goodWhen}
+						</p>
+						<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+							<span class="font-medium text-foreground">Watch out:</span> {option.watchOut}
+						</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<!-- Questions -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Eight questions to ask before you sign</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Ask every company the same questions, ideally in writing so you can compare the answers
+			side by side.
+		</p>
+		<ol class="mt-6 space-y-8">
+			{
+				questions.map((q, i) => (
+					<li>
+						<p class="font-medium">
+							{i + 1}. {q.question}
+						</p>
+						<p class="mt-2 leading-relaxed text-muted-foreground">{q.why}</p>
+						<div class="mt-3 grid gap-3 text-sm md:grid-cols-2">
+							<div class="rounded-lg border p-4">
+								<p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Good answer</p>
+								<p class="mt-1 leading-relaxed">{q.good}</p>
+							</div>
+							<div class="rounded-lg border p-4">
+								<p class="text-xs font-medium uppercase tracking-wider text-muted-foreground">Red flag</p>
+								<p class="mt-1 leading-relaxed">{q.bad}</p>
+							</div>
+						</div>
+					</li>
+				))
+			}
+		</ol>
+	</section>
+
+	<!-- Proposal red flags -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Red flags in a proposal</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Once the quotes arrive, read them for these warning signs. Any one of them is worth a
+			direct question. Two or more and I would keep looking.
+		</p>
+		<ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+			<li>They sent a price without asking anything about your users or your business.</li>
+			<li>Each feature is one line with no detail, but the price is fixed.</li>
+			<li>They cannot explain why they chose their technology in words you understand.</li>
+			<li>Most of the money is due upfront instead of being tied to finished milestones.</li>
+			<li>Testing, launch, and what happens after launch are not mentioned at all.</li>
+			<li>
+				The timeline runs to many months for a simple first version. With today's AI tools, ask
+				what all that time is for.
+			</li>
+			<li>
+				The product is built on their own private platform or framework, so only they can ever
+				work on it.
+			</li>
+		</ul>
+	</section>
+
+	<!-- Comparing quotes -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">How to compare quotes fairly</h2>
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Send everyone the same written feature list</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					If each company quotes its own interpretation of your idea, the prices are not
+					comparable. A one-page list of what users need to be able to do is enough.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Ask for a breakdown, not one total</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					A price per feature or per phase shows you where the money goes, and what you could
+					leave out to fit your budget.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Treat a much lower quote as a question</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					When one quote is far below the others, something is usually missing: testing, an
+					admin panel, launch work, or simply hours. Ask what is not included before you get
+					excited.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Check the timeline against how software is built now</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					AI tools have shortened build times. One 2026 industry guide puts a simple first version
+					with 3 to 5 core features at
+					<a href="https://technijian.com/software-development/mvp-development-timeline-2026-how-long-it-actually-takes-to-go-from-idea-to-launch/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">4 to 6 weeks</a>.
+					A quote that says six months for something that size was either padded or planned the
+					old way.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Get your own ballpark first</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Before you talk to anyone, tick your features in the
+					<a href="/tool/mvp-cost-estimator" class="underline underline-offset-4 hover:text-foreground">app and software development cost calculator</a>.
+					It takes two minutes, and you will know whether a quote is in a sensible range.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<!-- Scorecard -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">A simple scorecard</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Score each company from 1 to 5 on every line after your calls. Ownership and progress
+			matter more than the rest: a low score on either is a no, whatever the price.
+		</p>
+		<div class="mt-6 overflow-x-auto">
+			<table class="w-full text-left text-sm">
+				<thead>
+					<tr class="border-b">
+						<th class="py-3 pr-4 font-medium">What to check</th>
+						<th class="py-3 pr-4 font-medium">A 5 looks like</th>
+						<th class="py-3 font-medium">Score</th>
+					</tr>
+				</thead>
+				<tbody class="text-muted-foreground">
+					{
+						scorecard.map(([check, five]) => (
+							<tr class="border-b">
+								<td class="py-3 pr-4 text-foreground">{check}</td>
+								<td class="py-3 pr-4">{five}</td>
+								<td class="py-3">1 to 5</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+	</section>
+
+	<!-- Second opinion -->
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">When to get a second opinion</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			My rule of thumb: if you are about to sign for more than a few thousand dollars and
+			nobody on your side can judge the proposal technically, have someone independent read it
+			first. It costs a small fraction of the project, and the problems above are much cheaper
+			to fix before you sign than after.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			That is one of the things my {formatUsd(STRATEGY_SESSION.price)}
+			<a href="/fractional-cto/pricing" class="underline underline-offset-4 hover:text-foreground">Strategy Session</a>
+			is for: you send me the proposals, we go through them together for
+			{STRATEGY_SESSION.minutes} minutes, and you get a written recommendation within 48 hours.
+		</p>
+	</section>
+
+	<!-- Sources -->
+	<section class="mt-12">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Sources</h3>
+		<ol class="mt-3 list-decimal space-y-1 pl-5 text-sm text-muted-foreground">
+			<li>
+				Google,
+				<a href="https://blog.google/technology/developers/dora-report-2025/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">How are developers using AI? Inside our 2025 DORA report</a>
+			</li>
+			<li>
+				Technijian,
+				<a href="https://technijian.com/software-development/mvp-development-timeline-2026-how-long-it-actually-takes-to-go-from-idea-to-launch/" target="_blank" rel="noopener noreferrer" class="underline underline-offset-4 hover:text-foreground">MVP Development Timeline 2026</a>
+				(April 2026)
+			</li>
+		</ol>
+	</section>
+
+	<!-- Related -->
+	<section class="mt-12 border-t pt-8">
+		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related</h3>
+		<ul class="mt-3 space-y-2">
+			<li><a href="/tool/mvp-cost-estimator" class="text-sm underline underline-offset-4 hover:text-foreground">App and Software Development Cost Calculator</a></li>
+			<li><a href="/fractional-cto/pricing" class="text-sm underline underline-offset-4 hover:text-foreground">Fractional CTO Cost and Rates</a></li>
+			<li><a href="/notes/process-theater-vs-shipping-code" class="text-sm underline underline-offset-4 hover:text-foreground">Most of Your Software Process Is Cosplay</a></li>
+		</ul>
+	</section>
+
+	<!-- CTA -->
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Comparing quotes right now?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			Book a free 30-minute intro call. Tell me what you are building and who you are talking
+			to, and I'll tell you what I would ask them next.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book a free intro call
+		</a>
+	</section>
+</ContentLayout>
