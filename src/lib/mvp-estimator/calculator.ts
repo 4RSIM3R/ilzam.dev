@@ -14,20 +14,20 @@ import type { Feature, FeatureCategory, StackCatalogEntry } from './types'
 
 const FEATURES_BY_ID = new Map(FEATURES.map((f) => [f.id, f]))
 
-const PHASE_ORDER = ['Setup & Architecture', 'Core Build', 'Integration & QA', 'Polish & Launch'] as const
+const PHASE_ORDER = ['Planning & Setup', 'Building Core Features', 'Connecting & Testing', 'Final Polish & Launch'] as const
 export type Phase = (typeof PHASE_ORDER)[number]
 
 const PHASE_BY_CATEGORY: Record<FeatureCategory, Phase> = {
-  foundation: 'Setup & Architecture',
-  auth: 'Setup & Architecture',
-  payments: 'Core Build',
-  communication: 'Core Build',
-  admin: 'Core Build',
-  data: 'Core Build',
-  ai: 'Core Build',
-  mobile: 'Core Build',
-  integrations: 'Integration & QA',
-  infra: 'Polish & Launch',
+  foundation: 'Planning & Setup',
+  auth: 'Planning & Setup',
+  payments: 'Building Core Features',
+  communication: 'Building Core Features',
+  admin: 'Building Core Features',
+  data: 'Building Core Features',
+  ai: 'Building Core Features',
+  mobile: 'Building Core Features',
+  integrations: 'Connecting & Testing',
+  infra: 'Final Polish & Launch',
 }
 
 export interface OverheadItem {
@@ -127,10 +127,10 @@ export function estimateProject(rawSelectedIds: string[], options: EstimateOptio
   const selectedFeatures = FEATURES.filter((f) => selectedIds.has(f.id))
 
   const phaseHours: Record<Phase, [number, number]> = {
-    'Setup & Architecture': [0, 0],
-    'Core Build': [0, 0],
-    'Integration & QA': [0, 0],
-    'Polish & Launch': [0, 0],
+    'Planning & Setup': [0, 0],
+    'Building Core Features': [0, 0],
+    'Connecting & Testing': [0, 0],
+    'Final Polish & Launch': [0, 0],
   }
   for (const feature of selectedFeatures) {
     const bucket = phaseHours[PHASE_BY_CATEGORY[feature.category]]
@@ -150,7 +150,7 @@ export function estimateProject(rawSelectedIds: string[], options: EstimateOptio
   if (aiCount >= AI_FEATURE_THRESHOLD) {
     overhead.push({
       id: 'ai-feature-set-overhead',
-      label: `${aiCount} AI features selected: rate limiting, cost controls, and fallback handling compound across them`,
+      label: `${aiCount} AI features: extra work to keep AI costs under control and handle AI mistakes across all of them`,
       minHours: AI_FEATURE_OVERHEAD_HOURS[0],
       maxHours: AI_FEATURE_OVERHEAD_HOURS[1],
     })
@@ -158,19 +158,19 @@ export function estimateProject(rawSelectedIds: string[], options: EstimateOptio
   if (selectedFeatures.length >= FEATURE_COUNT_THRESHOLD) {
     overhead.push({
       id: 'feature-count-overhead',
-      label: `${selectedFeatures.length} features selected: cross-feature regression surface grows non-linearly past ~${FEATURE_COUNT_THRESHOLD}`,
+      label: `${selectedFeatures.length} features: past ${FEATURE_COUNT_THRESHOLD}, every new feature can affect the others, so testing takes longer`,
       minHours: FEATURE_COUNT_OVERHEAD_HOURS[0],
       maxHours: FEATURE_COUNT_OVERHEAD_HOURS[1],
     })
   }
 
   for (const item of overhead) {
-    phaseHours['Integration & QA'][0] += item.minHours
-    phaseHours['Integration & QA'][1] += item.maxHours
+    phaseHours['Connecting & Testing'][0] += item.minHours
+    phaseHours['Connecting & Testing'][1] += item.maxHours
   }
 
-  phaseHours['Polish & Launch'][0] += BASELINE_POLISH_HOURS[0]
-  phaseHours['Polish & Launch'][1] += BASELINE_POLISH_HOURS[1]
+  phaseHours['Final Polish & Launch'][0] += BASELINE_POLISH_HOURS[0]
+  phaseHours['Final Polish & Launch'][1] += BASELINE_POLISH_HOURS[1]
 
   const phases: PhaseBreakdown[] = PHASE_ORDER.map((phase) => {
     const [minHours, maxHours] = phaseHours[phase]

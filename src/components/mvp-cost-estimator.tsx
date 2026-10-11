@@ -77,6 +77,11 @@ export function MvpCostEstimator() {
                     />
                     <span>
                       {feature.label}
+                      {feature.helpText ? (
+                        <span className="mt-0.5 block text-xs text-muted-foreground">
+                          {feature.helpText}
+                        </span>
+                      ) : null}
                       {feature.requires?.length ? (
                         <span className="block text-xs text-muted-foreground">
                           Requires{" "}
@@ -140,7 +145,7 @@ export function MvpCostEstimator() {
               {estimate.overhead.length > 0 && (
                 <div className="mt-6">
                   <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                    Why it's more than the raw sum
+                    Extra work for this combination
                   </p>
                   <ul className="mt-2 space-y-1.5 text-xs text-muted-foreground">
                     {estimate.overhead.map((item) => (
@@ -152,7 +157,11 @@ export function MvpCostEstimator() {
 
               <div className="mt-6">
                 <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Recommended stack
+                  Suggested technology
+                </p>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  You don't need to know these. They're useful if you share this estimate
+                  with a developer.
                 </p>
                 <div className="mt-2 flex flex-wrap gap-1.5">
                   {estimate.recommendedStack.map((stack) => (
@@ -165,7 +174,7 @@ export function MvpCostEstimator() {
 
               <Button variant="outline" className="mt-6 w-full" onClick={() => window.print()}>
                 <DownloadIcon data-icon="inline-start" />
-                Download scope doc
+                Save as PDF
               </Button>
 
               <div className="mt-4">
@@ -174,8 +183,8 @@ export function MvpCostEstimator() {
             </>
           ) : (
             <p className="mt-3 text-sm text-muted-foreground">
-              Select features on the left to see your price range, timeline, and recommended
-              stack.
+              Tick the features your product needs to see a price range and how many weeks
+              it takes to build.
             </p>
           )}
         </div>
@@ -215,7 +224,7 @@ export function MvpCostEstimator() {
           </p>
 
           <h2 className="mt-6 text-sm font-semibold uppercase tracking-wider">
-            Recommended stack
+            Suggested technology
           </h2>
           <p className="mt-1 text-sm">
             {estimate.recommendedStack.map((stack) => stack.label).join(", ")}

@@ -32,8 +32,9 @@ export function MvpEstimatorCta({ estimate }: MvpEstimatorCtaProps) {
           Want this built?
         </h2>
         <p className="mt-4 max-w-sm text-sm leading-relaxed text-white/70">
-          Book a free 30-minute call and I'll walk through this estimate,
-          sanity-check the scope, and tell you what I'd actually cut for a v1.
+          Book a free 30-minute call. I'll go through this estimate with you,
+          check what you really need, and tell you what I'd leave out of the
+          first version to save money.
         </p>
 
         <div className="mt-6 flex flex-wrap gap-3">

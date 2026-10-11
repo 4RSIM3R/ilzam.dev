@@ -7,31 +7,31 @@ export const INTERACTION_RULES: InteractionRule[] = [
     id: 'billing-per-org',
     when: ['multi-tenant', 'subscriptions'],
     addHours: [8, 16],
-    reason: 'Per-organization billing, seats, and plan limits add coordination work beyond either feature alone.',
+    reason: 'Company accounts plus subscriptions means billing each company per seat, with plan limits.',
   },
   {
     id: 'permission-aware-admin',
     when: ['rbac', 'admin-dashboard'],
     addHours: [4, 8],
-    reason: 'Admin views need to respect roles instead of assuming full access.',
+    reason: "The admin panel has to respect each person's access level.",
   },
   {
     id: 'chat-push-delivery',
     when: ['realtime-chat', 'push-notifications'],
     addHours: [4, 8],
-    reason: 'Presence state has to decide when to fall back from a live socket to a push notification.',
+    reason: "Chat messages have to arrive as phone notifications when the person isn't in the app.",
   },
   {
     id: 'usage-metrics-in-admin',
     when: ['usage-billing', 'admin-dashboard'],
     addHours: [4, 8],
-    reason: 'Metered usage needs to be surfaced and reconciled in the admin view, not just billed.',
+    reason: 'Usage has to be visible and checkable in the admin panel, not just billed.',
   },
   {
     id: 'doc-ingestion-pipeline',
     when: ['rag-search', 'file-upload'],
     addHours: [6, 12],
-    reason: 'Uploaded files need a parsing/chunking/embedding pipeline before RAG can use them.',
+    reason: 'Uploaded files have to be processed before the AI can read and answer from them.',
   },
 ]
 

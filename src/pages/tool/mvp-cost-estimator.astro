@@ -1,22 +1,80 @@
 ---
 import ContentLayout from '@/layouts/content-layout.astro'
 import { MvpCostEstimator } from '@/components/mvp-cost-estimator'
+import {
+	AI_FEATURE_THRESHOLD,
+	BASELINE_POLISH_HOURS,
+	FEATURE_COUNT_THRESHOLD,
+	FEATURES,
+	HOURLY_RATE_RANGE,
+	HOURS_PER_BILLABLE_WEEK,
+	INTERACTION_RULES,
+} from '@/lib/mvp-estimator'
+
+const [rateMin, rateMax] = HOURLY_RATE_RANGE
 ---
 
 <ContentLayout
-	title="MVP Cost and Timeline Estimator | ilzam.dev"
-	description="Pick the features your MVP needs and get a price range, week-by-week timeline, and recommended stack instantly. Download a one-page scope doc."
+	title="App & Software Development Cost Calculator | ilzam.dev"
+	description="Free app and software development cost calculator. Tick the features your product needs and get a price range and week-by-week timeline. No signup."
 	wide
 >
 	<h1 class="text-3xl font-light leading-tight tracking-tight md:text-4xl print:hidden">
-		MVP Cost and Timeline Estimator
+		App &amp; Software Development Cost Calculator
 	</h1>
 	<p class="mt-3 text-muted-foreground print:hidden">
-		Check the features you need. The estimate, timeline, and recommended
-		stack update as you go, no signup required.
+		Find out roughly what your app or software product will cost to build, and how
+		long it takes. Tick the features you need and the price and timeline update
+		instantly. No signup, and no technical knowledge needed: each feature comes
+		with a short explanation.
 	</p>
 
 	<div class="mt-8">
 		<MvpCostEstimator client:load />
 	</div>
+
+	<section class="mt-16 max-w-3xl print:hidden">
+		<h2 class="text-xl font-semibold">How this estimate is calculated</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Each feature has a typical range of hours it takes to build. The calculator
+			adds up the features you tick, then adjusts for a few things that change the
+			real cost.
+		</p>
+		<ul class="mt-4 list-disc space-y-2 pl-5 leading-relaxed text-muted-foreground">
+			<li>
+				<strong class="text-foreground">{FEATURES.length} common features</strong>, grouped
+				into the categories above, from user accounts and payments to AI and mobile apps.
+			</li>
+			<li>
+				<strong class="text-foreground">Features that depend on each other.</strong> Some
+				combinations take extra work. For example, company accounts plus subscriptions
+				means billing each company per seat. The calculator checks for
+				{INTERACTION_RULES.length} of these combinations.
+			</li>
+			<li>
+				<strong class="text-foreground">Bigger products take longer to test.</strong> Picking
+				{AI_FEATURE_THRESHOLD} or more AI features, or {FEATURE_COUNT_THRESHOLD} or more features in
+				total, adds time, because every new piece can affect the others.
+			</li>
+			<li>
+				<strong class="text-foreground">Launch.</strong> Every project includes
+				{BASELINE_POLISH_HOURS[0]} to {BASELINE_POLISH_HOURS[1]} hours of final testing and going live.
+			</li>
+			<li>
+				<strong class="text-foreground">Price.</strong> Total hours multiplied by ${rateMin} to
+				${rateMax} per hour.
+			</li>
+			<li>
+				<strong class="text-foreground">Timeline.</strong> Based on {HOURS_PER_BILLABLE_WEEK} hours
+				of focused work a week, which leaves time for calls, reviews, and your feedback.
+			</li>
+		</ul>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Use the result as a ballpark for budgeting. A fixed quote needs a short call,
+			because the biggest cost drivers are things a checklist can't capture:
+			connecting to systems you already use, rules you have to follow (for example,
+			handling health or financial data), and how polished the first version needs
+			to be.
+		</p>
+	</section>
 </ContentLayout>
