@@ -1,0 +1,78 @@
+---
+import ContentLayout from '@/layouts/content-layout.astro'
+import { PRODUCTS, STATUS_LABELS, STATUS_ORDER } from '@/lib/kawakib'
+
+const groups = STATUS_ORDER.map((status) => ({
+	status,
+	label: STATUS_LABELS[status],
+	products: PRODUCTS.filter((p) => p.status === status),
+})).filter((group) => group.products.length > 0)
+
+const isExternal = (href: string) => href.startsWith('http')
+---
+
+<ContentLayout
+	title="Kawakib: Products and Tools by Ilzam"
+	description="Kawakib is where I build my own products: free tools, open-source projects, and software you can use or buy. See what's live and what's in progress."
+>
+	<h1 class="text-4xl font-light leading-tight tracking-tight md:text-5xl">Kawakib</h1>
+	<p class="mt-4 text-lg leading-relaxed">
+		Kawakib means "planets" in Arabic. These are the products that orbit ilzam.dev: free tools,
+		open-source projects, and software I build alongside client work.
+	</p>
+	<p class="mt-4 leading-relaxed text-muted-foreground">
+		I build them in the open, so you can see how I work before we ever talk. Some are live, some
+		are still in progress.
+	</p>
+
+	{
+		groups.map((group) => (
+			<section class="mt-12">
+				<h2 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+					{group.label}
+				</h2>
+				<div class="mt-4 grid gap-4">
+					{group.products.map((product) =>
+						product.href ? (
+							<a
+								href={product.href}
+								{...(isExternal(product.href) ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+								class="group rounded-lg border p-5 transition-shadow hover:shadow-md"
+							>
+								<div class="flex flex-wrap items-center gap-2">
+									<p class="font-semibold group-hover:underline">{product.name}</p>
+									<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium">{product.type}</span>
+								</div>
+								<p class="mt-1 text-sm leading-relaxed text-muted-foreground">{product.tagline}</p>
+							</a>
+						) : (
+							<div class="rounded-lg border p-5">
+								<div class="flex flex-wrap items-center gap-2">
+									<p class="font-semibold">{product.name}</p>
+									<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium">{product.type}</span>
+								</div>
+								<p class="mt-1 text-sm leading-relaxed text-muted-foreground">{product.tagline}</p>
+							</div>
+						)
+					)}
+				</div>
+			</section>
+		))
+	}
+
+	<section class="mt-12 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Want something like this built for your business?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			Book a free 30-minute intro call. No pitch, no pressure, just a real conversation about what
+			you're building.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book a free intro call
+		</a>
+	</section>
+</ContentLayout>
