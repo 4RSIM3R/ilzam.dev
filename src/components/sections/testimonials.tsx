@@ -5,6 +5,7 @@ const testimonials = [
   {
     name: "Eko Dedy Purnomo",
     role: "Co-Founder & CTO, Sekawan Media",
+    image: "/testimonials/eko-dedy-purnomo.jpg",
     quote:
       "Ilzam is a rare combination: a deep grasp of technical detail, paired with sharp business sense. Execution is fast and systematic, and always focused on solutions that make a real impact.",
     // Written in Indonesian; the quote above is a translation.
