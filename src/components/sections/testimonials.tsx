@@ -3,6 +3,15 @@ import { ArrowUpRightIcon } from "lucide-react"
 
 const testimonials = [
   {
+    name: "Eko Dedy Purnomo",
+    role: "Co-Founder & CTO, Sekawan Media",
+    quote:
+      "Ilzam is a rare combination: a deep grasp of technical detail, paired with sharp business sense. Execution is fast and systematic, and always focused on solutions that make a real impact.",
+    // Written in Indonesian; the quote above is a translation.
+    original:
+      "Ilzam itu kombinasi yang langka: paham detail teknis secara mendalam, tapi tetap punya business sense yang tajam. Eksekusinya cepat, sistematis, dan selalu berfokus pada solusi yang memberikan impact nyata.",
+  },
+  {
     name: "Berlian Triatma",
     role: "Business Intelligence & Human Capital Manager",
     relationship: "Direct manager",
@@ -24,6 +33,14 @@ const testimonials = [
       "Punya skill & pengetahuan di bidang programming yang bagus, serta punya semangat belajar yang sangat tinggi.",
   },
 ]
+
+// Shown in place of a photo until one is added to public/testimonials/.
+const initials = (name: string) =>
+  name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
 
 export function TestimonialsSection() {
   return (
@@ -64,20 +81,31 @@ export function TestimonialsSection() {
               )}
             </div>
             <figcaption className="mt-8 flex items-center gap-4">
-              <img
-                src={t.image}
-                alt={t.name}
-                width={56}
-                height={56}
-                className="size-14 shrink-0 rounded-full bg-muted object-cover"
-                loading="lazy"
-              />
+              {t.image ? (
+                <img
+                  src={t.image}
+                  alt={t.name}
+                  width={56}
+                  height={56}
+                  className="size-14 shrink-0 rounded-full bg-muted object-cover"
+                  loading="lazy"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className="flex size-14 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-medium"
+                >
+                  {initials(t.name)}
+                </span>
+              )}
               <div>
                 <p className="font-medium">{t.name}</p>
                 <p className="text-sm text-muted-foreground">{t.role}</p>
-                <p className="text-xs text-muted-foreground">
-                  {t.relationship} / {t.date}
-                </p>
+                {t.relationship && (
+                  <p className="text-xs text-muted-foreground">
+                    {t.relationship} / {t.date}
+                  </p>
+                )}
               </div>
             </figcaption>
           </figure>
