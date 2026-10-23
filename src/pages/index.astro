@@ -7,6 +7,12 @@ import { ToolstackSection } from '@/components/sections/toolstack'
 import { PricingSection } from '@/components/sections/pricing'
 import { FaqSection } from '@/components/sections/faq'
 import { CtaSection } from '@/components/sections/cta'
+import { Badge } from '@/components/ui/badge'
+import NoteCard from '@/components/note-card.astro'
+import { NOTES_PATH, notesByDate } from '@/lib/notes'
+
+// The homepage is in English, so it only features English notes.
+const latestNotes = notesByDate().filter((note) => (note.lang ?? 'en') === 'en').slice(0, 3)
 
 const personSchema = {
 	"@context": "https://schema.org",
@@ -91,17 +97,36 @@ const faqSchema = {
 	<ToolstackSection client:load />
 	<PricingSection client:load />
 	<FaqSection client:load />
+	<section id="notes" class="snap-start px-6 py-12 md:px-10 md:py-16">
+		<Badge
+			variant="outline"
+			className="mb-6 rounded-none border-0 font-mono text-xs uppercase tracking-widest"
+		>
+			[ Notes ]
+		</Badge>
+		<div class="flex flex-wrap items-end justify-between gap-4">
+			<h2 class="text-4xl font-light leading-tight tracking-tight md:text-5xl">
+				Latest <span class="rounded-sm bg-amber-100 px-1 font-normal">Notes</span>
+			</h2>
+			<a href={NOTES_PATH} class="text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">
+				All notes
+			</a>
+		</div>
+		<div class="mt-8 grid gap-4 md:grid-cols-3">
+			{latestNotes.map((note) => <NoteCard note={note} clamp />)}
+		</div>
+	</section>
 	<CtaSection client:load />
 	<footer class="border-t px-6 py-8 md:px-10">
 		<div class="flex flex-col gap-4 text-sm md:flex-row md:items-center md:justify-between">
 			<p class="text-muted-foreground">Building from East Java. Shipping to the world.</p>
 			<nav class="flex flex-wrap gap-x-6 gap-y-2">
-				<a href="/work" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Work</a>
-				<a href="/notes" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Notes</a>
-				<a href="/fractional-cto/pricing" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Pricing</a>
-				<a href="/contact" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Contact</a>
-				<a href="/tool" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Tools</a>
-				<a href="/kawakib" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Kawakib</a>
+				<a href="/work/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Work</a>
+				<a href="/notes/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Notes</a>
+				<a href="/fractional-cto/pricing/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Pricing</a>
+				<a href="/contact/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Contact</a>
+				<a href="/tool/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Tools</a>
+				<a href="/kawakib/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Kawakib</a>
 				<a href="https://github.com/4RSIM3R/" target="_blank" rel="noopener noreferrer" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">GitHub</a>
 				<a href="https://www.linkedin.com/in/ilzam-mulkhaq/" target="_blank" rel="noopener noreferrer" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">LinkedIn</a>
 			</nav>

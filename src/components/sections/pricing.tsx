@@ -34,7 +34,7 @@ const plans = [
     actions: [
       {
         label: "See Plans",
-        href: "/fractional-cto/pricing",
+        href: "/fractional-cto/pricing/",
         variant: "outline" as const,
         full: false,
         icon: ArrowRightIcon,

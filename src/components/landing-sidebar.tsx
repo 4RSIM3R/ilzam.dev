@@ -19,6 +19,7 @@ const navItems = [
   { label: "Stack", href: "#stack" },
   { label: "Pricing", href: "#pricing" },
   { label: "FAQ", href: "#faq" },
+  { label: "Notes", href: "#notes" },
 ]
 
 export function LandingSidebar() {

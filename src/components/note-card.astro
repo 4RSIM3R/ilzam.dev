@@ -1,0 +1,22 @@
+---
+import { formatNoteDate, getHub, notePath, type Note } from '@/lib/notes'
+
+interface Props {
+	note: Note
+	/** Off on a hub page, where every card shares the same topic. */
+	showHub?: boolean
+	/** Cut the description to three lines, for tight grids. */
+	clamp?: boolean
+}
+
+const { note, showHub = true, clamp = false } = Astro.props
+---
+
+<a href={notePath(note.slug)} lang={note.lang} class="group block rounded-lg border p-5 transition-shadow hover:shadow-md">
+	<p class="text-xs text-muted-foreground">
+		{showHub && <span class="font-medium uppercase">{getHub(note.hub).name} &middot; </span>}
+		<time datetime={note.published}>{formatNoteDate(note.published)}</time>
+	</p>
+	<h3 class="mt-2 font-semibold group-hover:underline">{note.title}</h3>
+	<p class:list={['mt-1 text-sm text-muted-foreground', clamp && 'line-clamp-3']}>{note.description}</p>
+</a>

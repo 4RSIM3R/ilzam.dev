@@ -1,0 +1,85 @@
+---
+// Wraps every page in src/pages/notes/ that is a note. Looks the note up in
+// src/lib/notes.ts by URL, then renders the breadcrumb, date, and the
+// BlogPosting and BreadcrumbList structured data from that entry.
+import ContentLayout from '@/layouts/content-layout.astro'
+import {
+	AUTHOR,
+	NOTES_PATH,
+	breadcrumbSchema,
+	formatNoteDate,
+	getHub,
+	hubPath,
+	noteFromPath,
+	toDateTime,
+} from '@/lib/notes'
+
+interface Props {
+	/** Meta title. Cards and structured data use the registry title. */
+	title: string
+	description: string
+	ogImage?: string
+}
+
+const { title, description, ogImage } = Astro.props
+const note = noteFromPath(Astro.url.pathname)
+const hub = getHub(note.hub)
+const lang = note.lang ?? 'en'
+const site = Astro.site ?? new URL('https://ilzam.dev')
+const url = new URL(Astro.url.pathname, site).href
+const datePublished = toDateTime(note.published)
+const dateModified = toDateTime(note.updated ?? note.published)
+
+const articleSchema = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: note.title,
+	description,
+	url,
+	mainEntityOfPage: url,
+	inLanguage: lang,
+	datePublished,
+	dateModified,
+	articleSection: hub.name,
+	author: { '@type': 'Person', ...AUTHOR },
+	publisher: { '@type': 'Person', ...AUTHOR },
+	// The default og:image is a profile photo, which Google says not to use
+	// as an article image, so only a note's own image goes in here.
+	...(ogImage && { image: [new URL(ogImage, site).href] }),
+}
+
+const crumbs = breadcrumbSchema(site, [
+	{ name: 'Home', path: '/' },
+	{ name: 'Notes', path: NOTES_PATH },
+	{ name: hub.name, path: hubPath(hub.slug) },
+	{ name: note.title, path: Astro.url.pathname },
+])
+---
+
+<ContentLayout title={title} description={description} ogImage={ogImage} lang={lang}>
+	<Fragment slot="head">
+		<meta property="article:published_time" content={datePublished} />
+		<meta property="article:modified_time" content={dateModified} />
+		<meta property="article:section" content={hub.name} />
+		<script type="application/ld+json" set:html={JSON.stringify(articleSchema)} />
+		<script type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+	</Fragment>
+
+	<nav aria-label="Breadcrumb" class="text-sm text-muted-foreground">
+		<ol class="flex flex-wrap items-center gap-2">
+			<li><a href={NOTES_PATH} class="hover:text-foreground">Notes</a></li>
+			<li aria-hidden="true">/</li>
+			<li><a href={hubPath(hub.slug)} class="hover:text-foreground">{hub.name}</a></li>
+		</ol>
+	</nav>
+
+	<p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+		<time datetime={note.published}>{formatNoteDate(note.published)}</time>
+		{note.updated && (
+			<span>Updated <time datetime={note.updated}>{formatNoteDate(note.updated)}</time></span>
+		)}
+		<span>By <a href="/" class="underline underline-offset-4 hover:text-foreground">Ilzam</a></span>
+	</p>
+
+	<slot />
+</ContentLayout>

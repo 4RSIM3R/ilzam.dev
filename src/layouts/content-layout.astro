@@ -7,6 +7,8 @@ interface Props {
 	canonicalUrl?: string
 	ogImage?: string
 	wide?: boolean
+	lang?: string
+	noindex?: boolean
 }
 
 const {
@@ -15,13 +17,16 @@ const {
 	canonicalUrl = Astro.url.href,
 	ogImage = '/profile.jpeg',
 	wide = false,
+	lang = 'en',
+	noindex = false,
 } = Astro.props
 
 const siteUrl = Astro.site?.toString().replace(/\/$/, '') ?? 'https://ilzam.dev'
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`
+const ogLocale = lang === 'id' ? 'id_ID' : 'en_US'
 ---
 
-<html lang="en">
+<html lang={lang}>
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -32,6 +37,9 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`
 		<meta name="description" content={description} />
 		<meta name="author" content="Ilzam" />
 		<link rel="canonical" href={canonicalUrl} />
+		{noindex && <meta name="robots" content="noindex, follow" />}
+		<link rel="alternate" type="application/rss+xml" title="Field Notes by Ilzam" href="/notes/rss.xml" />
+		<slot name="head" />
 
 		<!-- Open Graph -->
 		<meta property="og:type" content="article" />
@@ -40,7 +48,7 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`
 		<meta property="og:description" content={description} />
 		<meta property="og:image" content={ogImageUrl} />
 		<meta property="og:site_name" content="ilzam.dev" />
-		<meta property="og:locale" content="en_US" />
+		<meta property="og:locale" content={ogLocale} />
 
 		<!-- Twitter Card -->
 		<meta name="twitter:card" content="summary_large_image" />
@@ -83,9 +91,9 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`
 				</div>
 			</a>
 			<nav class="flex items-center gap-4 text-sm">
-				<a href="/work" class="text-muted-foreground transition-colors hover:text-foreground">Work</a>
-				<a href="/notes" class="text-muted-foreground transition-colors hover:text-foreground">Notes</a>
-				<a href="/contact" class="text-muted-foreground transition-colors hover:text-foreground">Contact</a>
+				<a href="/work/" class="text-muted-foreground transition-colors hover:text-foreground">Work</a>
+				<a href="/notes/" class="text-muted-foreground transition-colors hover:text-foreground">Notes</a>
+				<a href="/contact/" class="text-muted-foreground transition-colors hover:text-foreground">Contact</a>
 				<a
 					href="https://cal.com/ilzam/intro"
 					target="_blank"

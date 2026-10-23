@@ -1,18 +1,12 @@
 ---
-import ContentLayout from '@/layouts/content-layout.astro'
+import NoteLayout from '@/layouts/note-layout.astro'
+import RelatedNotes from '@/components/related-notes.astro'
 ---
 
-<ContentLayout
+<NoteLayout
 	title="Ketika C-level Kembali Ngoding, Lalu Bagaimana Nasib Software Engineer? | Ilzam"
 	description="sudah benar yang punya cita - cita ternak ayam, ke sawah dan buka kolam lele"
 >
-	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
-
-	<div class="mt-6 flex items-center gap-3">
-		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Founder Decisions</span>
-		<span class="text-xs text-muted-foreground">September 2026</span>
-	</div>
-
 	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
 		Ketika C-level kembali ngoding, lalu bagaimana nasib software engineer?
 	</h1>
@@ -184,6 +178,8 @@ import ContentLayout from '@/layouts/content-layout.astro'
 		</p>
 	</section>
 
+	<RelatedNotes picks={['process-theater-vs-shipping-code', 'cursor-vs-claude-code-founder-pricing']} />
+
 	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
 		<p class="font-medium">Masih mau bangun tim engineering yang kerjanya engineering, bukan tooling theater?</p>
 		<p class="mt-1 text-sm text-muted-foreground">
@@ -198,4 +194,4 @@ import ContentLayout from '@/layouts/content-layout.astro'
 			Book an Advisory Session
 		</a>
 	</section>
-</ContentLayout>
+</NoteLayout>

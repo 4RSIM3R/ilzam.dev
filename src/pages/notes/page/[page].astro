@@ -1,0 +1,16 @@
+---
+import type { GetStaticPaths } from 'astro'
+import NotesIndex from '@/components/notes-index.astro'
+import { notesPageCount } from '@/lib/notes'
+
+// Page 1 is /notes/ itself, so this only builds page 2 onward. It builds
+// nothing until there are more notes than NOTES_PER_PAGE.
+export const getStaticPaths = (() =>
+	Array.from({ length: notesPageCount() - 1 }, (_, i) => ({
+		params: { page: String(i + 2) },
+	}))) satisfies GetStaticPaths
+
+const page = Number(Astro.params.page)
+---
+
+<NotesIndex page={page} />

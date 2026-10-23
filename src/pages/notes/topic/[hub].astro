@@ -1,0 +1,84 @@
+---
+// Topic hub: links down to every note in the topic, and each note's
+// breadcrumb and related list link back up. Hubs stay noindex until they
+// hold MIN_NOTES_TO_INDEX_HUB notes, so a near-empty hub never competes in
+// search.
+import type { GetStaticPaths } from 'astro'
+import ContentLayout from '@/layouts/content-layout.astro'
+import NoteCard from '@/components/note-card.astro'
+import {
+	NOTES_PATH,
+	activeHubs,
+	breadcrumbSchema,
+	getHub,
+	hubPath,
+	isHubIndexable,
+	notesInHub,
+	type HubSlug,
+} from '@/lib/notes'
+
+export const getStaticPaths = (() =>
+	activeHubs().map((hub) => ({ params: { hub: hub.slug } }))) satisfies GetStaticPaths
+
+const hub = getHub(Astro.params.hub as HubSlug)
+const notes = notesInHub(hub.slug)
+const otherHubs = activeHubs().filter((h) => h.slug !== hub.slug)
+const crumbs = breadcrumbSchema(Astro.site ?? new URL('https://ilzam.dev'), [
+	{ name: 'Home', path: '/' },
+	{ name: 'Notes', path: NOTES_PATH },
+	{ name: hub.name, path: hubPath(hub.slug) },
+])
+---
+
+<ContentLayout title={hub.title} description={hub.description} noindex={!isHubIndexable(hub.slug)}>
+	<Fragment slot="head">
+		<script type="application/ld+json" set:html={JSON.stringify(crumbs)} />
+	</Fragment>
+
+	<a href={NOTES_PATH} class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
+
+	<h1 class="mt-6 text-4xl font-light leading-tight tracking-tight md:text-5xl">
+		{hub.name}
+	</h1>
+	{hub.intro.map((paragraph, i) => (
+		<p class:list={['mt-4 leading-relaxed', i === 0 ? 'text-lg' : 'text-muted-foreground']}>{paragraph}</p>
+	))}
+	<a href={hub.cta.href} class="mt-6 inline-block text-sm font-medium underline underline-offset-4 hover:text-muted-foreground">
+		{hub.cta.label} &rarr;
+	</a>
+
+	<section class="mt-12">
+		<h2 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+			{notes.length} {notes.length === 1 ? 'note' : 'notes'}
+		</h2>
+		<div class="mt-4 grid gap-4">
+			{notes.map((note) => <NoteCard note={note} showHub={false} />)}
+		</div>
+	</section>
+
+	{otherHubs.length > 0 && (
+		<nav aria-labelledby="other-topics-heading" class="mt-12 border-t pt-8">
+			<h2 id="other-topics-heading" class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Other topics</h2>
+			<ul class="mt-3 space-y-2">
+				{otherHubs.map((other) => (
+					<li><a href={hubPath(other.slug)} class="text-sm underline underline-offset-4 hover:text-foreground">{other.name}</a></li>
+				))}
+			</ul>
+		</nav>
+	)}
+
+	<section class="mt-12 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Not sure what to build or how to build it?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			That's exactly what the advisory session is for.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Advisory Session
+		</a>
+	</section>
+</ContentLayout>

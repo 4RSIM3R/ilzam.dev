@@ -80,7 +80,7 @@ export function CaseStudiesSection() {
         {caseStudies.map((study) => (
           <a
             key={study.title}
-            href={`/work/${study.slug}`}
+            href={`/work/${study.slug}/`}
             className="group"
           >
             <Card className="gap-0 overflow-hidden border p-0 transition-shadow group-hover:shadow-md">

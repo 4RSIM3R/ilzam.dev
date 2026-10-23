@@ -30,20 +30,20 @@ export const PRODUCTS: Product[] = [
     tagline: 'Tick the features your product needs and get a price range and timeline in two minutes.',
     status: 'live',
     type: 'Free tool',
-    href: '/tool/mvp-cost-estimator',
+    href: '/tool/mvp-cost-estimator/',
   },
   {
     name: 'DNS Checker',
     tagline: "Check your domain's settings when your website or email isn't working as expected.",
     status: 'live',
     type: 'Free tool',
-    href: '/tool/dns-checker',
+    href: '/tool/dns-checker/',
   },
   {
     name: 'Kotak Pasir',
     tagline: 'Safe, self-hosted spaces where AI agents can run code without touching anything important.',
     status: 'building',
     type: 'Open source',
-    href: '/work/kotakpasir-agent-sandboxes',
+    href: '/work/kotakpasir-agent-sandboxes/',
   },
 ]

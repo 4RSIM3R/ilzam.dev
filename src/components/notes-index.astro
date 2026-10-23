@@ -1,0 +1,89 @@
+---
+// One page of the /notes index. Page 1 is /notes/, later pages are
+// /notes/page/N/. Each page keeps its own canonical, and plain links connect
+// them, per Google's pagination guidance.
+import ContentLayout from '@/layouts/content-layout.astro'
+import NoteCard from '@/components/note-card.astro'
+import { activeHubs, hubPath, notesInHub, notesOnPage, notesPageCount, notesPagePath } from '@/lib/notes'
+
+interface Props {
+	page: number
+}
+
+const { page } = Astro.props
+const pageCount = notesPageCount()
+const notes = notesOnPage(page)
+const pages = Array.from({ length: pageCount }, (_, i) => i + 1)
+---
+
+<ContentLayout
+	title={page > 1 ? `Field Notes, Page ${page} | Ilzam` : 'Field Notes | Ilzam'}
+	description="Things I've figured out in production, written down so you don't have to figure them out the hard way. Technical deep dives, founder decision frameworks, and stack comparisons."
+>
+	<h1 class="text-4xl font-light leading-tight tracking-tight md:text-5xl">
+		Field Notes
+	</h1>
+	<p class="mt-4 text-muted-foreground">
+		Things I've figured out in production, written down so you don't have to figure them out the hard way.
+	</p>
+
+	<nav aria-labelledby="topics-heading" class="mt-10">
+		<h2 id="topics-heading" class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Topics</h2>
+		<ul class="mt-4 flex flex-wrap gap-2">
+			{activeHubs().map((hub) => (
+				<li>
+					<a href={hubPath(hub.slug)} class="inline-flex items-center gap-2 rounded-full border px-3 py-1 text-sm transition-colors hover:bg-muted">
+						{hub.name}
+						<span class="text-xs text-muted-foreground">{notesInHub(hub.slug).length}</span>
+					</a>
+				</li>
+			))}
+		</ul>
+	</nav>
+
+	<section class="mt-12">
+		<h2 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+			{page > 1 ? `Page ${page}` : 'Latest'}
+		</h2>
+		<div class="mt-4 grid gap-4">
+			{notes.map((note) => <NoteCard note={note} />)}
+		</div>
+	</section>
+
+	{pageCount > 1 && (
+		<nav aria-label="Pagination" class="mt-10 flex items-center justify-between gap-4 text-sm">
+			{page > 1 ? (
+				<a href={notesPagePath(page - 1)} rel="prev" class="text-muted-foreground hover:text-foreground">&larr; Newer</a>
+			) : <span />}
+			<ol class="flex flex-wrap gap-1">
+				{pages.map((n) => (
+					<li>
+						{n === page ? (
+							<span aria-current="page" class="inline-block rounded-md bg-muted px-3 py-1 font-medium">{n}</span>
+						) : (
+							<a href={notesPagePath(n)} class="inline-block rounded-md px-3 py-1 text-muted-foreground hover:bg-muted hover:text-foreground">{n}</a>
+						)}
+					</li>
+				))}
+			</ol>
+			{page < pageCount ? (
+				<a href={notesPagePath(page + 1)} rel="next" class="text-muted-foreground hover:text-foreground">Older &rarr;</a>
+			) : <span />}
+		</nav>
+	)}
+
+	<section class="mt-12 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Not sure what to build or how to build it?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			That's exactly what the advisory session is for.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book an Advisory Session
+		</a>
+	</section>
+</ContentLayout>

@@ -1,18 +1,12 @@
 ---
-import ContentLayout from '@/layouts/content-layout.astro'
+import NoteLayout from '@/layouts/note-layout.astro'
+import RelatedNotes from '@/components/related-notes.astro'
 ---
 
-<ContentLayout
+<NoteLayout
 	title="Most of Your Software Process Is Cosplay | Ilzam"
 	description="A project was 5 CRUD screens and 1 screen reading a materialized view. It still took tickets, story points, sprint ceremony, design review, and a pipeline before anyone wrote a line of code. Where does all that process actually come from, and when does it earn its place?"
 >
-	<a href="/notes" class="text-sm text-muted-foreground hover:text-foreground">&larr; All notes</a>
-
-	<div class="mt-6 flex items-center gap-3">
-		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Founder Decisions</span>
-		<span class="text-xs text-muted-foreground">September 2026</span>
-	</div>
-
 	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
 		Most of Your Software Process Is Cosplay
 	</h1>
@@ -159,13 +153,7 @@ import ContentLayout from '@/layouts/content-layout.astro'
 		</p>
 	</section>
 
-	<section class="mt-12 border-t pt-8">
-		<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related Notes</h3>
-		<ul class="mt-3 space-y-2">
-			<li><a href="/notes/elasticsearch-prod-is-not-a-youtube-tutorial" class="text-sm underline underline-offset-4 hover:text-foreground">Elasticsearch in Production Is Not a YouTube Tutorial</a></li>
-			<li><a href="/notes/cursor-vs-claude-code-founder-pricing" class="text-sm underline underline-offset-4 hover:text-foreground">Cursor vs Claude Code: A Founder's Pricing Teardown</a></li>
-		</ul>
-	</section>
+	<RelatedNotes picks={['elasticsearch-prod-is-not-a-youtube-tutorial', 'cursor-vs-claude-code-founder-pricing']} />
 
 	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
 		<p class="font-medium">Paying for process that doesn't match your risk?</p>
@@ -181,4 +169,4 @@ import ContentLayout from '@/layouts/content-layout.astro'
 			Book an Advisory Session
 		</a>
 	</section>
-</ContentLayout>
+</NoteLayout>

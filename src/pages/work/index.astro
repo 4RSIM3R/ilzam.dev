@@ -36,7 +36,7 @@ const caseStudies = [
 
 	<div class="mt-12 grid gap-6">
 		{caseStudies.map((study) => (
-			<a href={`/work/${study.slug}`} class="group block rounded-lg border p-5 transition-shadow hover:shadow-md">
+			<a href={`/work/${study.slug}/`} class="group block rounded-lg border p-5 transition-shadow hover:shadow-md">
 				<div class="flex items-center justify-between">
 					<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">{study.label}</span>
 					<span class="text-xs text-muted-foreground">{study.region} / {study.year}</span>

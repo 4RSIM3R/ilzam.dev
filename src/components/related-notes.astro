@@ -1,0 +1,33 @@
+---
+// End-of-note reading list. Hand-picked notes come first, then the list
+// fills up from the same topic, so a new note shows up under its older
+// neighbours without editing them.
+import { getHub, hubPath, noteFromPath, notePath, relatedNotes } from '@/lib/notes'
+
+interface Props {
+	/** Note slugs worth reading next, in order. They can be from any topic. */
+	picks?: string[]
+	/** Pages that are not notes, like a tool or the pricing page. Shown first. */
+	links?: { href: string; label: string }[]
+}
+
+const { picks = [], links = [] } = Astro.props
+const note = noteFromPath(Astro.url.pathname)
+const hub = getHub(note.hub)
+const notes = relatedNotes(note, picks)
+---
+
+<section class="mt-12 border-t pt-8">
+	<h3 class="text-sm font-medium uppercase tracking-wider text-muted-foreground">Related</h3>
+	<ul class="mt-3 space-y-2">
+		{links.map((link) => (
+			<li><a href={link.href} class="text-sm underline underline-offset-4 hover:text-foreground">{link.label}</a></li>
+		))}
+		{notes.map((related) => (
+			<li><a href={notePath(related.slug)} lang={related.lang} class="text-sm underline underline-offset-4 hover:text-foreground">{related.title}</a></li>
+		))}
+	</ul>
+	<a href={hubPath(hub.slug)} class="mt-4 inline-block text-sm text-muted-foreground hover:text-foreground">
+		All {hub.name} notes &rarr;
+	</a>
+</section>
