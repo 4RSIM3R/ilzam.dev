@@ -14,6 +14,7 @@ import {
   LifeBuoyIcon,
   CheckCircleIcon,
 } from "lucide-react"
+import { RESCUE_AUDIT, RETAINER_TIERS, formatUsd } from "@/lib/pricing"
 
 const capabilities = [
   {
@@ -51,7 +52,7 @@ const capabilities = [
         "Fixes for the bugs and slow pages your users actually hit",
         "Tests around sign-up, payments, and every flow that must not break",
         "A straight answer on whether to fix it or rebuild it",
-        "One fixed price, agreed before any work starts",
+        `Starts with a ${formatUsd(RESCUE_AUDIT.price)} audit, taken off the fix price`,
       ],
       tip: "Rebuilt a KOL platform from 85% to 99% uptime serving 5,000+ users.",
     },
@@ -60,7 +61,7 @@ const capabilities = [
     icon: BrainCircuitIcon,
     title: "Engineer on Retainer",
     description:
-      "A senior engineer on your team by the month. I make the technical calls, review what your developers or agency ship, and build alongside them when you need more hands. Plans run from 8 to 80 hours a month.",
+      `A senior engineer on your team by the month. I make the technical calls, review what your developers or agency ship, and build alongside them when you need more hands. Plans run from ${RETAINER_TIERS[0].hoursPerMonth} to ${RETAINER_TIERS[RETAINER_TIERS.length - 1].hoursPerMonth} hours a month.`,
     card: {
       badge: "Retainer",
       heading: "What You Get",

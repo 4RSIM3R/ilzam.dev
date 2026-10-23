@@ -76,8 +76,9 @@ const aiSavingPercent = Math.round((1 - aiHours / preAiHours) * 100)
 				{BASELINE_POLISH_HOURS[0]} to {BASELINE_POLISH_HOURS[1]} hours of final testing and going live.
 			</li>
 			<li>
-				<strong class="text-foreground">Price.</strong> Total hours multiplied by ${rateMin} to
-				${rateMax} per hour, with a minimum of {formatUsd(MINIMUM_PROJECT_PRICE)} for any project.
+				<strong class="text-foreground">Price.</strong> Total hours multiplied by
+				{rateMin === rateMax ? formatUsd(rateMin) : `${formatUsd(rateMin)} to ${formatUsd(rateMax)}`} per hour,
+				with a minimum of {formatUsd(MINIMUM_PROJECT_PRICE)} for any project.
 			</li>
 			<li>
 				<strong class="text-foreground">Timeline.</strong> Based on {HOURS_PER_BILLABLE_WEEK} hours

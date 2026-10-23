@@ -3,23 +3,22 @@ import ContentLayout from '@/layouts/content-layout.astro'
 import {
 	ENGAGEMENT_TERMS,
 	FULL_TIME_ENGINEER_SALARY,
+	HOURLY_RATE,
 	MVP_BUILD_FROM,
+	RESCUE_AUDIT,
 	RETAINER_TIERS,
 	STRATEGY_SESSION,
-	effectiveHourlyRate,
+	WEEKLY_CAPACITY_HOURS,
 	formatUsd,
 } from '@/lib/pricing'
 
 const cheapest = RETAINER_TIERS[0]
 const priciest = RETAINER_TIERS[RETAINER_TIERS.length - 1]
 const techLead = RETAINER_TIERS.find((t) => t.id === 'tech-lead')!
-const hourlyRates = RETAINER_TIERS.map(effectiveHourlyRate)
-const minHourly = Math.min(...hourlyRates)
-const maxHourly = Math.max(...hourlyRates)
 const monthlySalary = Math.round(FULL_TIME_ENGINEER_SALARY / 12)
 const salaryShare = Math.round((techLead.monthlyPrice / monthlySalary) * 100)
 
-const description = `Monthly engineering plans from ${formatUsd(cheapest.monthlyPrice)}, or ${formatUsd(minHourly)} to ${formatUsd(maxHourly)} per hour. MVP builds from ${formatUsd(MVP_BUILD_FROM)}. See what each plan includes and how it compares to a ${formatUsd(FULL_TIME_ENGINEER_SALARY / 1000)}k full-time engineer.`
+const description = `One rate for everything: ${formatUsd(HOURLY_RATE)} an hour. Monthly plans from ${formatUsd(cheapest.monthlyPrice)}, MVP builds from ${formatUsd(MVP_BUILD_FROM)}, and a ${formatUsd(RESCUE_AUDIT.price)} audit for AI-built apps. See how it compares to a ${formatUsd(FULL_TIME_ENGINEER_SALARY / 1000)}k full-time engineer.`
 ---
 
 <ContentLayout title="Pricing and Rates (2026) | Ilzam, AI-Native Software Engineer" description={description}>
@@ -33,11 +32,11 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 	</h1>
 
 	<p class="mt-6 text-lg leading-relaxed">
-		My monthly plans cost {formatUsd(cheapest.monthlyPrice)} to {formatUsd(priciest.monthlyPrice)},
-		depending on how many hours you need. That works out to {formatUsd(minHourly)} to
-		{formatUsd(maxHourly)} per hour. A first version of your product (an MVP) starts at
-		{formatUsd(MVP_BUILD_FROM)}, and if you only need one decision made well, a single
-		{STRATEGY_SESSION.minutes}-minute strategy session is {formatUsd(STRATEGY_SESSION.price)}.
+		Everything I do is billed at one rate, {formatUsd(HOURLY_RATE)} an hour. Monthly plans run from
+		{formatUsd(cheapest.monthlyPrice)} to {formatUsd(priciest.monthlyPrice)} depending on how many
+		hours you need. A first version of your product (an MVP) starts at {formatUsd(MVP_BUILD_FROM)},
+		and if you only need one decision made well, a single {STRATEGY_SESSION.minutes}-minute strategy
+		session is {formatUsd(STRATEGY_SESSION.price)}.
 	</p>
 	<p class="mt-4 leading-relaxed text-muted-foreground">{ENGAGEMENT_TERMS}</p>
 	<p class="mt-4 leading-relaxed text-muted-foreground">
@@ -58,7 +57,7 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 							<span class="text-sm text-muted-foreground"> / month</span>
 						</p>
 						<p class="mt-1 text-xs text-muted-foreground">
-							About {tier.hoursPerMonth} hours, {formatUsd(effectiveHourlyRate(tier))}/hour
+							About {tier.hoursPerMonth} hours, roughly {Math.round(tier.hoursPerMonth / 4)} a week
 						</p>
 						<p class="mt-4 text-sm leading-relaxed">{tier.summary}</p>
 						<ul class="mt-4 flex-1 space-y-2 text-sm text-muted-foreground">
@@ -89,8 +88,9 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 	<section class="mt-12">
 		<h2 class="text-xl font-semibold">Hourly rate</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			I price by the month instead of the hour, so you can message me when something comes up
-			without watching a meter. Here is what each plan works out to per hour.
+			{formatUsd(HOURLY_RATE)} an hour, on every plan and every build. You choose how much of my time
+			you need, and I bill by the month so you can message me when something comes up without
+			watching a meter.
 		</p>
 		<div class="mt-6 overflow-x-auto">
 			<table class="w-full text-left text-sm">
@@ -98,8 +98,8 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 					<tr class="border-b">
 						<th class="py-3 pr-4 font-medium">Plan</th>
 						<th class="py-3 pr-4 font-medium">Per month</th>
-						<th class="py-3 pr-4 font-medium">Hours</th>
-						<th class="py-3 font-medium">Per hour</th>
+						<th class="py-3 pr-4 font-medium">Hours a month</th>
+						<th class="py-3 font-medium">About per week</th>
 					</tr>
 				</thead>
 				<tbody class="text-muted-foreground">
@@ -109,7 +109,7 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 								<td class="py-3 pr-4 text-foreground">{tier.name}</td>
 								<td class="py-3 pr-4">{formatUsd(tier.monthlyPrice)}</td>
 								<td class="py-3 pr-4">~{tier.hoursPerMonth}</td>
-								<td class="py-3">{formatUsd(effectiveHourlyRate(tier))}</td>
+								<td class="py-3">~{Math.round(tier.hoursPerMonth / 4)} hours</td>
 							</tr>
 						))
 					}
@@ -117,9 +117,8 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 			</table>
 		</div>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			Smaller plans cost more per hour because every new client takes some fixed time to learn:
-			your product, your existing code, and your team. I need that context before my advice is
-			worth anything.
+			I keep about {WEEKLY_CAPACITY_HOURS} hours a week for client work, so the {priciest.name} plan
+			goes to one client at a time. If it is taken, the smaller plans usually still have room.
 		</p>
 	</section>
 
@@ -134,8 +133,8 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 			running a hiring and firing process.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			It stops saving money when you need someone most of the week for months on end. At that
-			point the {priciest.name} plan costs {formatUsd(priciest.monthlyPrice * 12)} a year, and a
+			It stops being the right fit when you need someone full time for months on end. The
+			{priciest.name} plan tops out at about {WEEKLY_CAPACITY_HOURS} hours a week, and past that a
 			full-time hire who owns the role long term is often the better investment. I'll tell you when
 			you've reached that point, and I can help you hire that person.
 		</p>
@@ -155,10 +154,10 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 			<div class="rounded-lg bg-muted/50 p-5">
 				<p class="font-medium">Whether I'm advising or building</p>
 				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-					The Advisor and {techLead.name} plans cover advice, decisions, and leading your
-					developers. If you also want me to build the product myself, that's the
-					{priciest.name} plan, or a one-time build of your first version (an MVP) starting from
-					{formatUsd(MVP_BUILD_FROM)}. To see what your product would cost to build, try the
+					The {cheapest.name} plan covers advice, code review, and small fixes. {techLead.name} adds
+					leading your developers and building features when they need more hands. If you want me
+					building every week, that's the {priciest.name} plan, or a one-time build of your first
+					version (an MVP) starting from {formatUsd(MVP_BUILD_FROM)}. To see what your product would cost to build, try the
 					<a href="/tool/mvp-cost-estimator/" class="underline underline-offset-4 hover:text-foreground">app and software development cost calculator</a>.
 				</p>
 			</div>
@@ -166,8 +165,9 @@ const description = `Monthly engineering plans from ${formatUsd(cheapest.monthly
 				<p class="font-medium">Whether you already have something built</p>
 				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
 					If you built a prototype with Lovable, Bolt, Cursor, or an earlier developer and it is
-					starting to break, I look at the code first and then quote one fixed price to make it
-					ready for real users. You know the full cost before any work starts.
+					starting to break, start with a {formatUsd(RESCUE_AUDIT.price)} {RESCUE_AUDIT.name}. Within
+					{RESCUE_AUDIT.businessDays} business days you get a plain-English report and one fixed price
+					for the fixes, with the audit fee taken off. You know the full cost before any work starts.
 				</p>
 			</div>
 		</div>

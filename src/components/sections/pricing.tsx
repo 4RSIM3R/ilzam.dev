@@ -9,7 +9,9 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { ArrowRightIcon, PhoneCallIcon, MailIcon } from "lucide-react"
 import {
+  HOURLY_RATE,
   MVP_BUILD_FROM,
+  RESCUE_AUDIT,
   RETAINER_TIERS,
   STRATEGY_SESSION,
   formatUsd,
@@ -26,7 +28,7 @@ const plans = [
       "Weekly check-ins, live or async",
       "Architecture and stack decisions",
       "Code review and quality oversight",
-      "Hands-on building on the Embedded plan",
+      "Hands-on building when you need it",
       "Help hiring developers you can trust",
       "Slack/async access between sessions",
     ],
@@ -74,10 +76,10 @@ const plans = [
   },
   {
     label: "Vibe-Code Rescue",
-    price: "Fixed Quote",
-    period: "",
+    price: formatUsd(RESCUE_AUDIT.price),
+    period: "/ Audit",
     description:
-      "Your AI-built prototype works until real users show up. I review the code, then quote one fixed price to make it secure, stable, and ready to grow.",
+      `Your AI-built prototype works until real users show up. A ${RESCUE_AUDIT.businessDays}-day audit finds what is broken, then you get one fixed price to make it secure and stable, with the audit fee taken off.`,
     features: [
       "Security check for leaked keys and open data",
       "Fixes for the bugs users actually hit",
@@ -147,7 +149,8 @@ export function PricingSection() {
       <p className="mt-4 max-w-xl text-sm text-muted-foreground">
         A senior engineer by the month, a product built from scratch, a rescue
         for the prototype that is falling over, or a one-time gut check. Every
-        option has a clear price before we start.
+        option is billed at the same {formatUsd(HOURLY_RATE)} an hour, with a
+        clear price before we start.
       </p>
 
       {/* Cards */}

@@ -9,15 +9,15 @@ Ilzam is an AI-native software engineer. He has shipped 15+ MVPs, led platform r
 ## Services
 
 ### MVP Build
-The first version of your product, designed, built, and shipped to production. AI agents write most of the code while Ilzam makes the architecture calls and reviews every change. A working demo every week. Most MVPs ship in 6-10 weeks, from $2,500.
+The first version of your product, designed, built, and shipped to production. AI agents write most of the code while Ilzam makes the architecture calls and reviews every change. A working demo every week. Most MVPs ship in 6-10 weeks, from $1,500.
 
 ### Vibe-Code Rescue
-For founders whose prototype was built with Lovable, Bolt, Cursor, or a cheap freelancer and is breaking under real users. A security check (leaked keys, open data, missing logins), fixes for the bugs users actually hit, tests on sign-up, payments, and core flows, and an honest fix-or-rebuild call. One fixed price, quoted after reviewing the code.
+For founders whose prototype was built with Lovable, Bolt, Cursor, or a cheap freelancer and is breaking under real users. A security check (leaked keys, open data, missing logins), fixes for the bugs users actually hit, tests on sign-up, payments, and core flows, and an honest fix-or-rebuild call. Starts with a $300 Rescue Audit (report within 5 business days), then one fixed price for the fixes with the audit fee taken off.
 
 ### Engineer on Retainer
 A senior engineer on your team by the month: architecture decisions, code review for your developers or agency, help hiring, and hands-on building on the larger plan.
 
-Pricing (month-to-month, cancel with 2 weeks' notice): Advisor $1,000/month (~8 hours), Tech Lead $3,000/month (~40 hours), Embedded Engineer $5,500/month (~80 hours, includes building). One-off 90-minute Strategy Session: $300. Details: https://ilzam.dev/pricing/
+Pricing: one rate for all work, $30/hour. Monthly plans (month-to-month, cancel with 2 weeks' notice): Advisor $600/month (~20 hours), Tech Lead $1,200/month (~40 hours), Embedded Engineer $2,400/month (~80 hours, about 20 hours a week, one client at a time). One-off 90-minute Strategy Session: $150, credited toward a plan or build booked within 30 days. Details: https://ilzam.dev/pricing/
 
 ## Tech Stack
 

@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge"
+import { RESCUE_AUDIT, formatUsd } from "@/lib/pricing"
 import {
   Accordion,
   AccordionContent,
@@ -28,7 +29,7 @@ export const faqs = [
   {
     question: "My app was built with AI and it keeps breaking. Can you fix it?",
     answer:
-      "Usually, yes. I start by reading the code and checking security, your data, and the flows your users depend on. Then you get a plain-English list of what to fix first and one fixed price for the work. If the prototype isn't worth saving, I'll tell you why before you spend anything on fixes.",
+      `Usually, yes. It starts with a ${formatUsd(RESCUE_AUDIT.price)} audit: I read the code and check security, your data, and the flows your users depend on. Then you get a plain-English list of what to fix first and one fixed price for the work, with the audit fee taken off. If the prototype isn't worth saving, I'll tell you why before you spend anything on fixes.`,
   },
   {
     question:

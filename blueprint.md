@@ -99,7 +99,9 @@ Best for: Founders with paying users on a prototype that was never built for the
 ### 3. Engineer on Retainer
 **Tagline:** "A senior engineer on your team, by the month."
 
-I make the technical calls, review what your developers or agency ship, and build alongside them when you need more hands. Plans: Advisor (~8 h), Tech Lead (~40 h), Embedded Engineer (~80 h, includes building). Prices live in `src/lib/pricing.ts`.
+I make the technical calls, review what your developers or agency ship, and build alongside them when you need more hands. Plans: Advisor (~20 h), Tech Lead (~40 h), Embedded Engineer (~80 h, one client at a time). Prices live in `src/lib/pricing.ts`.
+
+**Pricing model (2026-10-23):** one rate for everything, `HOURLY_RATE` in `src/lib/pricing.ts` ($30/h). Every price is hours times that rate: plans, MVP minimum (50 h), Rescue Audit (10 h, credited toward fixes), Strategy Session (5 h, credited within 30 days). About 20 client hours a week in total. Change the rate in one place and the site follows, except `public/llms.txt`.
 
 Best for: Pre-seed to seed startups. Non-technical founders. Teams without a senior engineer.
 

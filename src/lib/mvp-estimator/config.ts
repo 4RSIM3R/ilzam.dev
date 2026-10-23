@@ -1,11 +1,12 @@
 // Tunable business assumptions, kept separate from calculation logic so
 // pricing/pace can be adjusted without touching calculator.ts.
 
-import { MVP_BUILD_FROM } from '../pricing'
+import { HOURLY_RATE, MVP_BUILD_FROM } from '../pricing'
 import type { FeatureCategory } from './types'
 
-/** Blended [min, max] hourly rate used to turn hours into a price range. */
-export const HOURLY_RATE_RANGE: [number, number] = [25, 45]
+/** [min, max] hourly rate used to turn hours into a price range. Both ends are
+ * the site-wide rate, so the range comes from the hours estimate alone. */
+export const HOURLY_RATE_RANGE: [number, number] = [HOURLY_RATE, HOURLY_RATE]
 
 /** Share of a feature's pre-AI build hours still needed with AI-assisted
  * development (2026). Routine screens, forms, and admin work speed up most;
