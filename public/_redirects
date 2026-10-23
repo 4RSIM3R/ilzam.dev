@@ -1,0 +1,3 @@
+# Old pricing URL from before the rebrand. Astro writes the no-slash form from
+# astro.config.mjs redirects; Cloudflare matches paths exactly, so the slash form lives here.
+/fractional-cto/pricing/ /pricing/ 301

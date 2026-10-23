@@ -14,7 +14,7 @@ const steps = [
   {
     title: "Ship It",
     description:
-      "I build with AI-assisted development  - moving at 2-3x the speed of a traditional agency while writing production-quality code. Go, React, TypeScript, PostgreSQL. You get weekly updates, working demos, and zero surprises.",
+      "I build with AI agents from day one, moving at 2-3x the speed of a traditional agency, and I review every change before it ships. Go, React, TypeScript, PostgreSQL. You get working software every week, so nothing surprises you at the end.",
   },
   {
     title: "Measure and Improve",

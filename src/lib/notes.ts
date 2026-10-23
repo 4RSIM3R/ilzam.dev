@@ -5,7 +5,7 @@
 // `@/` imports. Hub copy is visitor-facing: write it for non-technical
 // founders.
 
-export type HubSlug = 'fractional-cto' | 'mvp-development-cost' | 'founder-decisions' | 'engineering'
+export type HubSlug = 'ai-native-development' | 'mvp-development-cost' | 'founder-decisions' | 'engineering'
 
 export interface Hub {
   slug: HubSlug
@@ -48,15 +48,15 @@ const MAX_RELATED = 4
 
 export const HUBS: Hub[] = [
   {
-    slug: 'fractional-cto',
-    name: 'Fractional CTO',
-    title: 'Fractional CTO Guides for Startup Founders | Ilzam',
-    description: 'What a fractional CTO does, what one costs, and how to tell whether your startup needs one yet. Written by a working fractional CTO.',
+    slug: 'ai-native-development',
+    name: 'AI-Native Development',
+    title: 'AI-Native Software Development Notes | Ilzam',
+    description: 'How I build software with AI agents on real projects: which tools are worth paying for, benchmarks I ran myself, and where a human still has to check the work.',
     intro: [
-      'A fractional CTO is a senior technical leader who works with your startup part time. They make the big technical decisions, check the work your developers ship, and help you hire, for a fraction of what a full-time executive costs.',
-      'These notes cover when that arrangement makes sense, what it should cost, and how it compares to hiring a full-time CTO or finding a technical co-founder.',
+      'Most code in 2026 is written with AI help. Whether that makes a project fast or a mess comes down to who checks the output, and how.',
+      'These notes are from my own work building with AI agents: what the tools cost, how they compare when I measure them, and what it takes to let an agent run code safely.',
     ],
-    cta: { href: '/fractional-cto/pricing/', label: 'See fractional CTO pricing' },
+    cta: { href: '/pricing/', label: 'Hire an engineer who works this way' },
   },
   {
     slug: 'mvp-development-cost',
@@ -73,18 +73,18 @@ export const HUBS: Hub[] = [
     slug: 'founder-decisions',
     name: 'Founder Decisions',
     title: 'Technical Decisions for Startup Founders | Ilzam',
-    description: 'Practical frameworks for the technical calls founders make without a CTO, like which AI coding tool to pay for, how much process a team needs, and how to build a startup website.',
+    description: 'Practical frameworks for the technical calls founders make without an engineer on the team, like how much process a team needs and how to build a startup website.',
     intro: [
       'In an early startup, most technical decisions get made by someone who is not technical. These notes are for that person.',
-      'Each one takes a single decision, like which AI coding tool to pay for or how much process a small team needs, and walks through how I would make it and why.',
+      'Each one takes a single decision, like how much process a small team needs or how to build your website, and walks through how I would make it and why.',
     ],
-    cta: { href: '/fractional-cto/pricing/', label: 'Talk a decision through in a Strategy Session' },
+    cta: { href: '/pricing/', label: 'Talk a decision through in a Strategy Session' },
   },
   {
     slug: 'engineering',
     name: 'Engineering',
     title: 'Engineering Notes from Production Systems | Ilzam',
-    description: 'Technical deep dives from real production work: event ingestion, Elasticsearch, concurrency, sandboxed AI agents, and codebase retrieval benchmarks.',
+    description: 'Technical deep dives from real production work: event ingestion, Elasticsearch, and concurrency.',
     intro: [
       'Write-ups from systems I have built and run in production, including the parts that broke. They are written for engineers and go deep into the details.',
       'Founders do not need to read these to work with me, but they show how I think about reliability and cost when the stakes are real.',
@@ -141,21 +141,21 @@ export const NOTES: Note[] = [
     slug: 'cursor-vs-claude-code-founder-pricing',
     title: "Cursor vs Claude Code: A Founder's Pricing Teardown",
     description: 'Cursor pays Anthropic $650M/year while earning $500M. I break down pricing, trust, business model risk, and why I chose the $100/month option with no middleman.',
-    hub: 'founder-decisions',
+    hub: 'ai-native-development',
     published: '2026-03-15',
   },
   {
     slug: 'gitnexus-codebase-rag-benchmark',
     title: "GitNexus Benchmark: Graph-Indexed Retrieval vs Claude Code's Native Exploration",
     description: "Does graph-indexed retrieval actually beat Claude Code's native codebase exploration? I ran the same architectural question both ways. $0.52 vs $0.39, 38 tool calls vs 12, and the KuzuDB internals that explain the difference.",
-    hub: 'engineering',
+    hub: 'ai-native-development',
     published: '2026-03-14',
   },
   {
     slug: 'ai-security-scanner-upstash-box',
     title: 'I Built an AI Agent That Runs Untrusted Code to Find Security Threats',
     description: '877,000 malicious packages and counting. I used Upstash Box to build a sandboxed AI security scanner that does both static and dynamic analysis.',
-    hub: 'engineering',
+    hub: 'ai-native-development',
     published: '2026-03-12',
   },
   {

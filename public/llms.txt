@@ -1,23 +1,23 @@
-# Ilzam — AI-Native Software Engineer & Fractional CTO
+# Ilzam | AI-Native Software Engineer for Founders
 
-> I help early-stage founders build and ship their product — acting as fractional CTO with AI-assisted development. Based in Indonesia, working globally.
+> I ship like a team of three, and you pay for one. AI agents handle the typing, I make the decisions and review every change before it ships, and the code is yours. Based in Indonesia, working globally.
 
 ## About
 
-Ilzam is an AI-native software engineer and fractional CTO. He has shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently works embedded in a San Francisco AI company — remotely from East Java, Indonesia. He builds with Go, React, TypeScript, .NET, and PostgreSQL. He thinks in systems, not tickets.
+Ilzam is an AI-native software engineer. He has shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently works embedded in a San Francisco AI company, remotely from East Java, Indonesia. He builds with Go, React, TypeScript, .NET, and PostgreSQL. He thinks in systems, not tickets.
 
 ## Services
 
-### Fractional CTO
-Senior technical judgment, without the full-time salary. For founders who need someone to own the technical side — architecture decisions, stack choices, vendor evaluation, team hiring, sprint planning — without committing to a $150k/year hire.
+### MVP Build
+The first version of your product, designed, built, and shipped to production. AI agents write most of the code while Ilzam makes the architecture calls and reviews every change. A working demo every week. Most MVPs ship in 6-10 weeks, from $2,500.
 
-Pricing (month-to-month, cancel with 2 weeks' notice): Advisor $1,000/month (~8 hours), Fractional CTO $3,000/month (~40 hours), Hands-on CTO $5,500/month (~80 hours, includes building). One-off 90-minute Strategy Session: $300. Details: https://ilzam.dev/fractional-cto/pricing
+### Vibe-Code Rescue
+For founders whose prototype was built with Lovable, Bolt, Cursor, or a cheap freelancer and is breaking under real users. A security check (leaked keys, open data, missing logins), fixes for the bugs users actually hit, tests on sign-up, payments, and core flows, and an honest fix-or-rebuild call. One fixed price, quoted after reviewing the code.
 
-### MVP Development
-From whiteboard to deployed. In weeks, not months. AI-assisted development that moves at 2-3x the speed of a traditional agency while writing production-quality code. Most MVPs ship in 6-10 weeks.
+### Engineer on Retainer
+A senior engineer on your team by the month: architecture decisions, code review for your developers or agency, help hiring, and hands-on building on the larger plan.
 
-### Technical Advisory
-A one-time or recurring session for founders who need a second opinion — on a vendor proposal, an agency quote, a build vs buy decision, or a technology choice.
+Pricing (month-to-month, cancel with 2 weeks' notice): Advisor $1,000/month (~8 hours), Tech Lead $3,000/month (~40 hours), Embedded Engineer $5,500/month (~80 hours, includes building). One-off 90-minute Strategy Session: $300. Details: https://ilzam.dev/pricing/
 
 ## Tech Stack
 
@@ -38,10 +38,10 @@ A one-time or recurring session for founders who need a second opinion — on a 
 
 ## Things I've Shipped
 
-- Chef Booking Marketplace (Scandinavia) — Two-sided marketplace, 10 weeks, one engineer. Go, React, PostgreSQL, Stripe Connect, Redis.
-- AI Knowledge Pipeline (San Francisco, US) — RAG that actually retrieves the right thing. Go, PostgreSQL, pgvector, BM25, Markdown AST.
-- KOL Management Platform Rebuild (Jakarta, Indonesia) — 85% to 99% uptime. 5,000+ users. Full-stack rebuild, team lead.
-- Government Vocational Dashboard (Indonesia) — Centralizing education data for a national directorate. REST API, recommender system, data dashboard.
+- Chef Booking Marketplace (Scandinavia): Two-sided marketplace, 10 weeks, one engineer. Go, React, PostgreSQL, Stripe Connect, Redis.
+- AI Knowledge Pipeline (San Francisco, US): RAG that actually retrieves the right thing. Go, PostgreSQL, pgvector, BM25, Markdown AST.
+- KOL Management Platform Rebuild (Jakarta, Indonesia): 85% to 99% uptime. 5,000+ users. Full-stack rebuild, team lead.
+- Government Vocational Dashboard (Indonesia): Centralizing education data for a national directorate. REST API, recommender system, data dashboard.
 
 ## Contact
 
@@ -54,4 +54,4 @@ A one-time or recurring session for founders who need a second opinion — on a 
 
 ## Location
 
-Pasuruan, East Java, Indonesia — working remotely with clients in the US, Europe, and Southeast Asia.
+Pasuruan, East Java, Indonesia, working remotely with clients in the US, Europe, and Southeast Asia.

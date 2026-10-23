@@ -1,8 +1,8 @@
 // Single source of truth for service prices. The homepage pricing section and
-// /fractional-cto/pricing both read from here, so update prices only in this file.
+// /pricing both read from here, so update prices only in this file.
 // public/llms.txt is static and repeats these prices: update it by hand too.
 
-export interface CtoTier {
+export interface RetainerTier {
   id: string
   name: string
   monthlyPrice: number
@@ -25,13 +25,13 @@ export const STRATEGY_SESSION = {
   ],
 }
 
-export const CTO_TIERS: CtoTier[] = [
+export const RETAINER_TIERS: RetainerTier[] = [
   {
     id: 'advisor',
     name: 'Advisor',
     monthlyPrice: 1000,
     hoursPerMonth: 8,
-    summary: 'A senior tech expert you can call on, while you stay in charge.',
+    summary: 'A senior engineer you can call on, while you stay in charge.',
     includes: [
       'A 30-minute call every week',
       'Message me questions anytime between calls',
@@ -40,8 +40,8 @@ export const CTO_TIERS: CtoTier[] = [
     bestFor: 'Founders who already have a developer or agency and want someone senior checking the decisions.',
   },
   {
-    id: 'fractional',
-    name: 'Fractional CTO',
+    id: 'tech-lead',
+    name: 'Tech Lead',
     monthlyPrice: 3000,
     hoursPerMonth: 40,
     summary: 'I take charge of the technical side of your company, part time.',
@@ -54,13 +54,13 @@ export const CTO_TIERS: CtoTier[] = [
     bestFor: 'Early-stage startups without a technical leader.',
   },
   {
-    id: 'hands-on',
-    name: 'Hands-on CTO',
+    id: 'embedded',
+    name: 'Embedded Engineer',
     monthlyPrice: 5500,
     hoursPerMonth: 80,
-    summary: 'Everything in Fractional CTO, and I build the product with you.',
+    summary: 'Everything in Tech Lead, and I build the product with you.',
     includes: [
-      'Everything in Fractional CTO',
+      'Everything in Tech Lead',
       'I write code and build features myself, alongside your team',
     ],
     bestFor: 'Founders who need one person to lead and build the product.',
@@ -69,8 +69,8 @@ export const CTO_TIERS: CtoTier[] = [
 
 export const MVP_BUILD_FROM = 2500
 
-/** Full-time CTO salary used for comparisons across the site. */
-export const FULL_TIME_CTO_SALARY = 150_000
+/** US senior software engineer salary used for comparisons across the site. */
+export const FULL_TIME_ENGINEER_SALARY = 150_000
 
 export const ENGAGEMENT_TERMS = "Month-to-month. Cancel with 2 weeks' notice."
 
@@ -78,6 +78,6 @@ export function formatUsd(amount: number) {
   return `$${amount.toLocaleString('en-US')}`
 }
 
-export function effectiveHourlyRate(tier: CtoTier) {
+export function effectiveHourlyRate(tier: RetainerTier) {
   return Math.round(tier.monthlyPrice / tier.hoursPerMonth)
 }

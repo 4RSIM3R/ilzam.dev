@@ -9,32 +9,32 @@ import {
 import { Separator } from "@/components/ui/separator"
 import { ArrowRightIcon, PhoneCallIcon, MailIcon } from "lucide-react"
 import {
-  CTO_TIERS,
   MVP_BUILD_FROM,
+  RETAINER_TIERS,
   STRATEGY_SESSION,
   formatUsd,
 } from "@/lib/pricing"
 
 const plans = [
   {
-    label: "Fractional CTO",
-    price: `From ${formatUsd(CTO_TIERS[0].monthlyPrice)}`,
+    label: "Retainer",
+    price: `From ${formatUsd(RETAINER_TIERS[0].monthlyPrice)}`,
     period: "/ Month",
     description:
-      `Ongoing technical leadership for your startup, in plans from ${CTO_TIERS[0].hoursPerMonth} to ${CTO_TIERS[CTO_TIERS.length - 1].hoursPerMonth} hours a month. I make architecture decisions, review code, and keep your product on track.`,
+      `A senior engineer on your team every week, in plans from ${RETAINER_TIERS[0].hoursPerMonth} to ${RETAINER_TIERS[RETAINER_TIERS.length - 1].hoursPerMonth} hours a month. I make the technical calls, review your developers' work, and build when you need it.`,
     features: [
-      "Weekly async or live check-ins",
+      "Weekly check-ins, live or async",
       "Architecture and stack decisions",
       "Code review and quality oversight",
-      "Team hiring from my trusted network",
-      "Sprint planning and prioritization",
+      "Hands-on building on the Embedded plan",
+      "Help hiring developers you can trust",
       "Slack/async access between sessions",
     ],
-    bestFor: "Pre-seed to seed startups. Non-technical founders. Companies between CTOs.",
+    bestFor: "Pre-seed to seed startups. Non-technical founders. Teams without a senior engineer.",
     actions: [
       {
         label: "See Plans",
-        href: "/fractional-cto/pricing/",
+        href: "/pricing/",
         variant: "outline" as const,
         full: false,
         icon: ArrowRightIcon,
@@ -53,11 +53,11 @@ const plans = [
     price: `From ${formatUsd(MVP_BUILD_FROM)}`,
     period: "",
     description:
-      "I scope, build, and ship your MVP to production. AI-assisted development means startup speed without agency prices. Most MVPs ship in 6-10 weeks.",
+      "I scope, build, and ship your MVP to production. AI agents do the heavy lifting and I review every change, so you get startup speed at a fraction of agency prices. Most MVPs ship in 6-10 weeks.",
     features: [
       "Feature scoping and tech stack selection",
       "Full-stack development (Go, React, TypeScript)",
-      "Database design and API architecture",
+      "A working demo every week",
       "Production deployment (AWS/Cloudflare)",
       "30 days of post-launch support",
     ],
@@ -73,46 +73,39 @@ const plans = [
     ],
   },
   {
+    label: "Vibe-Code Rescue",
+    price: "Fixed Quote",
+    period: "",
+    description:
+      "Your AI-built prototype works until real users show up. I review the code, then quote one fixed price to make it secure, stable, and ready to grow.",
+    features: [
+      "Security check for leaked keys and open data",
+      "Fixes for the bugs users actually hit",
+      "Tests on sign-up, payments, and core flows",
+      "An honest fix-or-rebuild call",
+    ],
+    bestFor: "Founders who built with Lovable, Bolt, Cursor, or a cheap freelancer and now have paying users.",
+    actions: [
+      {
+        label: "Get a Quote",
+        href: "https://cal.com/ilzam/intro",
+        variant: "default" as const,
+        full: true,
+        icon: PhoneCallIcon,
+      },
+    ],
+  },
+  {
     label: STRATEGY_SESSION.name,
     price: formatUsd(STRATEGY_SESSION.price),
     period: "/ Session",
     description:
       "A focused session where I review your vendor proposal, evaluate your tech stack, or give you a second opinion on a big technical decision.",
     features: STRATEGY_SESSION.includes,
-    bestFor: "Founders evaluating options. CTOs wanting peer review. Big decisions ahead.",
+    bestFor: "Founders evaluating options. Engineering leads wanting a peer review. Big decisions ahead.",
     actions: [
       {
         label: "Book Session",
-        href: "https://cal.com/ilzam/intro",
-        variant: "outline" as const,
-        full: false,
-        icon: PhoneCallIcon,
-      },
-      {
-        label: "Email Me",
-        href: "mailto:ilzammulkhaq85@gmail.com",
-        variant: "default" as const,
-        full: false,
-        icon: MailIcon,
-      },
-    ],
-  },
-  {
-    label: "Custom",
-    price: "Let's Talk",
-    period: "",
-    description:
-      "Need something that doesn't fit the boxes above? Larger builds, ongoing retainers, or team augmentation  - let's figure out the right scope together.",
-    features: [
-      "Tailored scope and deliverables",
-      "Flexible engagement length",
-      "Dedicated availability windows",
-      "Custom SLA and communication cadence",
-    ],
-    bestFor: "Larger projects. Unique requirements. Teams that need a custom arrangement.",
-    actions: [
-      {
-        label: "Book Intro Call",
         href: "https://cal.com/ilzam/intro",
         variant: "outline" as const,
         full: false,
@@ -138,7 +131,7 @@ export function PricingSection() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <h2 className="max-w-md text-4xl font-light leading-tight tracking-tight md:text-5xl">
-          Three ways to{" "}
+          Four ways to{" "}
           <span className="rounded-sm bg-amber-100 px-1 font-normal">
             work with me
           </span>
@@ -152,8 +145,9 @@ export function PricingSection() {
       </div>
 
       <p className="mt-4 max-w-xl text-sm text-muted-foreground">
-        Whether you need ongoing CTO-level support, a product built from
-        scratch, a one-time technical gut check, or something custom  - there's a clear path.
+        A senior engineer by the month, a product built from scratch, a rescue
+        for the prototype that is falling over, or a one-time gut check. Every
+        option has a clear price before we start.
       </p>
 
       {/* Cards */}
@@ -221,6 +215,19 @@ export function PricingSection() {
           </Card>
         ))}
       </div>
+
+      <p className="mt-8 text-sm text-muted-foreground">
+        Need something else, like a larger build or extra hands for your team?{" "}
+        <a
+          href="https://cal.com/ilzam/intro"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-4 transition-colors hover:text-foreground"
+        >
+          Book a call
+        </a>{" "}
+        and we'll scope it together.
+      </p>
     </section>
   )
 }

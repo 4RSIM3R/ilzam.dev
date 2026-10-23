@@ -1,48 +1,48 @@
 ---
 import ContentLayout from '@/layouts/content-layout.astro'
 import {
-	CTO_TIERS,
 	ENGAGEMENT_TERMS,
-	FULL_TIME_CTO_SALARY,
+	FULL_TIME_ENGINEER_SALARY,
 	MVP_BUILD_FROM,
+	RETAINER_TIERS,
 	STRATEGY_SESSION,
 	effectiveHourlyRate,
 	formatUsd,
 } from '@/lib/pricing'
 
-const cheapest = CTO_TIERS[0]
-const priciest = CTO_TIERS[CTO_TIERS.length - 1]
-const fractional = CTO_TIERS.find((t) => t.id === 'fractional')!
-const hourlyRates = CTO_TIERS.map(effectiveHourlyRate)
+const cheapest = RETAINER_TIERS[0]
+const priciest = RETAINER_TIERS[RETAINER_TIERS.length - 1]
+const techLead = RETAINER_TIERS.find((t) => t.id === 'tech-lead')!
+const hourlyRates = RETAINER_TIERS.map(effectiveHourlyRate)
 const minHourly = Math.min(...hourlyRates)
 const maxHourly = Math.max(...hourlyRates)
-const monthlySalary = Math.round(FULL_TIME_CTO_SALARY / 12)
-const salaryShare = Math.round((fractional.monthlyPrice / monthlySalary) * 100)
+const monthlySalary = Math.round(FULL_TIME_ENGINEER_SALARY / 12)
+const salaryShare = Math.round((techLead.monthlyPrice / monthlySalary) * 100)
 
-const description = `Fractional CTO pricing from ${formatUsd(cheapest.monthlyPrice)} a month, or ${formatUsd(minHourly)} to ${formatUsd(maxHourly)} per hour. See what each plan includes and how it compares to a ${formatUsd(FULL_TIME_CTO_SALARY / 1000)}k full-time CTO hire.`
+const description = `Monthly engineering plans from ${formatUsd(cheapest.monthlyPrice)}, or ${formatUsd(minHourly)} to ${formatUsd(maxHourly)} per hour. MVP builds from ${formatUsd(MVP_BUILD_FROM)}. See what each plan includes and how it compares to a ${formatUsd(FULL_TIME_ENGINEER_SALARY / 1000)}k full-time engineer.`
 ---
 
-<ContentLayout title="Fractional CTO Cost and Rates (2026 Pricing) | Ilzam" description={description}>
+<ContentLayout title="Pricing and Rates (2026) | Ilzam, AI-Native Software Engineer" description={description}>
 	<div class="flex items-center gap-3">
 		<span class="rounded-sm bg-muted px-2 py-0.5 text-xs font-medium uppercase">Pricing</span>
 		<span class="text-xs text-muted-foreground">Updated October 2026</span>
 	</div>
 
 	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
-		Fractional CTO Cost and Rates
+		Pricing and Rates
 	</h1>
 
 	<p class="mt-6 text-lg leading-relaxed">
-		My fractional CTO plans cost {formatUsd(cheapest.monthlyPrice)} to {formatUsd(priciest.monthlyPrice)} per
-		month, depending on how many hours you need. That works out to {formatUsd(minHourly)} to
-		{formatUsd(maxHourly)} per hour. If you only need one decision made well, a single
+		My monthly plans cost {formatUsd(cheapest.monthlyPrice)} to {formatUsd(priciest.monthlyPrice)},
+		depending on how many hours you need. That works out to {formatUsd(minHourly)} to
+		{formatUsd(maxHourly)} per hour. A first version of your product (an MVP) starts at
+		{formatUsd(MVP_BUILD_FROM)}, and if you only need one decision made well, a single
 		{STRATEGY_SESSION.minutes}-minute strategy session is {formatUsd(STRATEGY_SESSION.price)}.
 	</p>
 	<p class="mt-4 leading-relaxed text-muted-foreground">{ENGAGEMENT_TERMS}</p>
 	<p class="mt-4 leading-relaxed text-muted-foreground">
-		New to the term? A fractional CTO is a part-time technology leader: the person who makes
-		your technical decisions and keeps your developers on track, without the cost of a
-		full-time executive.
+		Every plan gets the same way of working. AI agents handle most of the typing, I make the
+		decisions and review every change before it ships, and you own all of the code.
 	</p>
 
 	<!-- Monthly plans -->
@@ -50,7 +50,7 @@ const description = `Fractional CTO pricing from ${formatUsd(cheapest.monthlyPri
 		<h2 class="text-xl font-semibold">Monthly plans</h2>
 		<div class="mt-6 grid gap-4 md:grid-cols-3">
 			{
-				CTO_TIERS.map((tier) => (
+				RETAINER_TIERS.map((tier) => (
 					<div class="flex flex-col rounded-lg border p-5">
 						<p class="font-medium">{tier.name}</p>
 						<p class="mt-3 text-3xl font-light tracking-tight">
@@ -87,9 +87,9 @@ const description = `Fractional CTO pricing from ${formatUsd(cheapest.monthlyPri
 
 	<!-- Hourly rate -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Fractional CTO hourly rate</h2>
+		<h2 class="text-xl font-semibold">Hourly rate</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			I price by the month, not by the hour, so you can message me when something comes up
+			I price by the month instead of the hour, so you can message me when something comes up
 			without watching a meter. Here is what each plan works out to per hour.
 		</p>
 		<div class="mt-6 overflow-x-auto">
@@ -104,7 +104,7 @@ const description = `Fractional CTO pricing from ${formatUsd(cheapest.monthlyPri
 				</thead>
 				<tbody class="text-muted-foreground">
 					{
-						CTO_TIERS.map((tier) => (
+						RETAINER_TIERS.map((tier) => (
 							<tr class="border-b">
 								<td class="py-3 pr-4 text-foreground">{tier.name}</td>
 								<td class="py-3 pr-4">{formatUsd(tier.monthlyPrice)}</td>
@@ -125,17 +125,17 @@ const description = `Fractional CTO pricing from ${formatUsd(cheapest.monthlyPri
 
 	<!-- Savings -->
 	<section class="mt-12">
-		<h2 class="text-xl font-semibold">Does a fractional CTO actually save money?</h2>
+		<h2 class="text-xl font-semibold">Is a monthly plan cheaper than hiring?</h2>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			A full-time CTO is a {formatUsd(FULL_TIME_CTO_SALARY)}+ salary commitment. That is about
-			{formatUsd(monthlySalary)} a month before equity, benefits, and recruiting. The
-			{fractional.name} plan is {formatUsd(fractional.monthlyPrice)} a month, roughly {salaryShare}% of
-			the salary alone, and you can stop it with 2 weeks' notice instead of running a hiring and
-			firing process.
+			A full-time senior engineer in the US is a {formatUsd(FULL_TIME_ENGINEER_SALARY)}+ salary
+			commitment. That is about {formatUsd(monthlySalary)} a month before equity, benefits, and
+			recruiting. The {techLead.name} plan is {formatUsd(techLead.monthlyPrice)} a month, roughly
+			{salaryShare}% of the salary alone, and you can stop it with 2 weeks' notice instead of
+			running a hiring and firing process.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
-			It stops saving money when you need a technical leader most of the week for months on end.
-			At that point the {priciest.name} plan costs {formatUsd(priciest.monthlyPrice * 12)} a year, and a
+			It stops saving money when you need someone most of the week for months on end. At that
+			point the {priciest.name} plan costs {formatUsd(priciest.monthlyPrice * 12)} a year, and a
 			full-time hire who owns the role long term is often the better investment. I'll tell you when
 			you've reached that point, and I can help you hire that person.
 		</p>
@@ -155,11 +155,19 @@ const description = `Fractional CTO pricing from ${formatUsd(cheapest.monthlyPri
 			<div class="rounded-lg bg-muted/50 p-5">
 				<p class="font-medium">Whether I'm advising or building</p>
 				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
-					The Advisor and Fractional CTO plans cover advice, decisions, and leading your
+					The Advisor and {techLead.name} plans cover advice, decisions, and leading your
 					developers. If you also want me to build the product myself, that's the
 					{priciest.name} plan, or a one-time build of your first version (an MVP) starting from
 					{formatUsd(MVP_BUILD_FROM)}. To see what your product would cost to build, try the
 					<a href="/tool/mvp-cost-estimator/" class="underline underline-offset-4 hover:text-foreground">app and software development cost calculator</a>.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Whether you already have something built</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					If you built a prototype with Lovable, Bolt, Cursor, or an earlier developer and it is
+					starting to break, I look at the code first and then quote one fixed price to make it
+					ready for real users. You know the full cost before any work starts.
 				</p>
 			</div>
 		</div>

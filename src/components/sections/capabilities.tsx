@@ -11,67 +11,67 @@ import { Separator } from "@/components/ui/separator"
 import {
   BrainCircuitIcon,
   RocketIcon,
-  ShieldCheckIcon,
+  LifeBuoyIcon,
   CheckCircleIcon,
 } from "lucide-react"
 
 const capabilities = [
   {
-    icon: BrainCircuitIcon,
-    title: "Fractional CTO",
+    icon: RocketIcon,
+    title: "MVP Build",
     description:
-      "You need someone to own the technical side  - architecture, stack choices, vendor evaluation, hiring  - without committing to a $150k/year executive. I act as your startup CTO on a fractional basis, embedded in your team weekly.",
+      "I design, build, and ship the first version of your product. AI agents write most of the code while I make every call that matters, so a build that used to need a 3-person team for 3 months takes weeks.",
     card: {
-      badge: "Technical Leadership",
+      badge: "Build",
       heading: "What You Get",
       message:
-        "Senior technical judgment and strategic oversight, without the full-time salary.",
+        "A working product in production, on code you own from day one.",
       items: [
-        "Architecture and technology decision-making",
-        "Code review and technical quality oversight",
-        "Sprint planning and async check-ins",
-        "Team building from my network of trusted engineers",
-        "Honest answers, not consultant fluff",
+        "Scope cut down to what your first customers will pay for",
+        "Full-stack development with Go, React, TypeScript, PostgreSQL",
+        "A working demo every week, so you always see real progress",
+        "Deployment to production infrastructure (AWS/Cloudflare)",
+        "Analytics and monitoring from launch day",
+      ],
+      tip: "15+ MVPs shipped. Chef booking marketplace, two-sided platform, 10 weeks, one engineer.",
+    },
+  },
+  {
+    icon: LifeBuoyIcon,
+    title: "Vibe-Code Rescue",
+    description:
+      "You built it fast with Lovable, Bolt, Cursor, or a cheap freelancer, and now real users are breaking it. I find what is dangerous, fix what matters first, and get it ready for growth. A rewrite only happens if the code truly needs one.",
+    card: {
+      badge: "Rescue",
+      heading: "What You Get",
+      message:
+        "A plain-English report on what is broken, then the fixes, most urgent first.",
+      items: [
+        "Security check for leaked keys, open databases, and missing logins",
+        "Fixes for the bugs and slow pages your users actually hit",
+        "Tests around sign-up, payments, and every flow that must not break",
+        "A straight answer on whether to fix it or rebuild it",
+        "One fixed price, agreed before any work starts",
       ],
       tip: "Rebuilt a KOL platform from 85% to 99% uptime serving 5,000+ users.",
     },
   },
   {
-    icon: RocketIcon,
-    title: "MVP Development",
+    icon: BrainCircuitIcon,
+    title: "Engineer on Retainer",
     description:
-      "I design, build, and ship your product using AI-assisted development. What used to take a 3-person team 3 months, I move through in weeks  - without the technical debt that kills products at scale.",
+      "A senior engineer on your team by the month. I make the technical calls, review what your developers or agency ship, and build alongside them when you need more hands. Plans run from 8 to 80 hours a month.",
     card: {
-      badge: "Build",
+      badge: "Retainer",
       heading: "What You Get",
       message:
-        "A working product shipped to production  - built fast, built right.",
+        "Senior judgment every week, on a plan you can cancel with 2 weeks' notice.",
       items: [
-        "Core feature scoping and startup tech stack selection",
-        "Full-stack development with Go, React, TypeScript, PostgreSQL",
-        "Database design and API architecture",
-        "Deployment to production infrastructure (AWS/Cloudflare)",
-        "Analytics and monitoring from day one",
-      ],
-      tip: "15+ MVPs shipped. Chef booking marketplace  - two-sided platform, 10 weeks, one engineer.",
-    },
-  },
-  {
-    icon: ShieldCheckIcon,
-    title: "Technical Advisory",
-    description:
-      "A one-time or recurring session for founders who need a second opinion  - on a vendor proposal, an agency quote, a build vs buy decision, or a technology choice. I'll tell you what I actually think.",
-    card: {
-      badge: "Advisory",
-      heading: "What You Get",
-      message:
-        "Clarity on the technical decision in front of you  - before you commit.",
-      items: [
-        "Vendor and agency proposal review",
-        "Build vs buy analysis for your specific case",
-        "Stack recommendation based on your constraints",
-        "Architecture review for existing systems",
-        "Honest assessment  - even if it means 'don't build this yet'",
+        "Architecture and technology decisions",
+        "Code review for your developers or agency",
+        "Weekly check-ins, with async access in between",
+        "Help hiring developers you can trust",
+        "Honest answers, even when the answer is 'don't build this yet'",
       ],
       tip: "Reduced infrastructure costs by 80% for a healthcare network.",
     },
@@ -90,11 +90,11 @@ export function CapabilitiesSection() {
       {/* Header */}
       <div className="flex items-start justify-between">
         <h2 className="max-w-xl text-4xl font-light leading-tight tracking-tight md:text-5xl">
-          Your startup needs a CTO.
+          I ship like a team of three.
           <br />
-          You don't need a{" "}
+          You{" "}
           <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            $200k salary
+            pay for one
           </span>
         </h2>
         <Badge
@@ -106,9 +106,10 @@ export function CapabilitiesSection() {
       </div>
 
       <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        I work as an AI-native software engineer and fractional CTO for
-        early-stage founders. I make the technical decisions, build the product,
-        and help you ship  - so you can focus on customers, not code.
+        I'm Ilzam, an AI-native software engineer working from East Java with
+        founders everywhere. AI agents handle the typing while I make the
+        decisions and review every change before it ships. That is how one
+        engineer moves at the pace of a small team, and the code stays yours.
       </p>
 
       {/* Content grid */}

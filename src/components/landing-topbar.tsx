@@ -9,7 +9,7 @@ export function LandingTopbar() {
         <SidebarTrigger className="md:hidden" />
         <img
           src="/profile.jpeg"
-          alt="Ilzam - Software Engineer"
+          alt="Ilzam, AI-Native Software Engineer"
           width={32}
           height={32}
           className="size-8 rounded-full object-cover"
@@ -20,7 +20,7 @@ export function LandingTopbar() {
             Ilzam
           </h1>
           <p className="text-xs text-muted-foreground">
-            Fractional CTO
+            AI-Native Software Engineer
           </p>
         </div>
       </div>

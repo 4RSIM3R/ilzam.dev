@@ -6,7 +6,7 @@ import { CaseStudiesSection } from '@/components/sections/case-studies'
 import { TestimonialsSection } from '@/components/sections/testimonials'
 import { ToolstackSection } from '@/components/sections/toolstack'
 import { PricingSection } from '@/components/sections/pricing'
-import { FaqSection } from '@/components/sections/faq'
+import { FaqSection, faqs } from '@/components/sections/faq'
 import { CtaSection } from '@/components/sections/cta'
 import { Badge } from '@/components/ui/badge'
 import NoteCard from '@/components/note-card.astro'
@@ -19,7 +19,7 @@ const personSchema = {
 	"@context": "https://schema.org",
 	"@type": "Person",
 	"name": "Muhammad Ilzam Mulkhaq",
-	"jobTitle": "AI-Native Software Engineer & Fractional CTO",
+	"jobTitle": "AI-Native Software Engineer",
 	"url": "https://ilzam.dev",
 	"sameAs": [
 		"https://github.com/4RSIM3R/",
@@ -37,61 +37,19 @@ const personSchema = {
 const faqSchema = {
 	"@context": "https://schema.org",
 	"@type": "FAQPage",
-	"mainEntity": [
-		{
-			"@type": "Question",
-			"name": "What exactly does a fractional CTO do?",
-			"acceptedAnswer": {
-				"@type": "Answer",
-				"text": "I act as your startup's technical leader on a part-time basis. That means I make architecture decisions, choose your tech stack, review code, plan sprints, and hire engineers  - everything a full-time CTO would do, without the $150k+ salary. I'm embedded in your team, not hovering above it."
-			}
-		},
-		{
-			"@type": "Question",
-			"name": "How is this different from hiring an agency or freelance developer?",
-			"acceptedAnswer": {
-				"@type": "Answer",
-				"text": "An agency builds what you tell them to build. A freelancer writes the code you spec out. I ask 'should we even build this?' before writing a single line. You get strategic thinking and technical execution from the same person  - no game of telephone between a project manager, designer, and three junior developers."
-			}
-		},
-		{
-			"@type": "Question",
-			"name": "How long does it take to build an MVP?",
-			"acceptedAnswer": {
-				"@type": "Answer",
-				"text": "Most MVPs ship in 6-10 weeks. I use AI-assisted development to move at 2-3x traditional speed, but I don't cut corners on architecture. A chef booking marketplace took 10 weeks. A RAG pipeline took 6. The timeline depends on scope  - and I'll be honest if your scope needs trimming."
-			}
-		},
-		{
-			"@type": "Question",
-			"name": "I'm a non-technical founder. Do I need a fractional CTO or a technical co-founder?",
-			"acceptedAnswer": {
-				"@type": "Answer",
-				"text": "If you're pre-product, exploring ideas, and need someone with skin in the game  - look for a co-founder. If you have a validated idea, funding (or revenue), and need someone to build it right and fast  - a fractional CTO gets you moving without giving up equity. Most of my clients are in the second camp."
-			}
-		},
-		{
-			"@type": "Question",
-			"name": "What tech stack do you recommend for an early-stage startup?",
-			"acceptedAnswer": {
-				"@type": "Answer",
-				"text": "It depends on what you're building, but my default stack for most startups is Go + React + PostgreSQL on AWS. It's fast, scales well, and doesn't lock you in. I've also shipped production apps with TypeScript, .NET, Flutter, and Laravel  - I pick the stack based on your constraints, not my preferences."
-			}
-		},
-		{
-			"@type": "Question",
-			"name": "You're based in Indonesia  - how does the remote work?",
-			"acceptedAnswer": {
-				"@type": "Answer",
-				"text": "I've been working remotely with US, European, and Southeast Asian clients for years. I'm currently embedded in a San Francisco AI company as an AI-native software engineer  - fully remote from East Java. Async by default, with live sessions when they matter. Time zone overlap has never been an issue."
-			}
+	"mainEntity": faqs.map((faq) => ({
+		"@type": "Question",
+		"name": faq.question,
+		"acceptedAnswer": {
+			"@type": "Answer",
+			"text": faq.answer
 		}
-	]
+	}))
 }
 ---
 
 <LandingLayout>
-	<h1 class="sr-only">Muhammad Ilzam Mulkhaq  - AI-Native Software Engineer & Fractional CTO for Early-Stage Founders</h1>
+	<h1 class="sr-only">Muhammad Ilzam Mulkhaq, AI-Native Software Engineer for Early-Stage Founders</h1>
 	<CapabilitiesSection client:load />
 	<ProcessSection client:load />
 	<CaseStudiesSection client:load />
@@ -125,7 +83,7 @@ const faqSchema = {
 			<nav class="flex flex-wrap gap-x-6 gap-y-2">
 				<a href="/work/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Work</a>
 				<a href="/notes/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Notes</a>
-				<a href="/fractional-cto/pricing/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Pricing</a>
+				<a href="/pricing/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Pricing</a>
 				<a href="/contact/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Contact</a>
 				<a href="/tool/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Tools</a>
 				<a href="/kawakib/" class="text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground">Kawakib</a>

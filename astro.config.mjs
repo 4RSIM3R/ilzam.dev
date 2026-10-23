@@ -29,6 +29,8 @@ export default defineConfig({
   ],
   redirects: {
     '/sitemap.xml': '/sitemap-index.xml',
+    // Old pricing URL from before the rebrand, kept so existing links and rankings carry over.
+    '/fractional-cto/pricing': '/pricing/',
   },
 
   vite: {

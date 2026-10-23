@@ -5,31 +5,38 @@
 ## Core Positioning
 
 **Name:** Ilzam
-**Title:** AI-Native Software Engineer & Fractional CTO
-**Location:** East Java, Indonesia — working remotely with clients worldwide
+**Title:** AI-Native Software Engineer
+**Location:** East Java, Indonesia, working remotely with clients worldwide
+
+**Positioning in one line:** One engineer, AI agents doing the typing, a human signing off on every change. Speed of a small team, code you can keep for years.
+
+**What the brand stands on (show these, never list them as buzzwords):**
+- AI-native: AI agents write most of the first draft. I make the decisions and review everything before it ships.
+- Pragmatic: the simplest stack that works, and "don't build this yet" when that is the honest answer. Never call it "pragmatic" in copy; "The Pragmatic Engineer" is someone else's brand.
+- Fast feedback: working software every week. Never say "agile" in copy; founders hear Jira and ceremonies.
+
+**Retired:** "Fractional CTO" is no longer used anywhere on the site (dropped 2026-10-23).
 
 ---
 
-## Tagline Options (pick one)
+## Tagline
 
-Primary:
-> "I help founders ship their product — fast, right, and without the full-time CTO price tag."
+Primary (homepage hero):
+> "I ship like a team of three. You pay for one."
 
-Alternatives:
-> "Your technical co-founder, without the equity ask."
-> "Senior technical judgment. Startup-speed execution."
-> "You bring the idea. I'll build the thing."
-> "Fractional CTO for founders who can't afford to build it wrong."
+Support lines:
+> "AI agents handle the typing. I make the calls and review every change."
+> "Building from East Java. Shipping to the world." (footer)
 
 ---
 
 ## Hero Section (above the fold)
 
 **Headline:**
-> Fractional CTO for Early-Stage Founders
+> I ship like a team of three. You pay for one.
 
 **Subheadline:**
-> I help non-technical founders make smart tech decisions and ship their product — acting as their on-demand CTO, with AI-assisted development that moves faster and costs less than a traditional agency.
+> I'm Ilzam, an AI-native software engineer working from East Java with founders everywhere. AI agents handle the typing while I make the decisions and review every change before it ships. That is how one engineer moves at the pace of a small team, and the code stays yours.
 
 **Social proof line (under CTA):**
 > 15+ MVPs shipped. Clients in the US, Europe, and Southeast Asia.
@@ -42,7 +49,7 @@ Alternatives:
 ## About / Who I Am
 
 **Short version (for header/bio):**
-> AI-native software engineer and fractional CTO. I've shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently work embedded in a San Francisco AI company — remotely from East Java, Indonesia. I build with Go, React, TypeScript, .NET, and PostgreSQL. I think in systems, not tickets.
+> AI-native software engineer. I've shipped 15+ MVPs, led platform rebuilds for 5,000+ user systems, and currently work embedded in a San Francisco AI company — remotely from East Java, Indonesia. I build with Go, React, TypeScript, .NET, and PostgreSQL. I think in systems, not tickets.
 
 **Long version (for about page):**
 
@@ -60,43 +67,43 @@ Currently based in Pasuruan, East Java. Graduated D4 Teknik Informatika from Pol
 
 ## What I Offer (Services)
 
-### 1. Fractional CTO
-**Tagline:** "Senior technical judgment, without the full-time salary."
-
-For founders who need someone to own the technical side — architecture decisions, stack choices, vendor evaluation, team hiring, sprint planning — without committing to a $150k/year hire.
-
-What's included:
-- Weekly async check-ins or sprint-based intensive sessions
-- Architecture and technology decision-making
-- Code review and technical quality oversight
-- Team building — I have a network of trusted engineers I can bring in
-- Honest answers, not consultant fluff
-
-Best for: Pre-seed to seed stage startups. Non-technical founders. Companies between technical hires.
-
----
-
-### 2. Build — MVP to Production
+### 1. MVP Build
 **Tagline:** "From whiteboard to deployed. Fast."
 
-I design, build, and ship your product using AI-assisted development. What used to take a 3-person team 3 months, we move through in weeks — without accumulating the kind of technical debt that kills products at scale.
+I design, build, and ship the first version of your product. AI agents write most of the code while I make every call that matters, so a build that used to need a 3-person team for 3 months takes weeks. A working demo every week.
 
 What I've built: marketplaces, SaaS platforms, mobile apps (iOS + Android), RAG/AI pipelines, government dashboards, booking systems, POS systems, social monitoring tools.
 
 Stack: Go, React, TypeScript, Node.js, .NET, PostgreSQL, Redis, Stripe, AWS.
 
-Best for: Founders with a validated idea ready to build. Companies needing a complete squad (I bring the team).
+Best for: Founders with a validated idea ready to build.
 
 ---
 
-### 3. Technical Advisory
-**Tagline:** "Don't get burned by the wrong decision early."
+### 2. Vibe-Code Rescue
+**Tagline:** "Your AI-built prototype works until real users show up."
 
-A one-time or recurring advisory engagement for founders who need a second opinion — on a vendor proposal, an agency quote, a technology choice, or a build vs buy decision.
+For founders who built fast with Lovable, Bolt, Cursor, or a cheap freelancer and are now watching it break. I find what is dangerous, fix what matters first, and get it ready for growth. A rewrite only happens if the code truly needs one.
 
-I'll tell you what I actually think, not what you want to hear.
+What's included:
+- Security check for leaked keys, open databases, and missing logins
+- Fixes for the bugs and slow pages users actually hit
+- Tests around sign-up, payments, and every flow that must not break
+- A straight answer on whether to fix it or rebuild it
+- One fixed price, agreed before any work starts
 
-Best for: Non-technical founders evaluating options. CTOs wanting a peer review. Teams about to make a big architectural decision.
+Best for: Founders with paying users on a prototype that was never built for them.
+
+---
+
+### 3. Engineer on Retainer
+**Tagline:** "A senior engineer on your team, by the month."
+
+I make the technical calls, review what your developers or agency ship, and build alongside them when you need more hands. Plans: Advisor (~8 h), Tech Lead (~40 h), Embedded Engineer (~80 h, includes building). Prices live in `src/lib/pricing.ts`.
+
+Best for: Pre-seed to seed startups. Non-technical founders. Teams without a senior engineer.
+
+One-off option: the 90-minute Strategy Session for a single big decision (vendor proposal, agency quote, build vs buy).
 
 ---
 
@@ -149,12 +156,12 @@ URL: `/notes/[problem-in-stack]`
 **Pattern 2: Decision framework for founders**
 URL: `/notes/[decision-founders-face]`
 
-- `/notes/when-to-hire-fractional-cto`
+- `/notes/how-to-rescue-an-ai-built-prototype`
 - `/notes/build-vs-buy-early-stage-startup`
 - `/notes/how-to-evaluate-agency-proposal`
 - `/notes/mvp-stack-choice-2026`
 - `/notes/how-much-does-mvp-cost`
-- `/notes/technical-co-founder-vs-fractional-cto`
+- `/notes/technical-co-founder-vs-hiring-an-engineer`
 - `/notes/when-to-rewrite-vs-refactor`
 
 **Pattern 3: Stack comparison (search traffic)**
@@ -235,12 +242,12 @@ That's exactly what the advisory session is for.
 
 ## SEO Defaults
 
-Site title: `Ilzam — AI-Native Software Engineer & Fractional CTO`
+Site title: `Muhammad Ilzam Mulkhaq | AI-Native Software Engineer for Founders`
 
 Meta description:
-`I help early-stage founders build and ship their product — AI-native engineering with fractional CTO-level judgment. Go, React, TypeScript, .NET. Based in Indonesia, working globally.`
+`I ship like a team of three, and you pay for one. AI-native software engineer for early-stage founders: MVP builds, vibe-code rescue, and a senior engineer on retainer. Based in Indonesia, working globally.`
 
-OG image text: `Ilzam.dev — Fractional CTO for Early-Stage Founders`
+OG image text: `Ilzam.dev | I ship like a team of three. You pay for one.`
 
 ---
 
