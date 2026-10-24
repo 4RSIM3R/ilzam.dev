@@ -95,6 +95,13 @@ export const HUBS: Hub[] = [
 
 export const NOTES: Note[] = [
   {
+    slug: 'langfuse-ai-agent-observability',
+    title: 'Langfuse: Stop Guessing Whether Your AI Agent Works',
+    description: 'Five clean test runs only rule out a failure rate above 45%. The reliability math behind agents, how Langfuse ingests and stores traces (and why v4 went observation-first), LLM judges you can calibrate, and a CI gate that fails on regressions instead of noise.',
+    hub: 'ai-native-development',
+    published: '2026-10-24',
+  },
+  {
     slug: 'how-to-choose-a-software-development-company',
     title: 'How to Choose a Software Development Company as a Startup',
     description: 'Eight questions to ask before you sign, including how they use AI, the red flags to look for in a proposal, and how to compare quotes fairly, even if you are not technical.',

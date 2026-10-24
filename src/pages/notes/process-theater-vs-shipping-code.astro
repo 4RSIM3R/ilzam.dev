@@ -90,7 +90,9 @@ import RelatedNotes from '@/components/related-notes.astro'
 			For a task this size, you don't need an agent framework. You need to employ Claude directly, describe the 5 screens and the materialized view, let
 			it write the code, and review the output the way you'd review a junior engineer's PR. The orchestration layer earns its place when you're running
 			hundreds of agents against a real production system with real failure modes to coordinate. It's dead weight bolted onto a task one model, used
-			directly, finishes in an afternoon.
+			directly, finishes in an afternoon. Evaluation tooling has the same threshold: it pays off once the model's answers are the product itself,
+			which I cover in <a href="/notes/langfuse-ai-agent-observability/" class="underline underline-offset-4 hover:text-foreground">my note on
+			tracing and evaluating agents with Langfuse</a>.
 		</p>
 		<p class="mt-4 leading-relaxed text-muted-foreground">
 			This is the same pattern as agile and cloud, just wearing a newer costume. The vocabulary changed, agents instead of sprints, harnesses instead of

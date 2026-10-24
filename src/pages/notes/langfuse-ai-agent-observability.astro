@@ -1,0 +1,530 @@
+---
+import NoteLayout from '@/layouts/note-layout.astro'
+import RelatedNotes from '@/components/related-notes.astro'
+import { RESCUE_AUDIT, formatUsd } from '@/lib/pricing'
+
+const codeInstall = `pip install "langfuse>=4.7"
+
+export LANGFUSE_PUBLIC_KEY="pk-lf-..."
+export LANGFUSE_SECRET_KEY="sk-lf-..."
+export LANGFUSE_BASE_URL="https://cloud.langfuse.com"  # or your self-hosted URL`
+
+const codeTrace = `from langfuse import observe, propagate_attributes
+from langfuse.openai import openai  # drop-in client, every model call is logged
+
+@observe(as_type="tool")
+def lookup_order(order_id: str) -> dict:
+    return orders_api.get(order_id)
+
+@observe(as_type="agent")
+def support_agent(question: str, user_id: str, chat_id: str) -> str:
+    # Enter this before any child step starts, so every observation carries it
+    with propagate_attributes(user_id=user_id, session_id=chat_id):
+        return run_agent_loop(question, tools=[lookup_order])`
+
+const codeGate = `from langfuse import Evaluation, RegressionError, RunnerContext
+
+THRESHOLD = 0.9
+
+def task(*, item, **kwargs):
+    return support_agent(item.input["question"], user_id="ci", chat_id=item.id)
+
+def correct_status(*, output, expected_output, **kwargs):
+    ok = expected_output["status"] in output
+    return Evaluation(name="correct_status", value=1.0 if ok else 0.0)
+
+def experiment(context: RunnerContext):
+    result = context.run_experiment(
+        name="support-agent",
+        task=task,
+        evaluators=[correct_status],
+    )
+    scores = [
+        e.value
+        for r in result.item_results
+        for e in r.evaluations
+        if e.name == "correct_status"
+    ]
+    avg = sum(scores) / len(scores) if scores else 0.0
+    if avg < THRESHOLD:
+        raise RegressionError(
+            result=result, metric="correct_status", value=avg, threshold=THRESHOLD
+        )
+    return result`
+
+// Zero failures in n runs rules out, at 95% confidence, any failure rate above 1 - 0.05^(1/n).
+const cleanRuns = [
+	[5, '45%'],
+	[20, '14%'],
+	[59, '5%'],
+	[300, '1%'],
+]
+
+const link = 'underline underline-offset-4 hover:text-foreground'
+const ext = { target: '_blank', rel: 'noopener noreferrer', class: link }
+---
+
+<NoteLayout
+	title="Langfuse: Stop Guessing Whether Your AI Agent Works | Ilzam"
+	description="Five passing prompts tell you almost nothing about an AI agent. The reliability math, how Langfuse stores traces in ClickHouse, and evals that can fail a build."
+>
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		Stop Playing Tebak-Tebak Berhadiah With Your AI Agent
+	</h1>
+
+	<blockquote class="mt-6">
+		<p class="text-sm font-medium">TL;DR</p>
+		<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+			You built an agent or a harness, tried it on five prompts, and shipped it because it felt right. That's tebak-tebak berhadiah, Indonesian for a
+			guessing game with a prize. The math is unkind: five clean runs only rule out a failure rate above 45%. This note covers why agents slip past
+			normal testing, how <strong>Langfuse</strong> ingests and stores traces (and why v4 rebuilt its data model around observations), how to build
+			evaluators you can trust, and a CI gate that catches real regressions without failing on noise.
+		</p>
+	</blockquote>
+
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			Someone builds an AI agent. It reads a customer's question, calls a couple of tools, searches a knowledge base, and writes an answer. They try it
+			on five or six questions they thought of, every answer looks good, and it goes live.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			A week later a customer complains that the bot said their order had shipped when it hadn't. The developer adds a sentence to the prompt, "only
+			report order status from the lookup tool", reruns the same five questions, and they still pass. Ship it.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Did that fix it? Did it break something else? How often was it happening in the first place? Nobody knows. In Indonesia we call this
+			<em>tebak-tebak berhadiah</em>: the guessing game at a 17 Agustus neighborhood party, where someone shouts an answer and hopes for a prize. It's
+			a fine way to spend an afternoon in a kampung. As a release process, it's how you lose customers without ever learning why.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The fix is engineering, and most of it is unglamorous: counting, sampling, and storing the right data in the right shape. Langfuse happens to be
+			a good place to see all of it, because its own architecture went through the same lessons.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Five passing prompts rule out almost nothing</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Treat each run of your agent as a trial that comes out correct with some unknown probability. Your five test prompts are a sample of that
+			distribution, and a sample of five is tiny.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Say the agent is wrong one time in five. The chance that all five of your tries pass anyway is 0.8<sup>5</sup>, about 33%. A third of the time,
+			your test session reports a clean bill of health on an agent that fails 20% of real requests.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Now ask what a clean streak actually proves. With zero failures in <em>n</em> runs, the highest failure rate you can rule out at 95% confidence is
+			1 &minus; 0.05<sup>1/<em>n</em></sup>:
+		</p>
+		<div class="mt-6 overflow-x-auto">
+			<table class="w-full text-left text-sm">
+				<thead>
+					<tr class="border-b">
+						<th class="py-3 pr-4 font-medium">Clean runs in a row</th>
+						<th class="py-3 font-medium">Failure rates you can rule out (95%)</th>
+					</tr>
+				</thead>
+				<tbody class="text-muted-foreground">
+					{
+						cleanRuns.map(([runs, rate]) => (
+							<tr class="border-b">
+								<td class="py-3 pr-4 text-foreground">{runs}</td>
+								<td class="py-3">Above {rate}</td>
+							</tr>
+						))
+					}
+				</tbody>
+			</table>
+		</div>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The bottom rows follow the rule of three: zero failures in <em>n</em> runs puts the true rate below roughly 3/<em>n</em>. To claim your agent
+			fails less than 5% of the time, you need about 60 clean runs on realistic inputs, which nobody types by hand.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Agents compound the problem because a run is a chain of decisions, and errors multiply along it. If each step (pick a tool, fill in its
+			arguments, read the result correctly) is right 95% of the time, a 10-step run is fully right 0.95<sup>10</sup>, about 60% of the time.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Consistency matters as much as capability. The τ-bench paper [1] measures pass<sup>k</sup>, the probability that an agent succeeds on all
+			<em>k</em> attempts at the same task. GPT-4o solved under half of its tasks, and its pass<sup>8</sup> in the retail domain was under 25%. A
+			customer who asks the same thing twice and gets two different answers has just measured your pass<sup>2</sup>.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Why your usual tooling doesn't see it</h2>
+		<div class="mt-6 space-y-4">
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Temperature 0 doesn't make it deterministic</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Identical requests at temperature 0 can still produce different outputs. Inference servers batch requests from many users together, and
+					common GPU kernels give slightly different floating-point results depending on batch size, so your output depends on how many other people
+					were calling the API at that moment [2]. One different token early in a run can send an agent down a different path.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Failures return 200 OK</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					APM tools watch status codes, latency, and exceptions. An agent failure is semantic. The request returns 200 in four seconds, the error
+					tracker stays quiet, and the customer reads a confident, wrong answer. Stack traces tell you whether code ran, and that's all they tell you.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">The prompt is global state</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Every request reads the same system prompt, so editing it is like changing a global variable every code path depends on. The sentence that
+					fixes order-status answers also changes refund answers. In my
+					<a href="/notes/ai-security-scanner-upstash-box/" class={link}>AI security scanner</a>, the biggest quality jump came from one line, "Only
+					flag real, concrete issues." A line that cuts noise that well can also cut real findings, and only a measurement over many cases tells you
+					which one happened.
+				</p>
+			</div>
+			<div class="rounded-lg bg-muted/50 p-5">
+				<p class="font-medium">Token cost grows with the square of the step count</p>
+				<p class="mt-1 text-sm leading-relaxed text-muted-foreground">
+					Each step of the loop resends the conversation so far, every earlier tool result included. Start with 2,000 tokens of context, add 1,000
+					tokens of tool output per step, and a 5-step run sends 20,000 input tokens while a 25-step run sends 350,000. Five times the steps costs
+					more than 17 times the tokens. Prompt caching discounts the repeated prefix, but the context window still fills. When I
+					<a href="/notes/gitnexus-codebase-rag-benchmark/" class={link}>benchmarked GitNexus against Claude Code's native exploration</a>, cache
+					reads were 88 to 96% of all tokens, and the cheaper run won by needing fewer steps: about 12 tool calls against 38.
+				</p>
+			</div>
+		</div>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">How Langfuse is built, and why it changes your instrumentation</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Langfuse is an open-source platform for tracing and evaluating LLM applications. The main repository is MIT licensed apart from its enterprise
+			folders, and ClickHouse acquired the company in January 2026 with no planned license changes [3]. For an engineer, the plumbing is the
+			interesting part, because a few of its design decisions dictate how you should write your instrumentation.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">The SDK is OpenTelemetry underneath</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The Python and JS/TS SDKs are built on OpenTelemetry, and an observation is an OTel span. The <code>@observe</code> decorator opens a span and
+			puts it in the OTel context (contextvars, in Python), so any observed function called inside it becomes a child automatically, through nested
+			calls and async tasks. Finished spans are queued in memory and exported in batches by a background thread, which keeps tracing off your request
+			path.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Batching has a price. A short-lived process can exit before the exporter runs: a serverless runtime may freeze the process right after the
+			response, and a CLI or cron job simply ends. Call <code>langfuse.flush()</code> before that point or the last traces never arrive.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Ingestion is a queue, so reads lag writes</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Langfuse v2 did all of its work inside the ingestion request. Each event meant looking up the existing row, tokenizing the prompt and completion,
+			computing cost, and upserting into Postgres. Bursty batch traffic exhausted Postgres IOPS and burned CPU on tokenization, and ingestion latency
+			spiked to 50 seconds in the summer of 2023 [4].
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			v3 split the path in two. The API checks auth and body format, writes the raw events to S3, and pushes a reference onto a Redis queue. A worker
+			pulls the reference, loads every event for that object, computes the final state, and inserts it into ClickHouse without reading from ClickHouse
+			first, which sidesteps read-after-write races. Raw events in S3 can be replayed after a failure, and Redis only carries pointers, which keeps
+			it clear of its network limits.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			The consequence for you is eventual consistency. A trace appears seconds after the request ends, so a test that writes a trace and immediately
+			reads it back through the API can fail for reasons unrelated to your code.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">v4 rebuilt storage around observations</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			In v3, traces and observations lived in separate ClickHouse tables on <code>ReplacingMergeTree</code>. An update was written as a new full row,
+			duplicates only disappeared when background merges got around to them, and queries had to deduplicate at read time with <code>FINAL</code> or
+			<code>LIMIT BY</code>. Any question like cost per user needed a join between the two tables. Data processed grew 19x over a year, and the largest
+			projects could only load a few days of dashboard data [5].
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			v4 replaces this with one wide, mostly immutable observations table. OTel spans are immutable once they end, and roughly 60% of Langfuse Cloud
+			observations already arrive over the OTel endpoint, so most rows never need a merge. <code>trace_id</code> becomes a correlation column, like
+			<code>session_id</code>. Attributes such as <code>user_id</code>, <code>session_id</code>, and tags are written onto every observation at
+			ingestion, so cost per user becomes a column filter plus a <code>GROUP BY</code>, with no join [5].
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			It's the same lesson as my
+			<a href="/notes/elasticsearch-prod-is-not-a-youtube-tutorial/" class={link}>Elasticsearch post-mortem</a>: shape storage for the queries you
+			actually run, and make every write carry what those queries need.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">What that means for your code</h3>
+		<ul class="mt-3 space-y-3 leading-relaxed text-muted-foreground">
+			<li>
+				<strong class="text-foreground">Set attributes at the top of the request.</strong> <code>propagate_attributes</code> applies
+				<code>user_id</code>, <code>session_id</code>, and tags to the current observation and its children inside its scope [6]. Steps that start
+				before you enter it won't carry them, and filters on those attributes won't find those steps.
+			</li>
+			<li>
+				<strong class="text-foreground">Upgrade the SDK.</strong> Real-time data on v4 needs Python SDK 4.7.0 or JS/TS SDK 5.4.0 and up, and older
+				SDKs can lag by up to 15 minutes. Langfuse Cloud deprecates the v3 endpoints on November 16, 2026, and trace-level LLM judges must move to
+				observations by then [7].
+			</li>
+			<li>
+				<strong class="text-foreground">Don't assert on fresh writes.</strong> Read your own traces back with a retry, or assert on the experiment
+				result object your script already holds.
+			</li>
+		</ul>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Instrumenting an agent</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Three environment variables, the drop-in OpenAI client so every model call gets logged with model, tokens, and cost, and a decorator on your own
+			functions so they show up as typed steps:
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeInstall} /></pre>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeTrace} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Use the observation types. Langfuse has ten, including <code>agent</code>, <code>tool</code>, <code>retriever</code>,
+			<code>generation</code>, and <code>guardrail</code> [8], and a typed trace reads like your design instead of a column of anonymous spans. Since
+			it's all OTel, a request that crosses services (an API that enqueues a job for a worker) can stay one trace if you pass the W3C trace context
+			along with the job.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Harnesses need this as much as chatbots do. If you run agents inside sandboxes (I built
+			<a href="/work/kotakpasir-agent-sandboxes/" class={link}>Kotak Pasir</a> for that), the sandbox decides what the agent is allowed to do. The trace
+			records what it actually tried.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Evals: push each check down to the cheapest layer that can decide it</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			A score is a number, boolean, category, or text note attached to an observation. Where scores come from matters far more than the dashboard they
+			land on. I sort evaluators by cost and variance, and move every check as far down that list as it will go.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Code evaluators: zero variance, almost zero cost</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Anything code can decide should be decided by code. For agents, the most useful checks look at the trajectory as well as the final text:
+		</p>
+		<ul class="mt-3 list-disc space-y-1 pl-5 leading-relaxed text-muted-foreground">
+			<li>the lookup tool ran before the answer stated an order status</li>
+			<li>tool arguments validate against the tool's schema</li>
+			<li>the run finished inside its step budget</li>
+			<li>no tool was called twice in a row with identical arguments, the usual sign of a stuck loop</li>
+			<li>the output parses as the JSON your frontend expects</li>
+		</ul>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Langfuse runs Python or TypeScript code evaluators on live observations, with a 2-second limit, no network access, and no third-party packages
+			[9]. An evaluator can only check what the observation carries, so if a check needs the tool's raw output or the list of steps, record it on the
+			observation the evaluator runs against. Checks that need the whole trace are easier in experiments, where your evaluator is ordinary code.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">LLM judges: useful, biased, and in need of calibration</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			For questions code can't settle, like whether an answer stayed faithful to the retrieved documents, a second model grades the output against
+			your rubric. Langfuse runs judges on observations, with filters on type, name, metadata, user, session, or tags, and a sampling rate to cap cost
+			[10].
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			A judge is a model with failure modes of its own. The MT-Bench paper [11] documents position bias (favoring whichever answer comes first),
+			verbosity bias (favoring longer answers), and self-enhancement bias (favoring output from its own model family). What helps in practice: a judge
+			from a different model family than the agent, binary or small categorical labels instead of 1-to-10 scales, and a rubric that spells out
+			concrete failure conditions.
+		</p>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Then calibrate it. Label a set of observations yourself and compare. Use Cohen's kappa rather than raw percent agreement, because raw agreement
+			flatters a judge on imbalanced data. If 90% of your agent's answers are good, a judge that always says "good" agrees with you 90% of the time and
+			has a kappa of exactly 0. Langfuse has a human vs AI annotation agreement view for this comparison. Skip calibration and you've traded
+			tebak-tebak berhadiah for tebak-tebak berhadiah with charts.
+		</p>
+
+		<h3 class="mt-8 text-base font-semibold">Humans and users: the ground truth</h3>
+		<p class="mt-3 leading-relaxed text-muted-foreground">
+			Annotation queues give you or a domain expert a review inbox, and those labels become the reference set your judge is calibrated against. User
+			feedback, thumbs up or down from the browser SDK or your server, is noisy and skews toward unhappy users. It's still the only signal that comes
+			from the people you're building for, and a thumbs down is the best pointer to a trace worth reading.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Experiments and a CI gate that doesn't flake</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Every low-scored trace is a real input your agent got wrong, which beats anything you'd invent at your desk as test material. Add it to a
+			dataset, from the trace view or through the SDK, with an expected output where you have one. An experiment runs your current code over the
+			dataset and scores each item with the same evaluators, so two prompt versions, two models, or two branches can be compared item by item.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Langfuse ships a GitHub Action, <code>langfuse/experiment-action</code>, that runs an experiment script on pull requests. The script raises
+			<code>RegressionError</code> when a score falls below your threshold, the job fails, and the action can post the scores as a PR comment. It needs
+			Python SDK 4.6.0 or JS SDK 5.3.0 and up [12].
+		</p>
+		<pre class="mt-4 overflow-x-auto rounded-lg bg-muted p-4 text-sm leading-relaxed"><code set:text={codeGate} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The hard part is that threshold, because the score is a sample too. With 50 items and a true pass rate of 90%, the standard error is
+			&radic;(0.9 &times; 0.1 / 50), about 4.2 points, so the 95% interval is roughly &plusmn;8 points. An unchanged agent can score 86% on a bad day,
+			and a fixed 0.9 threshold on a 50-item set will fail random pull requests until the team learns to rerun the job and ignore it. To keep the gate
+			honest:
+		</p>
+		<ul class="mt-3 space-y-3 leading-relaxed text-muted-foreground">
+			<li>
+				<strong class="text-foreground">Size the dataset for the change you want to catch.</strong> At 200 items the same interval narrows to about
+				&plusmn;4 points.
+			</li>
+			<li>
+				<strong class="text-foreground">Compare against the main branch, not a constant.</strong> Score main on the same dataset and fail when the
+				drop is larger than the noise.
+			</li>
+			<li>
+				<strong class="text-foreground">Give critical cases their own gate.</strong> An average can hide a case you just broke, so the Langfuse docs
+				recommend checking each case against a reviewed baseline. Since a single run can flip on nondeterminism alone, run those cases <em>k</em> times
+				and require pass<sup>k</sup>.
+			</li>
+		</ul>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">Running it yourself</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Self-hosted Langfuse is two containers, web and worker, on top of Postgres, ClickHouse, Redis or Valkey, and S3-compatible storage, with a Docker
+			Compose file for a local trial [13]. Self-hosted v4 is generally available, and v3 gets security patches through January 2027 [7]. Traces hold
+			your prompts, your users' messages, and whatever your tools returned, so if a contract or a regulator says that data stays on your servers, this
+			is the path.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			ClickHouse is the component that needs real operations work: disk, retention, merges. During the v4 migration, Langfuse's own team found
+			partitions with around 1,000 parts where 150 to 200 is typical, and nodes learning about new data 25 minutes after insertion [5]. Budget for that,
+			or use the cloud. The free Hobby plan gives 50,000 units a month, and a unit is any data point you send (the trace, each step, each score), so a
+			10-step run with two scores costs about 13 units, a little under 4,000 runs a month [14].
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">When this is overkill</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			In an earlier note I called a lot of AI tooling
+			<a href="/notes/process-theater-vs-shipping-code/" class={link}>cosplay</a>, evaluation harnesses included, when they get bolted onto tasks
+			that don't need them. I still think that, so here's where the line sits.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			If you use AI to write code, say Claude Code building five CRUD screens, you don't need Langfuse. The output is code, and you verify it the way
+			you verify any code: read the diff, run the tests. Once it's merged, the model is out of the picture.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Langfuse earns its place when the model runs in production and its answers are the product: a support agent, a search over your documents, a
+			classifier that routes tickets, a harness that runs agents for your customers. There every request is a fresh draw from the distribution, and
+			nobody can review them all by hand.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Match the setup to the stage. With ten beta users, tracing alone is enough, and you'll read every trace anyway. Add evaluators once traffic
+			outgrows your reading time. Add datasets and the CI gate when prompts change weekly and a silent regression would cost you a customer.
+		</p>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The setup I'd start with</h2>
+		<ol class="mt-4 list-decimal space-y-2 pl-5 leading-relaxed text-muted-foreground">
+			<li>
+				Install Python SDK 4.7.0 or JS/TS SDK 5.4.0 or newer. Trace every request, set <code>user_id</code> and <code>session_id</code> at the top with
+				<code>propagate_attributes</code>, and call <code>flush()</code> in anything short-lived.
+			</li>
+			<li>Write code evaluators for trajectory failures: step budget, required tool calls, schema-valid arguments, parseable output.</li>
+			<li>
+				Hand-label 100 observations. Then add one LLM judge for the quality question code can't answer, and check its kappa against your labels before
+				you trust it.
+			</li>
+			<li>Send every thumbs down and every low score to a dataset.</li>
+			<li>
+				Gate pull requests that touch prompts, tools, or model settings on an experiment, with a threshold set from measured noise and a separate
+				pass<sup>k</sup> gate for critical cases.
+			</li>
+			<li>Alert on steps per run and cost per run. A loop that stops terminating shows up there before it shows up on the invoice.</li>
+		</ol>
+	</section>
+
+	<section class="mt-12">
+		<h2 class="text-xl font-semibold">The takeaway</h2>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			An agent that passes the five questions you tried has a failure rate somewhere below 45%. That's the honest reading of the evidence. Langfuse
+			leaves the model exactly as smart as it was. What it gives you is evidence: traces that explain each failure, and scores with known error bars
+			that can block a regression before a customer finds it. With both in place, shipping a prompt change stops being a quiz show.
+		</p>
+	</section>
+
+	<!-- References -->
+	<section class="mt-12 border-t pt-8">
+		<h2 class="text-xl font-semibold">References</h2>
+		<ol class="mt-4 space-y-3 text-sm text-muted-foreground">
+			<li class="leading-relaxed">
+				[1] S. Yao, N. Shinn, P. Razavi, and K. Narasimhan,
+				<a href="https://arxiv.org/abs/2406.12045" {...ext}>"τ-bench: A Benchmark for Tool-Agent-User Interaction in Real-World Domains,"</a>
+				arXiv:2406.12045, 2024.
+			</li>
+			<li class="leading-relaxed">
+				[2] H. He and Thinking Machines Lab,
+				<a href="https://thinkingmachines.ai/blog/defeating-nondeterminism-in-llm-inference/" {...ext}>"Defeating Nondeterminism in LLM Inference,"</a>
+				September 10, 2025.
+			</li>
+			<li class="leading-relaxed">
+				[3] Langfuse, <a href="https://langfuse.com/blog/joining-clickhouse" {...ext}>"Langfuse joins ClickHouse,"</a> January 16, 2026.
+			</li>
+			<li class="leading-relaxed">
+				[4] Langfuse,
+				<a href="https://langfuse.com/blog/2024-12-langfuse-v3-infrastructure-evolution" {...ext}>"Langfuse v3 infrastructure evolution,"</a>
+				December 2024.
+			</li>
+			<li class="leading-relaxed">
+				[5] Langfuse,
+				<a href="https://langfuse.com/blog/2026-03-10-simplify-langfuse-for-scale" {...ext}>"Simplifying Langfuse for Scale,"</a> March 10, 2026.
+			</li>
+			<li class="leading-relaxed">
+				[6] Langfuse docs, <a href="https://langfuse.com/docs/observability/sdk/instrumentation" {...ext}>Instrumentation</a>.
+			</li>
+			<li class="leading-relaxed">
+				[7] Langfuse, <a href="https://langfuse.com/faq/all/upgrade-to-langfuse-v4" {...ext}>Upgrade to Langfuse v4</a>.
+			</li>
+			<li class="leading-relaxed">
+				[8] Langfuse docs, <a href="https://langfuse.com/docs/observability/features/observation-types" {...ext}>Observation types</a>.
+			</li>
+			<li class="leading-relaxed">
+				[9] Langfuse docs, <a href="https://langfuse.com/docs/evaluation/evaluation-methods/code-evaluators" {...ext}>Code evaluators</a>.
+			</li>
+			<li class="leading-relaxed">
+				[10] Langfuse docs, <a href="https://langfuse.com/docs/evaluation/evaluation-methods/llm-as-a-judge" {...ext}>LLM-as-a-Judge</a>.
+			</li>
+			<li class="leading-relaxed">
+				[11] L. Zheng et al.,
+				<a href="https://arxiv.org/abs/2306.05685" {...ext}>"Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena,"</a> NeurIPS Datasets and
+				Benchmarks Track, 2023.
+			</li>
+			<li class="leading-relaxed">
+				[12] Langfuse docs, <a href="https://langfuse.com/docs/evaluation/experiments/experiments-ci-cd" {...ext}>Experiments in CI/CD</a>.
+			</li>
+			<li class="leading-relaxed">
+				[13] Langfuse docs, <a href="https://langfuse.com/self-hosting" {...ext}>Self-hosting</a>.
+			</li>
+			<li class="leading-relaxed">
+				[14] Langfuse, <a href="https://langfuse.com/pricing" {...ext}>Pricing</a>, checked October 24, 2026.
+			</li>
+		</ol>
+	</section>
+
+	<!-- Related -->
+	<RelatedNotes
+		picks={['gitnexus-codebase-rag-benchmark', 'ai-security-scanner-upstash-box', 'elasticsearch-prod-is-not-a-youtube-tutorial']}
+		links={[
+			{ href: '/work/kotakpasir-agent-sandboxes/', label: 'Kotak Pasir: self-hosted sandboxes for AI agents' },
+			{ href: '/pricing/', label: 'Pricing and Rates' },
+		]}
+	/>
+
+	<!-- CTA -->
+	<section class="mt-10 rounded-lg bg-muted/50 p-6 text-center">
+		<p class="font-medium">Shipping an agent and not sure it works?</p>
+		<p class="mt-1 text-sm text-muted-foreground">
+			Book a free 30-minute intro call. Tell me what your agent does and how you test it today, and I'll tell you where I'd start measuring. If it's
+			already live and misbehaving, a {formatUsd(RESCUE_AUDIT.price)}
+			<a href="/pricing/" class={link}>Rescue Audit</a> gets you a written report and a fixed price for the fixes.
+		</p>
+		<a
+			href="https://cal.com/ilzam/intro"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="mt-4 inline-block rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-opacity hover:opacity-90"
+		>
+			Book a free intro call
+		</a>
+	</section>
+</NoteLayout>
