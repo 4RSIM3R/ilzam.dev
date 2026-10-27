@@ -13,6 +13,15 @@ const testimonials = [
       "Ilzam itu kombinasi yang langka: paham detail teknis secara mendalam, tapi tetap punya business sense yang tajam. Eksekusinya cepat, sistematis, dan selalu berfokus pada solusi yang memberikan impact nyata.",
   },
   {
+    name: "Taufan Fadhilah Iskandar",
+    role: "Senior Software Engineer, Clearview",
+    relationship: "Direct manager",
+    date: "October 2026",
+    image: "/testimonials/taufan-fadhilah-iskandar.jpg",
+    quote:
+      "I highly recommend Ilzam for his strong problem-solving skills and solid technical knowledge. He has a great ability to analyze challenges, explore different approaches, and come up with practical and effective solutions. What stands out about Ilzam is his willingness to find the best solution rather than just the quickest one. He's knowledgeable, resourceful, and always brings valuable insights to technical discussions. He's definitely someone I'd recommend working with!",
+  },
+  {
     name: "Berlian Triatma",
     role: "Business Intelligence & Human Capital Manager",
     relationship: "Direct manager",
