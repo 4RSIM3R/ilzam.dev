@@ -32,6 +32,9 @@ function useEastJavaTime() {
 
 const PORTRAIT_SRC = "/wave-full.webp";
 
+// The nav avatar (36px) plus the gap before the name.
+const SLOT_WIDTH = 46;
+
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
 /*
@@ -53,9 +56,11 @@ function usePortraitMorph(
     const fly = flyRef.current;
     const shadow = shadowRef.current;
     const target = document.getElementById("nav-avatar");
-    if (!card || !fly || !shadow || !target) return;
+    const slot = document.getElementById("nav-avatar-slot");
+    if (!card || !fly || !shadow || !target || !slot) return;
 
     if (reduce) {
+      slot.style.width = `${SLOT_WIDTH}px`;
       card.style.opacity = "";
       fly.style.visibility = "hidden";
       target.style.opacity = "1";
@@ -70,6 +75,9 @@ function usePortraitMorph(
       start.top + y + start.height / 2 - (end.top + end.height / 2),
     );
     const t = Math.min(1, Math.max(0, y / distance));
+
+    // The name gives up its spot to the portrait as it arrives, and takes it back on the way up.
+    slot.style.width = `${SLOT_WIDTH * t}px`;
 
     const flying = t > 0 && t < 1;
     card.style.opacity = t > 0 ? "0" : "";

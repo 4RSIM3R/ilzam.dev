@@ -138,21 +138,24 @@ export function LandingNav() {
         >
           <a
             href="#top"
-            className="flex items-center gap-2.5 rounded-full pr-2"
+            className="flex items-center rounded-full pr-2"
             aria-label="Ilzam, back to top"
           >
-            {/* The hero portrait flies into this spot on scroll; the hero shows it once it lands. */}
-            <span
-              id="nav-avatar"
-              className="size-9 shrink-0 overflow-hidden rounded-full bg-brand-tint opacity-0 ring-1 ring-brand/10"
-            >
-              <img
-                src="/wave-full.webp"
-                alt=""
-                width={AVATAR_SIZE}
-                height={AVATAR_SIZE}
-                className="size-full object-cover"
-              />
+            {/* The hero portrait flies into this spot on scroll. The slot starts collapsed so
+                the name sits at the left edge, and the hero widens it as the portrait arrives. */}
+            <span id="nav-avatar-slot" className="relative h-9 w-0 shrink-0">
+              <span
+                id="nav-avatar"
+                className="absolute top-0 left-0 size-9 overflow-hidden rounded-full bg-brand-tint opacity-0 ring-1 ring-brand/10"
+              >
+                <img
+                  src="/wave-full.webp"
+                  alt=""
+                  width={AVATAR_SIZE}
+                  height={AVATAR_SIZE}
+                  className="size-full object-cover"
+                />
+              </span>
             </span>
             <span className="text-sm font-semibold">Ilzam</span>
           </a>
