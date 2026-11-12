@@ -52,18 +52,23 @@ const initials = (name: string) =>
     .map((part) => part[0])
     .join("")
 
+// One span per word, so the quote can light up as the reader reaches it.
+const words = (text: string) =>
+  text.split(" ").map((word, i) => (
+    <span key={i}>
+      {word}{" "}
+    </span>
+  ))
+
 export function TestimonialsSection() {
   return (
-    <section id="proof" className="snap-start px-6 py-12 md:px-10 md:py-16">
+    <section id="proof" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-16 md:px-10 md:py-24">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <h2 className="max-w-md text-4xl font-light leading-tight tracking-tight md:text-5xl">
+        <h2 className="journey-reveal max-w-md text-4xl font-light leading-tight tracking-tight md:text-5xl">
           Don't take my
           <br />
-          <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            word
-          </span>{" "}
-          for it
+          <span className="brand-marker font-normal">word</span> for it
         </h2>
         <Badge
           variant="outline"
@@ -78,8 +83,8 @@ export function TestimonialsSection() {
         {testimonials.map((t) => (
           <figure key={t.name} className="flex flex-col justify-between">
             <div>
-              <blockquote className="text-lg font-light leading-relaxed md:text-xl">
-                &ldquo;{t.quote}&rdquo;
+              <blockquote className="journey-read text-lg font-light leading-relaxed md:text-xl">
+                {words(`\u201C${t.quote}\u201D`)}
               </blockquote>
               {t.original && (
                 <p className="mt-3 text-sm text-muted-foreground">
@@ -90,7 +95,7 @@ export function TestimonialsSection() {
                 </p>
               )}
             </div>
-            <figcaption className="mt-8 flex items-center gap-4">
+            <figcaption className="journey-reveal mt-8 flex items-center gap-4">
               {t.image ? (
                 <img
                   src={t.image}
@@ -129,7 +134,7 @@ export function TestimonialsSection() {
         rel="noopener noreferrer"
         className="mt-10 inline-flex items-center gap-1 text-sm text-muted-foreground underline underline-offset-4 transition-colors hover:text-foreground"
       >
-        Read it on LinkedIn <ArrowUpRightIcon className="size-3.5" />
+        Read them on LinkedIn <ArrowUpRightIcon className="size-3.5" />
       </a>
     </section>
   )

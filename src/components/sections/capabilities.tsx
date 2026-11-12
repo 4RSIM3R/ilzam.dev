@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { motion, AnimatePresence } from "motion/react"
+import { useEffect, useRef, useState, type CSSProperties } from "react"
+import { motion, AnimatePresence, useReducedMotion } from "motion/react"
 import { Badge } from "@/components/ui/badge"
 import {
   Card,
@@ -15,36 +15,37 @@ import {
   CheckCircleIcon,
 } from "lucide-react"
 import { RESCUE_AUDIT, RETAINER_TIERS, formatUsd } from "@/lib/pricing"
+import { EASE_OUT } from "@/lib/motion"
 
 const capabilities = [
   {
     icon: RocketIcon,
-    title: "MVP Build",
+    title: "Idea to Launch",
     description:
-      "I design, build, and ship the first version of your product. AI agents write most of the code while I make every call that matters, so a build that used to need a 3-person team for 3 months takes weeks.",
+      "You have an idea and you're ready to test it with real customers. I build the first version (your MVP) and get it live. AI agents write most of the code while I make every call that matters, so a build that used to need a 3-person team for 3 months takes weeks.",
     card: {
-      badge: "Build",
-      heading: "What You Get",
+      badge: "Launch",
+      heading: "What you get",
       message:
-        "A working product in production, on code you own from day one.",
+        "A live product real customers can use, on code you own from day one.",
       items: [
         "Scope cut down to what your first customers will pay for",
-        "Full-stack development with Go, React, TypeScript, PostgreSQL",
+        "Built on common, proven tools that any future developer can take over",
         "A working demo every week, so you always see real progress",
-        "Deployment to production infrastructure (AWS/Cloudflare)",
-        "Analytics and monitoring from launch day",
+        "Launched on reliable hosting (AWS or Cloudflare)",
+        "Usage tracking and error alerts from launch day",
       ],
-      tip: "15+ MVPs shipped. Chef booking marketplace, two-sided platform, 10 weeks, one engineer.",
+      tip: "A two-sided chef booking marketplace, built by one engineer in 10 weeks.",
     },
   },
   {
     icon: LifeBuoyIcon,
     title: "Vibe-Code Rescue",
     description:
-      "You built it fast with Lovable, Bolt, Cursor, or a cheap freelancer, and now real users are breaking it. I find what is dangerous, fix what matters first, and get it ready for growth. A rewrite only happens if the code truly needs one.",
+      "You built it fast with Lovable, Bolt, Cursor, or a cheap freelancer, and now real users are breaking it. I find what could hurt you and fix the most urgent problems first. A rewrite only happens if the code truly needs one.",
     card: {
       badge: "Rescue",
-      heading: "What You Get",
+      heading: "What you get",
       message:
         "A plain-English report on what is broken, then the fixes, most urgent first.",
       items: [
@@ -54,79 +55,107 @@ const capabilities = [
         "A straight answer on whether to fix it or rebuild it",
         `Starts with a ${formatUsd(RESCUE_AUDIT.price)} audit, taken off the fix price`,
       ],
-      tip: "Rebuilt a KOL platform from 85% to 99% uptime serving 5,000+ users.",
+      tip: "Rebuilt an influencer marketing platform with 5,000+ users, taking it from 85% to 99% uptime.",
     },
   },
   {
     icon: BrainCircuitIcon,
     title: "Engineer on Retainer",
     description:
-      `A senior engineer on your team by the month. I make the technical calls, review what your developers or agency ship, and build alongside them when you need more hands. Plans run from ${RETAINER_TIERS[0].hoursPerMonth} to ${RETAINER_TIERS[RETAINER_TIERS.length - 1].hoursPerMonth} hours a month.`,
+      `You have developers or an agency, but nobody senior checking the work. I join your team by the month to make the technical calls, and I build alongside them when you need more hands. Plans run from ${RETAINER_TIERS[0].hoursPerMonth} to ${RETAINER_TIERS[RETAINER_TIERS.length - 1].hoursPerMonth} hours a month.`,
     card: {
       badge: "Retainer",
-      heading: "What You Get",
+      heading: "What you get",
       message:
         "Senior judgment every week, on a plan you can cancel with 2 weeks' notice.",
       items: [
-        "Architecture and technology decisions",
-        "Code review for your developers or agency",
-        "Weekly check-ins, with async access in between",
+        "Decisions on how to build it and which tools to use",
+        "A senior check on your developers' or agency's work",
+        "A weekly call, plus answers to your messages between calls",
         "Help hiring developers you can trust",
         "Honest answers, even when the answer is 'don't build this yet'",
       ],
-      tip: "Reduced infrastructure costs by 80% for a healthcare network.",
+      tip: "Cut a healthcare network's hosting bill by 80%.",
     },
   },
 ]
 
+// On desktop the service crossing the middle of the screen becomes the active one,
+// so scrolling walks through all three without a click.
+function useScrollSpy(onActive: (index: number) => void) {
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([])
+
+  useEffect(() => {
+    if (!window.matchMedia("(min-width: 48rem)").matches) return
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) onActive(itemRefs.current.indexOf(entry.target as HTMLDivElement))
+        }
+      },
+      { rootMargin: "-50% 0px -50% 0px" }
+    )
+    for (const item of itemRefs.current) if (item) observer.observe(item)
+    return () => observer.disconnect()
+  }, [])
+
+  return itemRefs
+}
+
 export function CapabilitiesSection() {
   const [active, setActive] = useState(0)
   const current = capabilities[active]
+  const itemRefs = useScrollSpy(setActive)
+  const reduce = useReducedMotion()
 
   return (
     <section
       id="services"
-      className="snap-start min-h-[calc(100vh-3.5rem)] px-6 py-12 md:px-10 md:py-16"
+      className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-16 md:px-10 md:py-24"
     >
       {/* Header */}
       <div className="flex items-start justify-between">
-        <h2 className="max-w-xl text-4xl font-light leading-tight tracking-tight md:text-5xl">
-          I ship like a team of three.
-          <br />
-          You{" "}
-          <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            pay for one
-          </span>
+        <h2 className="journey-reveal max-w-xl text-4xl leading-tight font-light tracking-tight md:text-5xl">
+          Where is your product{" "}
+          <span className="brand-marker font-normal">right now</span>?
         </h2>
         <Badge
           variant="outline"
-          className="hidden shrink-0 rounded-none border-0 font-mono text-xs uppercase tracking-widest md:inline-flex"
+          className="hidden shrink-0 rounded-none border-0 font-mono text-xs tracking-widest uppercase md:inline-flex"
         >
           [ What I Do ]
         </Badge>
       </div>
 
-      <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-        I'm Ilzam, an AI-native software engineer working from East Java with
-        founders everywhere. AI agents handle the typing while I make the
-        decisions and review every change before it ships. That is how one
-        engineer moves at the pace of a small team, and the code stays yours.
-      </p>
-
       {/* Content grid */}
-      <div className="mt-12 grid gap-10 md:grid-cols-[2fr_3fr]">
+      <div className="mt-12 grid gap-10 md:grid-cols-5">
         {/* Left  - capability list */}
-        <div className="flex flex-col">
+        <div className="flex flex-col md:col-span-2">
           {capabilities.map((item, i) => {
             const isActive = i === active
             return (
-              <div key={item.title}>
+              <div
+                key={item.title}
+                ref={(node) => {
+                  itemRefs.current[i] = node
+                }}
+                className="journey-reveal"
+                style={{ "--i": i } as CSSProperties}
+              >
                 <button
                   onClick={() => setActive(i)}
-                  className={`w-full cursor-pointer py-5 text-left transition-opacity ${
+                  aria-pressed={isActive}
+                  className={`relative w-full cursor-pointer py-5 pl-5 text-left transition-opacity duration-300 ${
                     isActive ? "opacity-100" : "opacity-50 hover:opacity-75"
                   }`}
                 >
+                  {isActive && (
+                    <motion.span
+                      layoutId="service-indicator"
+                      transition={{ type: "spring", duration: 0.45, bounce: 0.15 }}
+                      className="absolute inset-y-5 left-0 w-0.5 rounded-full bg-brand"
+                    />
+                  )}
                   <div className="mb-2 flex items-center gap-2">
                     <item.icon className="size-4 text-muted-foreground" />
                     <h3 className="text-base font-semibold">{item.title}</h3>
@@ -144,21 +173,21 @@ export function CapabilitiesSection() {
         </div>
 
         {/* Right  - dynamic card */}
-        <div className="flex items-start justify-center md:sticky md:top-20">
-          <AnimatePresence mode="wait">
+        <div className="relative md:sticky md:top-24 md:col-span-3 md:self-start">
+          <AnimatePresence mode="popLayout" initial={false}>
             <motion.div
               key={active}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -16 }}
-              transition={{ duration: 0.25 }}
+              initial={{ opacity: 0, y: reduce ? 0 : 12, filter: "blur(4px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              exit={{ opacity: 0, y: reduce ? 0 : -8, filter: "blur(4px)" }}
+              transition={{ duration: 0.3, ease: EASE_OUT }}
               className="w-full"
             >
-              <Card className="shadow-lg">
+              <Card className="shadow-lg shadow-brand/5">
                 <CardHeader>
                   <Badge
                     variant="secondary"
-                    className="w-fit text-xs uppercase"
+                    className="w-fit bg-brand-tint text-xs text-brand-ink uppercase"
                   >
                     {current.card.badge}
                   </Badge>
@@ -176,7 +205,7 @@ export function CapabilitiesSection() {
                         key={item}
                         className="flex items-start gap-2 text-sm"
                       >
-                        <CheckCircleIcon className="mt-0.5 size-4 shrink-0 text-green-500" />
+                        <CheckCircleIcon className="mt-0.5 size-4 shrink-0 text-brand" />
                         {item}
                       </li>
                     ))}

@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge"
-import { RESCUE_AUDIT, formatUsd } from "@/lib/pricing"
+import { HOURLY_RATE, RESCUE_AUDIT, formatUsd } from "@/lib/pricing"
 import {
   Accordion,
   AccordionContent,
@@ -22,14 +22,24 @@ export const faqs = [
       "With an agency, a project manager, a designer, and a few developers sit between you and the code. With me, the person on the call is the person building it. I'll also ask 'should we even build this?' before writing a single line, which is the question that saves founders the most money.",
   },
   {
+    question: "Why is your rate so much lower than US or European developers?",
+    answer:
+      `Two reasons. I live in East Java, where living costs are a fraction of San Francisco's, and AI agents do the typing, so a feature takes fewer of my hours. The review standard is the one I hold myself to at a San Francisco AI company. Everything is billed at ${formatUsd(HOURLY_RATE)} an hour, and you see the work every week.`,
+  },
+  {
     question: "How long does it take to build an MVP?",
     answer:
-      "Most MVPs ship in 6-10 weeks. I use AI-assisted development to move at 2-3x traditional speed, but I don't cut corners on architecture. A chef booking marketplace took 10 weeks. A RAG pipeline took 6. The timeline depends on scope, and I'll be honest if your scope needs trimming.",
+      "Most first versions launch in 6-10 weeks. I use AI-assisted development to move at 2-3x traditional speed, but I don't cut corners on architecture. A chef booking marketplace took 10 weeks. An AI assistant that answers questions from a company's documents took 6. The timeline depends on scope, and I'll be honest if your scope needs trimming.",
   },
   {
     question: "My app was built with AI and it keeps breaking. Can you fix it?",
     answer:
       `Usually, yes. It starts with a ${formatUsd(RESCUE_AUDIT.price)} audit: I read the code and check security, your data, and the flows your users depend on. Then you get a plain-English list of what to fix first and one fixed price for the work, with the audit fee taken off. If the prototype isn't worth saving, I'll tell you why before you spend anything on fixes.`,
+  },
+  {
+    question: "What if it doesn't work out?",
+    answer:
+      "Then we stop, and you keep everything built so far, because the code is yours from day one. Retainers end with 2 weeks' notice. I also build with common tools on purpose, so any good developer can pick up where I left off.",
   },
   {
     question:
@@ -45,20 +55,18 @@ export const faqs = [
   {
     question: "You're based in Indonesia. How does the remote work?",
     answer:
-      "I've been working remotely with US, European, and Southeast Asian clients for years. I'm currently embedded in a San Francisco AI company as an AI-native software engineer, fully remote from East Java. Async by default, with live sessions when they matter. Time zone overlap has never been an issue.",
+      "I've been working remotely with US, European, and Southeast Asian clients for years. I'm currently embedded in a San Francisco AI company as an AI-native software engineer, fully remote from East Java. Most work happens in writing, with live calls when they matter. Time zone overlap has never been an issue.",
   },
 ]
 
 export function FaqSection() {
   return (
-    <section id="faq" className="snap-start px-6 py-12 md:px-10 md:py-16">
+    <section id="faq" className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-16 md:px-10 md:py-24">
       {/* Header */}
       <div className="flex items-start justify-between">
-        <h2 className="max-w-lg text-4xl font-light leading-tight tracking-tight md:text-5xl">
+        <h2 className="journey-reveal max-w-lg text-4xl font-light leading-tight tracking-tight md:text-5xl">
           Questions founders{" "}
-          <span className="rounded-sm bg-amber-100 px-1 font-normal">
-            usually ask
-          </span>
+          <span className="brand-marker font-normal">usually ask</span>
         </h2>
         <Badge
           variant="outline"
@@ -69,7 +77,7 @@ export function FaqSection() {
       </div>
 
       {/* Accordion */}
-      <Accordion type="single" collapsible className="mt-12">
+      <Accordion type="single" collapsible className="journey-reveal mt-12">
         {faqs.map((faq, i) => (
           <AccordionItem key={i} value={`item-${i}`}>
             <AccordionTrigger className="text-left text-base">

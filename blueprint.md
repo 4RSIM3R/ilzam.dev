@@ -22,7 +22,7 @@
 ## Tagline
 
 Primary (homepage hero):
-> "I ship like a team of three. You pay for one."
+> "Two AI agents and me. You only pay for me."
 
 Support lines:
 > "AI agents handle the typing. I make the calls and review every change."
@@ -33,10 +33,10 @@ Support lines:
 ## Hero Section (above the fold)
 
 **Headline:**
-> I ship like a team of three. You pay for one.
+> Two AI agents and me. You only pay for me.
 
 **Subheadline:**
-> I'm Ilzam, an AI-native software engineer working from East Java with founders everywhere. AI agents handle the typing while I make the decisions and review every change before it ships. That is how one engineer moves at the pace of a small team, and the code stays yours.
+> I build new products for founders and fix apps that were rushed out with AI tools. The agents handle the typing, which keeps your bill low. Nothing ships until I have reviewed it, so your product holds up when real customers arrive.
 
 **Social proof line (under CTA):**
 > 15+ MVPs shipped. Clients in the US, Europe, and Southeast Asia.
@@ -208,9 +208,10 @@ Region: Indonesia — Remote
 
 **Primary — hero and end of service pages:**
 ```
-Ready to build something?
-Book a free 30-minute intro call. No pitch, no pressure —
-just a real conversation about what you're building.
+Tell me what you're building
+Book a free 30-minute call and leave with a rough idea of the
+timeline and cost. If I'm the wrong person for the job, I'll tell
+you, and all it cost you was half an hour.
 
 → cal.com/ilzam/intro
 ```
@@ -247,9 +248,9 @@ That's exactly what the advisory session is for.
 Site title: `Muhammad Ilzam Mulkhaq | AI-Native Software Engineer for Founders`
 
 Meta description:
-`I ship like a team of three, and you pay for one. AI-native software engineer for early-stage founders: MVP builds, vibe-code rescue, and a senior engineer on retainer. Based in Indonesia, working globally.`
+`Two AI agents and one senior engineer, and you only pay for the engineer. AI-native software engineer for early-stage founders: MVP builds, vibe-code rescue, and a senior engineer on retainer. Based in Indonesia, working globally.`
 
-OG image text: `Ilzam.dev | I ship like a team of three. You pay for one.`
+OG image text: `Ilzam.dev | Two AI agents and me. You only pay for me.`
 
 ---
 

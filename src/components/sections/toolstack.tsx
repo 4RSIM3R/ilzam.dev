@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react"
 import { Badge } from "@/components/ui/badge"
 
 const cells: [number, number, string, string][] = [
@@ -8,16 +9,26 @@ const cells: [number, number, string, string][] = [
   // Row 3
   [1, 3, "Redis", "https://cdn.simpleicons.org/redis"], [2, 3, "Kafka", "https://cdn.simpleicons.org/apachekafka"], [3, 3, "Google Cloud", "https://cdn.simpleicons.org/googlecloud"], [4, 3, "Kubernetes", "https://cdn.simpleicons.org/kubernetes"], [5, 3, "GitHub", "https://cdn.simpleicons.org/github"],
   // Row 4
-  [1, 4, "Tailwind", "https://cdn.simpleicons.org/tailwindcss"], [2, 4, "Github", "https://cdn.simpleicons.org/github"], [3, 4, "Node.js", "https://cdn.simpleicons.org/nodedotjs"], [4, 4, "Python", "https://cdn.simpleicons.org/python"], [5, 4, "Flutter", "https://cdn.simpleicons.org/flutter"],
+  [1, 4, "Tailwind", "https://cdn.simpleicons.org/tailwindcss"], [2, 4, "Cloudflare", "https://cdn.simpleicons.org/cloudflare"], [3, 4, "Node.js", "https://cdn.simpleicons.org/nodedotjs"], [4, 4, "Python", "https://cdn.simpleicons.org/python"], [5, 4, "Flutter", "https://cdn.simpleicons.org/flutter"],
   // Row 5
-  [1, 5, "Py Torch", "https://cdn.simpleicons.org/pytorch"], [2, 5, "Claude", "https://cdn.simpleicons.org/claude"], [3, 5, "Datadog", "https://cdn.simpleicons.org/datadog"], [4, 5, "Astro", "https://cdn.simpleicons.org/astro"], [5, 5, "Dart", "https://cdn.simpleicons.org/dart"],
+  [1, 5, "PyTorch", "https://cdn.simpleicons.org/pytorch"], [2, 5, "Claude", "https://cdn.simpleicons.org/claude"], [3, 5, "Datadog", "https://cdn.simpleicons.org/datadog"], [4, 5, "Astro", "https://cdn.simpleicons.org/astro"], [5, 5, "Dart", "https://cdn.simpleicons.org/dart"],
 ]
+
+// Each tile starts thrown out from the center of the grid and settles into place as the grid scrolls in.
+const scatter = (col: number, row: number) =>
+  ({
+    gridColumn: col,
+    gridRow: row,
+    "--dx": `${(col - 3) * 2.5}rem`,
+    "--dy": `${(row - 3) * 2.5 + 2}rem`,
+    "--r": `${(((col * 7 + row * 3) % 5) - 2) * 9}deg`,
+  }) as CSSProperties
 
 export function ToolstackSection() {
   return (
     <section
       id="stack"
-      className="snap-start min-h-[calc(100vh-3.5rem)] px-6 py-12 md:px-10 md:py-16"
+      className="mx-auto w-full max-w-6xl scroll-mt-20 px-6 py-16 md:px-10 md:py-24"
     >
       <div className="grid items-start gap-8 md:grid-cols-[1fr_1.5fr]">
         {/* Left  - heading + description */}
@@ -29,32 +40,28 @@ export function ToolstackSection() {
             >
               [ Stack ]
             </Badge>
-            <h2 className="text-4xl font-light leading-tight tracking-tight md:text-5xl">
-              What I{" "}
-              <span className="rounded-sm bg-amber-100 px-1 font-normal">
-                Build
-              </span>{" "}
-              With
+            <h2 className="journey-reveal text-4xl font-light leading-tight tracking-tight md:text-5xl">
+              What I <span className="brand-marker font-normal">Build</span> With
             </h2>
           </div>
 
-          <div className="mt-12 max-w-sm">
-            <p className="text-lg">*</p>
+          <div className="journey-reveal mt-12 max-w-sm">
+            <p className="text-lg text-brand">*</p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              I pick the right tool for the job, not the trendiest one. Go for
-              performance-critical backends. React for interactive frontends.
-              PostgreSQL for data that matters.
+              I start with the simplest set of tools that does the job, and I
+              stick to well-known ones, so any developer you hire later can pick
+              up the code.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-              Event-driven architectures, microservices, REST APIs, RAG
-              pipelines  - the infrastructure that makes products work at scale.
+              When a product needs more, like AI features or millions of rows of
+              data, I have built that too.
             </p>
           </div>
         </div>
 
         {/* Right  - tool grid */}
         <div
-          className="grid gap-2 md:gap-3"
+          className="journey-assemble grid gap-2 md:gap-3"
           style={{
             gridTemplateColumns: "repeat(5, minmax(0, 80px))",
             gridTemplateRows: "repeat(5, minmax(0, 80px))",
@@ -65,7 +72,7 @@ export function ToolstackSection() {
             <div
               key={`${col}-${row}`}
               className="flex items-center justify-center rounded-2xl bg-muted/50 shadow-sm transition-shadow hover:shadow-md"
-              style={{ gridColumn: col, gridRow: row }}
+              style={scatter(col, row)}
               title={name || undefined}
             >
               {icon && (
