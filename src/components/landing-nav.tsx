@@ -141,7 +141,11 @@ export function LandingNav() {
             className="flex items-center gap-2.5 rounded-full pr-2"
             aria-label="Ilzam, back to top"
           >
-            <span className="size-9 shrink-0 overflow-hidden rounded-full bg-brand-tint ring-1 ring-brand/10">
+            {/* The hero portrait flies into this spot on scroll; the hero shows it once it lands. */}
+            <span
+              id="nav-avatar"
+              className="size-9 shrink-0 overflow-hidden rounded-full bg-brand-tint opacity-0 ring-1 ring-brand/10"
+            >
               <img
                 src="/wave-full.webp"
                 alt=""

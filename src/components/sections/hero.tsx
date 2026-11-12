@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { useReducedMotion } from "motion/react";
+import { createPortal } from "react-dom";
+import { useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import { ArrowDownIcon, PhoneCallIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -29,9 +30,87 @@ function useEastJavaTime() {
   return time;
 }
 
+const PORTRAIT_SRC = "/wave-full.webp";
+
+const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+/*
+ * As the page scrolls, the hero portrait shrinks and flies into the nav avatar.
+ * A fixed clone does the flying (portalled to <body>, since the hero's entrance
+ * transform would trap a fixed child), while the real card and the nav avatar
+ * hide. Styles are written straight to the DOM, so scrolling never re-renders.
+ */
+function usePortraitMorph(
+  cardRef: React.RefObject<HTMLDivElement | null>,
+  flyRef: React.RefObject<HTMLDivElement | null>,
+  shadowRef: React.RefObject<HTMLDivElement | null>,
+  reduce: boolean | null,
+) {
+  const { scrollY } = useScroll();
+
+  function update(y: number) {
+    const card = cardRef.current;
+    const fly = flyRef.current;
+    const shadow = shadowRef.current;
+    const target = document.getElementById("nav-avatar");
+    if (!card || !fly || !shadow || !target) return;
+
+    if (reduce) {
+      card.style.opacity = "";
+      fly.style.visibility = "hidden";
+      target.style.opacity = "1";
+      return;
+    }
+
+    const start = card.getBoundingClientRect();
+    const end = target.getBoundingClientRect();
+    // Lands when the card's centre would have scrolled up to the avatar's centre.
+    const distance = Math.max(
+      240,
+      start.top + y + start.height / 2 - (end.top + end.height / 2),
+    );
+    const t = Math.min(1, Math.max(0, y / distance));
+
+    const flying = t > 0 && t < 1;
+    card.style.opacity = t > 0 ? "0" : "";
+    target.style.opacity = t >= 1 ? "1" : "0";
+    fly.style.visibility = flying ? "visible" : "hidden";
+    if (!flying) return;
+
+    const size = lerp(start.width, end.width, t);
+    const scale = size / start.width;
+    const startRadius = parseFloat(getComputedStyle(card).borderTopLeftRadius);
+    const radius = lerp(startRadius, end.width / 2, t);
+
+    fly.style.width = `${start.width}px`;
+    fly.style.height = `${start.height}px`;
+    fly.style.transform = `translate3d(${lerp(start.left, end.left, t)}px, ${lerp(start.top, end.top, t)}px, 0) scale(${scale})`;
+    fly.style.borderRadius = `${radius / scale}px`;
+    shadow.style.borderRadius = fly.style.borderRadius;
+    shadow.style.opacity = `${1 - t}`;
+  }
+
+  useMotionValueEvent(scrollY, "change", update);
+
+  useEffect(() => {
+    const sync = () => update(window.scrollY);
+    sync();
+    window.addEventListener("resize", sync);
+    return () => window.removeEventListener("resize", sync);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reduce]);
+}
+
 export function HeroSection() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const flyRef = useRef<HTMLDivElement>(null);
+  const shadowRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => setMounted(true), []);
+  usePortraitMorph(cardRef, flyRef, shadowRef, reduce);
   const time = useEastJavaTime();
 
   function wave() {
@@ -139,11 +218,12 @@ export function HeroSection() {
           {/* The portrait is cut out of its background, so the card's blue shows around it and
               the card's own bottom and right edges crop the jacket. */}
           <div
+            ref={cardRef}
             onClick={wave}
             className="relative size-full overflow-hidden rounded-3xl bg-brand-tint shadow-2xl ring-1 shadow-brand/15 ring-brand/10 md:rounded-4xl"
           >
             <img
-              src="/wave-full.webp"
+              src={PORTRAIT_SRC}
               alt="Illustrated portrait of Ilzam waving hello"
               width={1024}
               height={1024}
@@ -168,6 +248,27 @@ export function HeroSection() {
           </div>
         </div>
       </div>
+
+      {mounted &&
+        createPortal(
+          <div
+            ref={flyRef}
+            aria-hidden="true"
+            style={{ visibility: "hidden" }}
+            className="pointer-events-none fixed top-0 left-0 z-50 origin-top-left bg-brand-tint ring-1 ring-brand/10 will-change-transform"
+          >
+            <div
+              ref={shadowRef}
+              className="absolute inset-0 -z-10 shadow-2xl shadow-brand/15"
+            />
+            <img
+              src={PORTRAIT_SRC}
+              alt=""
+              className="relative size-full rounded-[inherit] object-cover"
+            />
+          </div>,
+          document.body,
+        )}
 
       <a
         href="#team"
