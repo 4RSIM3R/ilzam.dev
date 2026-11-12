@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { motion, useReducedMotion, useSpring } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import { ArrowDownIcon, PhoneCallIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -30,23 +30,9 @@ function useEastJavaTime() {
 }
 
 export function HeroSection() {
-  const frameRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const reduce = useReducedMotion();
   const time = useEastJavaTime();
-
-  const rotateX = useSpring(0, { stiffness: 150, damping: 20 });
-  const rotateY = useSpring(0, { stiffness: 150, damping: 20 });
-
-  function tilt(event: React.PointerEvent) {
-    const frame = frameRef.current;
-    if (!frame || reduce || event.pointerType !== "mouse") return;
-    const box = frame.getBoundingClientRect();
-    const dx = (event.clientX - (box.left + box.width / 2)) / box.width;
-    const dy = (event.clientY - (box.top + box.height / 2)) / box.height;
-    rotateY.set(Math.max(-1, Math.min(1, dx)) * 6);
-    rotateX.set(Math.max(-1, Math.min(1, dy)) * -6);
-  }
 
   function wave() {
     const video = videoRef.current;
@@ -58,11 +44,6 @@ export function HeroSection() {
   return (
     <section
       id="top"
-      onPointerMove={tilt}
-      onPointerLeave={() => {
-        rotateX.set(0);
-        rotateY.set(0);
-      }}
       className="relative mx-auto flex min-h-svh w-full max-w-6xl items-center px-6 pt-28 pb-20 md:px-10"
     >
       <div className="grid w-full items-center gap-10 md:grid-cols-5 md:gap-12">
@@ -103,8 +84,8 @@ export function HeroSection() {
           >
             I build new products for founders and fix apps that were rushed out
             with AI tools. The agents handle the typing, which keeps your bill
-            low. Nothing ships until I have reviewed it, so your product holds up
-            when real customers arrive.
+            low. Nothing ships until I have reviewed it, so your product holds
+            up when real customers arrive.
           </p>
 
           <div
@@ -152,15 +133,12 @@ export function HeroSection() {
         </div>
 
         <div
-          ref={frameRef}
           className="journey-enter order-first mx-auto aspect-square w-56 md:order-none md:col-span-2 md:w-full md:max-w-md"
           style={step(1)}
         >
           {/* The portrait is cut out of its background, so the card's blue shows around it and
               the card's own bottom and right edges crop the jacket. */}
-          <motion.div
-            style={{ rotateX, rotateY, transformPerspective: 900 }}
-            onPointerEnter={wave}
+          <div
             onClick={wave}
             className="relative size-full overflow-hidden rounded-3xl bg-brand-tint shadow-2xl ring-1 shadow-brand/15 ring-brand/10 md:rounded-4xl"
           >
@@ -187,7 +165,7 @@ export function HeroSection() {
                 <source src={WAVE_VIDEO.mp4} type="video/mp4" />
               </video>
             )}
-          </motion.div>
+          </div>
         </div>
       </div>
 

@@ -129,75 +129,78 @@ export function LandingNav() {
   useMotionValueEvent(scrollY, "change", (y) => setScrolled(y > 16));
 
   return (
-    <header className="journey-enter fixed inset-x-0 top-3 z-40 px-3 md:top-4">
-      <div
-        data-scrolled={scrolled || undefined}
-        className="mx-auto flex h-14 max-w-3xl items-center justify-between gap-2 rounded-full border border-transparent px-2.5 transition duration-300 ease-out-strong data-scrolled:border-border data-scrolled:bg-background/80 data-scrolled:shadow-lg data-scrolled:shadow-black/5 data-scrolled:backdrop-blur-md"
-      >
-        <a
-          href="#top"
-          className="flex items-center gap-2.5 rounded-full pr-2"
-          aria-label="Ilzam, back to top"
+    <header className="journey-enter fixed inset-x-0 top-3 z-40 md:top-4">
+      {/* Same width and gutters as the hero, so the pill lines up with the banner. */}
+      <div className="mx-auto w-full max-w-6xl px-6 md:px-10">
+        <div
+          data-scrolled={scrolled || undefined}
+          className="flex h-14 items-center justify-between gap-2 rounded-full border border-transparent px-2.5 transition duration-300 ease-out-strong data-scrolled:border-border data-scrolled:bg-background/80 data-scrolled:shadow-lg data-scrolled:shadow-black/5 data-scrolled:backdrop-blur-md"
         >
-          <span className="size-9 shrink-0 overflow-hidden rounded-full bg-brand-tint ring-1 ring-brand/10">
-            <img
-              src="/wave-full.webp"
-              alt=""
-              width={AVATAR_SIZE}
-              height={AVATAR_SIZE}
-              className="size-full object-cover"
-            />
-          </span>
-          <span className="text-sm font-semibold">Ilzam</span>
-        </a>
-
-        <nav aria-label="Site navigation" className="hidden md:block">
-          <ul className="flex items-center">
-            {links.map((link) => {
-              const isActive = active === link.href.slice(1);
-              return (
-                <li key={link.href}>
-                  <a
-                    href={link.href}
-                    data-active={isActive || undefined}
-                    aria-current={isActive ? "location" : undefined}
-                    className="relative isolate block rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground data-active:text-foreground"
-                  >
-                    {isActive && (
-                      <motion.span
-                        layoutId="nav-active"
-                        transition={{
-                          type: "spring",
-                          duration: 0.4,
-                          bounce: 0.15,
-                        }}
-                        className="absolute inset-0 -z-10 rounded-full bg-muted"
-                      />
-                    )}
-                    {link.label}
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-
-        <div className="flex items-center gap-1">
-          <Button
-            variant="brand"
-            className="h-9 rounded-full px-4"
-            render={
-              <a
-                href="https://cal.com/ilzam/intro"
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
+          <a
+            href="#top"
+            className="flex items-center gap-2.5 rounded-full pr-2"
+            aria-label="Ilzam, back to top"
           >
-            <PhoneCallIcon data-icon="inline-start" />
-            Book a call
-          </Button>
-          <MobileMenu />
+            <span className="size-9 shrink-0 overflow-hidden rounded-full bg-brand-tint ring-1 ring-brand/10">
+              <img
+                src="/wave-full.webp"
+                alt=""
+                width={AVATAR_SIZE}
+                height={AVATAR_SIZE}
+                className="size-full object-cover"
+              />
+            </span>
+            <span className="text-sm font-semibold">Ilzam</span>
+          </a>
+
+          <nav aria-label="Site navigation" className="hidden md:block">
+            <ul className="flex items-center">
+              {links.map((link) => {
+                const isActive = active === link.href.slice(1);
+                return (
+                  <li key={link.href}>
+                    <a
+                      href={link.href}
+                      data-active={isActive || undefined}
+                      aria-current={isActive ? "location" : undefined}
+                      className="relative isolate block rounded-full px-3 py-1.5 text-sm text-muted-foreground transition-colors duration-200 hover:text-foreground data-active:text-foreground"
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="nav-active"
+                          transition={{
+                            type: "spring",
+                            duration: 0.4,
+                            bounce: 0.15,
+                          }}
+                          className="absolute inset-0 -z-10 rounded-full bg-muted"
+                        />
+                      )}
+                      {link.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          <div className="flex items-center gap-1">
+            <Button
+              variant="brand"
+              className="h-9 rounded-full px-4"
+              render={
+                <a
+                  href="https://cal.com/ilzam/intro"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+            >
+              <PhoneCallIcon data-icon="inline-start" />
+              Book a call
+            </Button>
+            <MobileMenu />
+          </div>
         </div>
       </div>
     </header>
