@@ -4,9 +4,9 @@ import { useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
 import { ArrowDownIcon, PhoneCallIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-// The waving clip of the portrait. Put the files in public/hero/ and fill this in;
-// until then the still portrait shows on its own.
-const WAVE_VIDEO: { mp4: string; webm: string } | null = null;
+// The waving clip of the portrait. It plays once on load and again on click; the still
+// underneath covers loading and reduced motion.
+const WAVE_VIDEO = { mp4: "/hero/wave.mp4", webm: "/hero/wave.webm" };
 
 const STATUS = "Available for new projects";
 
@@ -47,6 +47,8 @@ function usePortraitMorph(
   cardRef: React.RefObject<HTMLDivElement | null>,
   flyRef: React.RefObject<HTMLDivElement | null>,
   shadowRef: React.RefObject<HTMLDivElement | null>,
+  videoRef: React.RefObject<HTMLVideoElement | null>,
+  frameRef: React.RefObject<HTMLCanvasElement | null>,
   reduce: boolean | null,
 ) {
   const { scrollY } = useScroll();
@@ -96,6 +98,22 @@ function usePortraitMorph(
     fly.style.borderRadius = `${radius / scale}px`;
     shadow.style.borderRadius = fly.style.borderRadius;
     shadow.style.opacity = `${1 - t}`;
+
+    // The clip ends on a different pose than the still, so the clone carries the frame on screen.
+    const video = videoRef.current;
+    const frame = frameRef.current;
+    if (
+      video &&
+      frame &&
+      video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA
+    ) {
+      if (frame.width !== video.videoWidth) {
+        frame.width = video.videoWidth;
+        frame.height = video.videoHeight;
+      }
+      frame.getContext("2d")?.drawImage(video, 0, 0);
+      frame.style.visibility = "visible";
+    }
   }
 
   useMotionValueEvent(scrollY, "change", update);
@@ -114,11 +132,12 @@ export function HeroSection() {
   const cardRef = useRef<HTMLDivElement>(null);
   const flyRef = useRef<HTMLDivElement>(null);
   const shadowRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLCanvasElement>(null);
   const reduce = useReducedMotion();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);
-  usePortraitMorph(cardRef, flyRef, shadowRef, reduce);
+  usePortraitMorph(cardRef, flyRef, shadowRef, videoRef, frameRef, reduce);
   const time = useEastJavaTime();
 
   function wave() {
@@ -238,7 +257,7 @@ export function HeroSection() {
               fetchPriority="high"
               className="size-full object-cover"
             />
-            {WAVE_VIDEO && !reduce && (
+            {!reduce && (
               <video
                 ref={videoRef}
                 autoPlay
@@ -273,6 +292,11 @@ export function HeroSection() {
               src={PORTRAIT_SRC}
               alt=""
               className="relative size-full rounded-[inherit] object-cover"
+            />
+            <canvas
+              ref={frameRef}
+              style={{ visibility: "hidden" }}
+              className="absolute inset-0 size-full rounded-[inherit]"
             />
           </div>,
           document.body,
