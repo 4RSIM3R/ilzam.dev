@@ -1,0 +1,103 @@
+---
+import NoteLayout from '@/layouts/note-layout.astro'
+import RelatedNotes from '@/components/related-notes.astro'
+
+const link = 'underline underline-offset-4 hover:text-foreground'
+
+const specBefore = `## Who can be offered the request
+
+The filters are built by \`FamilyRequestMatchFilters\` in \`internal/repository/family_request_matching.go\`, and they run through the same \`SearchHelpers\` query the rest of the platform uses, so there is no separate matcher. A helper must be approved, and their service area (\`helper_service_coverages\`) must cover the family's country, region and city. From wave 2 onward only the country and region are checked. The helper's recurring availability must be free on the weekdays and times the family asked for, across the whole period from the start date to the end date, or for 26 weeks when there is no end date.
+
+Families can describe their days in two ways. If they gave a time window, such as "any time between 15 and 19", the helper only needs a free stretch inside that window long enough for the visit; \`FilterCandidatesByWindowFeasibility\` does this check. If the family offered more days than they want visits (candidate mode, \`visits_per_cycle > 0\`, for example four possible days for two visits), the helper only needs enough of those days to cover the visits.
+
+The helper's hourly rate must fall inside one of the price bands the family picked; older requests use the \`hourly_rate_min\`/\`hourly_rate_max\` pair instead. If the family chose languages, the helper must speak one of them. The helper's cooking education (\`helpers.cook_education\`) must meet the family's experience level, and the family's lowest pick counts as a minimum, so more experienced helpers also pass; "no preference" removes this filter. Finally, a helper who was already offered this request is never offered it again. Dietary preference, ingredient shopping and menu delegation play no part in matching; they are only shown to the helper in the offer.`
+
+const specAfter = `## Who can receive an offer
+
+\`FamilyRequestMatchFilters\` in \`internal/repository/family_request_matching.go\` builds the filters. The filters run through \`SearchHelpers\`, the same query that the rest of the platform uses. There is no separate matcher.
+
+A helper must pass all of these filters:
+
+- **Approval.** The helper is approved.
+- **Service area.** The helper's service area (\`helper_service_coverages\`) covers the family's country, region, and city. From wave 2 onward, the backend checks only the country and region.
+- **Availability.** The helper's recurring availability is free on the weekdays and at the times that the family asked for. This must hold for the whole period from the start date to the end date. If the request has no end date, the period is 26 weeks.
+- **Price.** The helper's hourly rate falls inside one of the price bands that the family picked. Older requests use the \`hourly_rate_min\`/\`hourly_rate_max\` pair instead.
+- **Language.** If the family chose languages, the helper speaks at least one of them.
+- **Experience.** The helper's cooking education (\`helpers.cook_education\`) meets the family's experience level. The family's lowest pick is a minimum, so helpers with more experience also pass. If the family picked "no preference", the backend does not apply this filter.
+- **No repeat offers.** The backend never sends a second offer for the same request to the same helper.
+
+Families can describe their days in two ways. Each way relaxes the availability filter:`
+
+const agentRule = 'Use ASD-STE100 Simplified Technical English when narrating explanations.'
+
+// Spec prose is long lines, so wrap it instead of scrolling sideways.
+const proseBlock = 'mt-4 whitespace-pre-wrap wrap-break-word rounded-lg bg-muted p-4 text-sm leading-relaxed'
+---
+
+<NoteLayout
+	title="I Can't Read What My AI Agent Writes | Ilzam"
+	description="AI agents ship faster than I can read their specs, and most of the slop I ship starts there. A before and after of the same spec section rewritten in ASD-STE100 Simplified Technical English, and the one line to add to your CLAUDE.md."
+>
+	<h1 class="mt-4 text-3xl font-light leading-tight tracking-tight md:text-4xl">
+		I Can't Read What My AI Agent Writes
+	</h1>
+
+	<section class="mt-10">
+		<p class="text-lg leading-relaxed">
+			We are in an age where agents can ship more, and faster, than humans.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			But in my experience, at least three things become the bottleneck:
+		</p>
+		<ul class="mt-4 list-disc space-y-2 pl-6 leading-relaxed text-muted-foreground">
+			<li>Asking for the right thing → this is where all your brainstorming skill goes.</li>
+			<li>Verifying the output → you don't want to ship something broken.</li>
+			<li>Taste → it matters if you build a platform for humans.</li>
+		</ul>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			But lately I realized that most of the slop I ship comes from the first one, asking for the right thing.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			We often just get "fatigued" and "overwhelmed" reading what Opus 5.5 xhigh writes in <code>SPEC.md</code>.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			The thing that annoys me most is that I cannot read it "plainly" and understand it "easily".
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			I keep going back and forth, asking: "So the tl;dr of {'{topic the agent wrote}'} is {'{my dumber version}'}, right?"
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			What if we could make it "easier" to read, so I stop burning tokens just to verify what my AI agent wrote?
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Introducing
+			<a href="https://www.asd-ste100.org/" target="_blank" rel="noopener noreferrer" class={link}>ASD-STE100</a>,
+			Simplified Technical English. If you're curious, please read about it yourself. I don't want AI to write an explanation of it when my first point
+			is a complaint about how AI writes explanations.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Here is an example. Before:
+		</p>
+		<pre class={proseBlock}><code set:text={specBefore} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			After:
+		</p>
+		<pre class={proseBlock}><code set:text={specAfter} /></pre>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Just read the first paragraph and you can see it: the same thing, the exact same content, narrated differently. Which one is easier to
+			understand? From my perspective, the second one.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Why is this concerning? We rely on AI so much that we have already lost sight of what it is doing.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			Yes, some people ship 3k+ PRs per month, but they are cracked engineers, and I am not. I don't know about you.
+		</p>
+		<p class="mt-4 leading-relaxed text-muted-foreground">
+			My take: add this to your <code>AGENTS.md</code> / <code>CLAUDE.md</code>:
+		</p>
+		<pre class={proseBlock}><code set:text={agentRule} /></pre>
+	</section>
+
+	<RelatedNotes />
+</NoteLayout>

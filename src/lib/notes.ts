@@ -95,6 +95,13 @@ export const HUBS: Hub[] = [
 
 export const NOTES: Note[] = [
   {
+    slug: 'i-cant-read-what-my-ai-agent-writes',
+    title: "I Can't Read What My AI Agent Writes",
+    description: 'AI agents ship faster than I can read their specs, and most of the slop I ship starts there. A before and after of the same spec section rewritten in ASD-STE100 Simplified Technical English, and the one line to add to your CLAUDE.md.',
+    hub: 'ai-native-development',
+    published: '2026-11-21',
+  },
+  {
     slug: 'langfuse-ai-agent-observability',
     title: 'Langfuse: Stop Guessing Whether Your AI Agent Works',
     description: 'Five clean test runs only rule out a failure rate above 45%. The reliability math behind agents, how Langfuse ingests and stores traces (and why v4 went observation-first), LLM judges you can calibrate, and a CI gate that fails on regressions instead of noise.',
